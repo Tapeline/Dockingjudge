@@ -11,16 +11,23 @@ class BadBalancingStrategy(ImproperlyConfiguredException):
 
 
 class RequestProcessingException(Exception):
-    pass
+    CODE = "RPE"
+    MESSAGE = "Request processing exception"
+
+    def __init__(self, *args):
+        super().__init__(self.MESSAGE % args)
 
 
 class JudgeletNotFoundException(RequestProcessingException):
-    pass
+    CODE = "JUDGELET_NOT_FOUND"
+    MESSAGE = "No available judgelet for compiler label %s"
 
 
 class JudgeletAnswerException(RequestProcessingException):
-    pass
+    CODE = "JUDGELET_ANSWER_ERROR"
+    MESSAGE = "Judgelet returned error %s"
 
 
 class BadRequestFormatException(RequestProcessingException):
-    pass
+    CODE = "BAD_REQUEST"
+    MESSAGE = "Request does not conform to valid format"

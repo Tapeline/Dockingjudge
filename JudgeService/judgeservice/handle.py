@@ -19,6 +19,6 @@ async def handle_request(request_data: dict, target_addr: str) -> dict:
         ) as response:
             logging.info(f"Got response {response.status}")
             if response.status != 200:
-                raise JudgeletAnswerException
+                raise JudgeletAnswerException(await response.json())
             json_response = await response.json()
             return json_response

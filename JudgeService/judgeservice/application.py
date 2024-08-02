@@ -74,12 +74,13 @@ class ServerApplication:
                 return group
         return None
 
-    async def answer_error(self, request_data: dict, error: str):
+    async def answer_error(self, request_data: dict, error_code: str, error: str):
         await self._out_exchange.publish(
             Message(_encode_message({
                 "answer_to": request_data.get("id"),
                 "is_successful": False,
-                "details": error
+                "details": error,
+                "code": error_code
             }), delivery_mode=DeliveryMode.PERSISTENT),
             routing_key="solution_answer"
         )
@@ -100,12 +101,12 @@ class ServerApplication:
         if group is None:
             logging.warning("Unknown compiler label %s. Aborting",
                             request_data["compiler"])
-            raise JudgeletNotFoundException
+            raise JudgeletNotFoundException(request_data["compiler"])
         judgelet = group.get_judgelet()
         if judgelet is None:
             logging.warning("No active judgelet for label %s. Aborting",
                             request_data["compiler"])
-            raise JudgeletNotFoundException
+            raise JudgeletNotFoundException(request_data["compiler"])
         judgelet.notify_opened_connection()
         try:
             logging.info(f"Directing request {request_data['id']} to {judgelet.address}")
@@ -121,7 +122,7 @@ class ServerApplication:
         try:
             await self.handle_request(request_data)
         except RequestProcessingException as e:
-            await self.answer_error(request_data, str(e))
+            await self.answer_error(request_data, e.CODE, str(e))
 
     async def on_message(self, message: AbstractIncomingMessage) -> None:
         contents = _decode_message(message.body)
