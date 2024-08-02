@@ -1,0 +1,93 @@
+version: "3.7"
+services:
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: ${RMQ_DEPLOY_ADDRESS}
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648"
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 1s
+      timeout: 3s
+      retries: 30
+
+  db_service:
+    image: postgres:13.3
+    hostname: ${DB_HOST}
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "${DB_PORT}:5432"
+    expose:
+      - ${DB_PORT}
+    networks:
+      - main_network
+    volumes:
+      - pgdata:/var/lib/postgresql/
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+  judgelet_py_0:
+    build: JudgeUnit
+    ports:
+      - "9000:8000"
+    environment:
+      IO_ENCODING: ${GLOBAL_ENCODING}
+    healthcheck:
+      test: curl --fail http://localhost:8000/ping || exit 1
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+  judgelet_py_1:
+    build: JudgeUnit
+    ports:
+      - "9001:8000"
+    environment:
+      IO_ENCODING: ${GLOBAL_ENCODING}
+    healthcheck:
+      test: curl --fail http://localhost:8000/ping || exit 1
+      interval: 10s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+
+
+  judge_server:
+    build: JudgeService
+    environment:
+      RMQ_ADDRESS: ${RMQ_ADDRESS}
+      RMQ_USER: ${RMQ_USER}
+      RMQ_PASSWORD: ${RMQ_PASSWORD}
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      judgelet_py_0:
+        condition: service_healthy
+      judgelet_py_1:
+        condition: service_healthy
+
+
+networks:
+  main_network:
+    driver: bridge
+
+
+volumes:
+  pgdata:

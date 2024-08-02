@@ -1,0 +1,7 @@
+judgelet_groups:
+  - name: python
+    selector: python|py
+    nodes:
+      - http://localhost:9000
+      - http://localhost:9001
+    load_balancing: round-robin
