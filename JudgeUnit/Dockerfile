@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY . .
 
+RUN apk --no-cache add curl
+
 RUN pip install -r requirements.txt
 ENV PYTHONPATH /app
 
