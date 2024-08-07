@@ -1,5 +1,6 @@
 from enum import Enum
 
+from django.db.models import Model
 from pydantic import BaseModel
 from pydantic import ValidationError as PydanticValidationError
 from rest_framework.exceptions import ValidationError
@@ -24,6 +25,7 @@ class TestCase(BaseModel):
     files_out: list = []
     time_limit: int
     mem_limit_mb: int
+    public: bool = False
 
 
 class TestGroup(BaseModel):
@@ -88,3 +90,15 @@ def validate_quiz_validator(validator: dict):
         QuizValidator(**validator)
     except PydanticValidationError as e:
         raise ValidationError from e
+
+
+def validate_task_id_and_get(task_type: str, task_id: int) -> Model:
+    if task_type not in ("quiz", "code"):
+        raise ValidationError(f"Bad task type {task_type}", "BAD_TASK_TYPE")
+    model = {
+        "quiz": models.QuizTask,
+        "code": models.CodeTask
+    }[task_type]
+    if not model.objects.filter(id=task_id).exists():
+        raise ValidationError(f"No task of type {task_type} with id {task_id}", "NOT_FOUND")
+    return model.objects.get(id=task_id)
