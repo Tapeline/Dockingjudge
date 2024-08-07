@@ -4,7 +4,7 @@ from typing import Optional
 from rest_framework_simplejwt.exceptions import InvalidToken
 from rest_framework_simplejwt.tokens import AccessToken
 
-from api.models import IssuedToken
+from .models import IssuedToken
 
 
 class TokenWithInvalidation(AccessToken):
