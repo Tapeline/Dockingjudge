@@ -51,6 +51,7 @@ class QuizTask(models.Model):
     title = models.CharField(max_length=255)
     description = models.TextField()
     validator = models.JSONField(default={})
+    points = models.IntegerField()
 
     def save(self, **kwargs):
         validation.validate_quiz_validator(self.validator)

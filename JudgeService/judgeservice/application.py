@@ -6,7 +6,7 @@ import aio_pika
 from aio_pika import Message
 from aio_pika.abc import AbstractRobustChannel, AbstractRobustExchange, DeliveryMode, AbstractIncomingMessage
 
-import settings
+from judgeservice import settings
 from judgeservice import handle
 from judgeservice.configuration import Configuration
 from judgeservice.exceptions import JudgeletNotFoundException, RequestProcessingException
@@ -28,7 +28,8 @@ def _validate_message(message: dict):
 
 
 class ServerApplication:
-    def __init__(self, logging_level=logging.INFO, config_path: str = "config.yml"):
+    def __init__(self, logging_level=logging.DEBUG,
+                 config_path: str = settings.CONFIG_PATH):
         self._in_exchange = None
         self._out_exchange: AbstractRobustExchange | None = None
         self._in_queue = None
@@ -39,9 +40,7 @@ class ServerApplication:
         self._groups = config.load_config()
 
     async def connect(self):
-        logging.basicConfig(level=self._logging_level, filemode="w",
-                            format="%(asctime)s %(levelname)s %(message)s")
-        logging.info("Connecting...")
+        logging.info("Connecting to %s:5672...", settings.RMQ_ADDRESS)
         self._connection = await aio_pika.connect_robust(
             host=settings.RMQ_ADDRESS,
             port=5672,
@@ -51,7 +50,10 @@ class ServerApplication:
         logging.info("Connected")
         self._channel = await self._connection.channel()
         logging.info("Channel received")
-        self._in_exchange = await self._channel.declare_exchange("solutions_exchange")
+        self._in_exchange = await self._channel.declare_exchange(
+            "solutions_exchange",
+            durable=True
+        )
         self._out_exchange = await self._channel.declare_exchange(
             "judge_answers_exchange",
             aio_pika.ExchangeType.DIRECT,
@@ -136,6 +138,7 @@ class ServerApplication:
         logging.info(f"Handled request #{contents['id']}")
 
     async def run(self):
+        logging.info("Setting up...")
         await self.connect()
         logging.info("Setup complete")
         await self._in_queue.consume(self.on_message, no_ack=True)

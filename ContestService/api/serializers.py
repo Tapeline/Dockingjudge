@@ -55,7 +55,7 @@ class FullQuizTaskSerializer(serializers.ModelSerializer):
 class UserQuizTaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.QuizTask
-        fields = ["contest", "title", "description"]
+        fields = ["contest", "title", "description", "points"]
 
 
 class FullCodeTaskSerializer(serializers.ModelSerializer):

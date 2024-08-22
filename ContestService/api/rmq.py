@@ -33,3 +33,30 @@ def publish_message(exchange: str, routing_key: str, data: dict) -> None:
                           body=json_str.encode(settings.ENCODING))
     connection.close()
 
+
+def notify_contest_deleted(data: dict) -> None:
+    publish_message(CONTEST_OBJECT_EXCHANGE, "contest_event", {
+        "event": "DELETED",
+        "object": data
+    })
+
+
+def notify_text_page_deleted(data: dict) -> None:
+    publish_message(CONTEST_OBJECT_EXCHANGE, "text_page_event", {
+        "event": "DELETED",
+        "object": data
+    })
+
+
+def notify_quiz_task_deleted(data: dict) -> None:
+    publish_message(CONTEST_OBJECT_EXCHANGE, "quiz_task_event", {
+        "event": "DELETED",
+        "object": data
+    })
+
+
+def notify_code_task_deleted(data: dict) -> None:
+    publish_message(CONTEST_OBJECT_EXCHANGE, "code_task_event", {
+        "event": "DELETED",
+        "object": data
+    })

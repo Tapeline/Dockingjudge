@@ -1,36 +1,28 @@
+import logging
 from typing import Union
 
+from django.db.models import Model
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from . import serializers, models, accessor, permissions, validation
+from . import serializers, models, accessor, permissions, validation, rmq
 
 
-class ListCreateContestView(ListCreateAPIView):
-    serializer_class = serializers.ContestSerializer
-    queryset = models.Contest.objects.all()
-    permission_classes = (IsAuthenticated,)
+class NotifyOnDeleteMixin:
+    notification_serializer = None
+    notify_function = None
 
-    def create(self, request, *args, **kwargs):
-        request.data["author"] = request.user.id
-        return super().create(request, *args, **kwargs)
-
-
-class RetrieveUpdateDestroyContestView(RetrieveUpdateDestroyAPIView):
-    serializer_class = serializers.ContestSerializer
-    queryset = models.Contest.objects.all()
-    permission_classes = (IsAuthenticated,
-                          permissions.IsContestAdminOrReadOnly)
-
-    def get_serializer(self, *args, **kwargs):
-        return super().get_serializer(
-            *args, **kwargs,
-            display_only_enter_pages=not permissions.can_view_all_pages(
-                self.request.user.id, self.get_object()
-            )
-        )
+    def delete(self, request, *args, **kwargs):
+        obj: Model = self.get_object()
+        data = self.notification_serializer(obj).data
+        response = super().delete(request, *args, **kwargs)
+        try:
+            self.notify_function(data)
+        except Exception as e:
+            logging.error("Failed to notify deletion of %s: %s", obj, e)
+        return response
 
 
 class ContestMixin:
@@ -54,6 +46,32 @@ class ContestFieldInjectorOnCreation:
         return super().create(request, *args, **kwargs)
 
 
+class ListCreateContestView(ListCreateAPIView):
+    serializer_class = serializers.ContestSerializer
+    queryset = models.Contest.objects.all()
+    permission_classes = (IsAuthenticated,)
+
+    def create(self, request, *args, **kwargs):
+        request.data["author"] = request.user.id
+        return super().create(request, *args, **kwargs)
+
+
+class RetrieveUpdateDestroyContestView(NotifyOnDeleteMixin,
+                                       RetrieveUpdateDestroyAPIView):
+    serializer_class = serializers.ContestSerializer
+    queryset = models.Contest.objects.all()
+    permission_classes = (IsAuthenticated,
+                          permissions.IsContestAdminOrReadOnly)
+
+    def get_serializer(self, *args, **kwargs):
+        return super().get_serializer(
+            *args, **kwargs,
+            display_only_enter_pages=not permissions.can_view_all_pages(
+                self.request.user.id, self.get_object()
+            )
+        )
+
+
 class ListCreateTextPageView(ContestFieldInjectorOnCreation,
                              ListCreateAPIView):
     serializer_class = serializers.TextPageSerializer
@@ -62,9 +80,12 @@ class ListCreateTextPageView(ContestFieldInjectorOnCreation,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
 
 
-class RetrieveUpdateDestroyTextPageView(ContestFieldInjectorOnCreation,
+class RetrieveUpdateDestroyTextPageView(NotifyOnDeleteMixin,
+                                        ContestFieldInjectorOnCreation,
                                         RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.TextPageSerializer
+    notification_serializer = serializer_class
+    notify_function = rmq.notify_text_page_deleted
     queryset = models.TextPage.objects.all()
     permission_classes = (IsAuthenticated,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
@@ -72,7 +93,8 @@ class RetrieveUpdateDestroyTextPageView(ContestFieldInjectorOnCreation,
 
 class ListCreateQuizTaskView(ContestFieldInjectorOnCreation,
                              SerializerSwitchingMixin,
-                             ListCreateAPIView, ContestMixin):
+                             ListCreateAPIView,
+                             ContestMixin):
     serializer_class = serializers.UserQuizTaskSerializer
     full_serializer_class = serializers.FullQuizTaskSerializer
     queryset = models.QuizTask.objects.all()
@@ -80,19 +102,24 @@ class ListCreateQuizTaskView(ContestFieldInjectorOnCreation,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
 
 
-class RetrieveUpdateDestroyQuizTaskView(ContestFieldInjectorOnCreation,
+class RetrieveUpdateDestroyQuizTaskView(NotifyOnDeleteMixin,
+                                        ContestFieldInjectorOnCreation,
                                         SerializerSwitchingMixin,
-                                        RetrieveUpdateDestroyAPIView, ContestMixin):
+                                        RetrieveUpdateDestroyAPIView,
+                                        ContestMixin):
     serializer_class = serializers.UserQuizTaskSerializer
     full_serializer_class = serializers.FullQuizTaskSerializer
     queryset = models.QuizTask.objects.all()
     permission_classes = (IsAuthenticated,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
+    notification_serializer = full_serializer_class
+    notify_function = rmq.notify_quiz_task_deleted
 
 
 class ListCreateCodeTaskView(ContestFieldInjectorOnCreation,
                              SerializerSwitchingMixin,
-                             ListCreateAPIView, ContestMixin):
+                             ListCreateAPIView,
+                             ContestMixin):
     serializer_class = serializers.UserCodeTaskSerializer
     full_serializer_class = serializers.FullCodeTaskSerializer
     queryset = models.CodeTask.objects.all()
@@ -100,14 +127,18 @@ class ListCreateCodeTaskView(ContestFieldInjectorOnCreation,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
 
 
-class RetrieveUpdateDestroyCodeTaskView(ContestFieldInjectorOnCreation,
+class RetrieveUpdateDestroyCodeTaskView(NotifyOnDeleteMixin,
+                                        ContestFieldInjectorOnCreation,
                                         SerializerSwitchingMixin,
-                                        RetrieveUpdateDestroyAPIView, ContestMixin):
+                                        RetrieveUpdateDestroyAPIView,
+                                        ContestMixin):
     serializer_class = serializers.UserCodeTaskSerializer
     full_serializer_class = serializers.FullCodeTaskSerializer
     queryset = models.CodeTask.objects.all()
     permission_classes = (IsAuthenticated,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
+    notification_serializer = full_serializer_class
+    notify_function = rmq.notify_code_task_deleted
 
 
 class CanSubmitSolutionToTask(APIView):

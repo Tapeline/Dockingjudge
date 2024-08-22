@@ -4,7 +4,9 @@ WORKDIR /app
 
 COPY . .
 
+RUN chmod +x ./start.sh
+
 RUN pip install -r requirements.txt
 ENV PYTHONPATH /app
 
-CMD python judgeserver/main.py
+CMD ./start.sh

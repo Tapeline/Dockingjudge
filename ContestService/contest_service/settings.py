@@ -23,9 +23,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-3&uwud=s#&0(uz**lf5$fi+m#)gf40l+s!v84l&afvi5bxqjr!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+MODE = os.getenv("MODE") or "local"
+DEBUG = MODE == "local"
 
 ALLOWED_HOSTS = []
+if "ALLOWED_HOSTS" in os.environ:
+    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split()
 
 
 # Application definition
@@ -91,7 +94,7 @@ DATABASES = {
         "PORT": os.environ.get("PG_PORT"),
     }
 }
-DATABASES["default"] = DATABASES[os.environ.get("USE_DB") or "local"]
+DATABASES["default"] = DATABASES[MODE]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -139,10 +142,9 @@ REST_FRAMEWORK = {
         "api.auth.RemoteAuthentication",
     )
 }
-ACCOUNT_SERVICE = "http://localhost:8001"
+ACCOUNT_SERVICE = os.getenv("ACCOUNT_SERVICE") or "http://localhost:8001/api/accounts"
 
 RMQ_ADDRESS = os.getenv("RMQ_ADDRESS") or "localhost"
 RMQ_USER = os.getenv("RMQ_USER") or "rm_user"
 RMQ_PASS = os.getenv("RMQ_PASS") or "rm_password"
 ENCODING = os.getenv("ENCODING") or "utf-8"
-print(f"RMQ Creds: {RMQ_USER}@{RMQ_ADDRESS} {RMQ_PASS}")

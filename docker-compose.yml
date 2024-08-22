@@ -9,9 +9,10 @@ services:
       RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD}
       RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648"
     volumes:
-      - ./rabbitmq:/var/lib/rabbitmq
+      - rabbitmq_data:/var/lib/rabbitmq
     expose:
       - "5672"
+      - "15672"
     ports:
       - "15672:15672"
       - "5672:5672"
@@ -23,31 +24,11 @@ services:
     networks:
       - main_network
 
-  db_service:
-    image: postgres:13.3
-    hostname: ${DB_HOST}
-    environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-    ports:
-      - "${DB_PORT}:5432"
-    expose:
-      - ${DB_PORT}
-    networks:
-      - main_network
-    volumes:
-      - pgdata:/var/lib/postgresql/
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    restart: unless-stopped
 
   judgelet_py_0:
+    hostname: jl_py_0
     image: dockingjudge-unit
+    expose: [8000]
     ports:
       - "9000:8000"
     environment:
@@ -58,9 +39,13 @@ services:
       retries: 5
       start_period: 10s
       timeout: 10s
+    networks:
+      - judgelet_network
 
   judgelet_py_1:
+    hostname: jl_py_1
     image: dockingjudge-unit
+    expose: [8000]
     ports:
       - "9001:8000"
     environment:
@@ -71,14 +56,19 @@ services:
       retries: 5
       start_period: 10s
       timeout: 10s
+    networks:
+      - judgelet_network
 
 
-  judge_server:
+  judge_service:
+    hostname: judge_service
     build: JudgeService
     environment:
-      RMQ_ADDRESS: ${RMQ_ADDRESS}
+      IO_ENCODING: ${GLOBAL_ENCODING}
+      RMQ_ADDRESS: rabbitmq
       RMQ_USER: ${RMQ_USER}
       RMQ_PASSWORD: ${RMQ_PASSWORD}
+      CONFIG_PATH: /app/config.yml
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -86,28 +76,35 @@ services:
         condition: service_healthy
       judgelet_py_1:
         condition: service_healthy
+    networks:
+      - main_network
+      - judgelet_network
+
 
   account_service:
     build: AccountService
     hostname: account_service
     environment:
       SECRET_KEY: ${SECRET_KEY}
-      DEBUG: False
       PG_USER: ${DB_USER}
       PG_PASS: ${DB_PASS}
       PG_HOST: account_db
       PG_PORT: 5432
-      USE_DB: production
+      MODE: production
       RMQ_ADDRESS: rabbitmq
       RMQ_USER: ${RMQ_USER}
       RMQ_PASS: ${RMQ_PASS}
       ENCODING: ${GLOBAL_ENCODING}
     ports:
       - "8001:8000"
+    expose:
+      - 8000
     networks:
       - main_network
     depends_on:
       account_db:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
   account_db:
@@ -131,6 +128,31 @@ services:
       start_period: 10s
     restart: unless-stopped
 
+
+  contest_service:
+    build: ContestService
+    hostname: contest_service
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      PG_USER: ${DB_USER}
+      PG_PASS: ${DB_PASS}
+      PG_HOST: contest_db
+      PG_PORT: 5432
+      MODE: production
+      RMQ_ADDRESS: rabbitmq
+      RMQ_USER: ${RMQ_USER}
+      RMQ_PASS: ${RMQ_PASS}
+      ENCODING: ${GLOBAL_ENCODING}
+      ACCOUNT_SERVICE: "http://account_service:8000/api/accounts"
+    ports:
+      - "8002:8000"
+    expose:
+      - 8000
+    networks:
+      - main_network
+    depends_on:
+      contest_db:
+        condition: service_healthy
 
   contest_db:
     image: postgres:13.3
@@ -156,12 +178,85 @@ services:
     restart: unless-stopped
 
 
+  solution_service:
+    build: SolutionService
+    hostname: solution_service
+    environment:
+      SECRET_KEY: ${SECRET_KEY}
+      PG_USER: ${DB_USER}
+      PG_PASS: ${DB_PASS}
+      PG_HOST: solution_db
+      PG_PORT: 5432
+      MODE: production
+      RMQ_ADDRESS: rabbitmq
+      RMQ_USER: ${RMQ_USER}
+      RMQ_PASS: ${RMQ_PASS}
+      ENCODING: ${GLOBAL_ENCODING}
+      ACCOUNT_SERVICE: "account_service:8000/api/accounts"
+      CONTEST_SERVICE: "contest_service:8000/api"
+    ports:
+      - "8003:8000"
+    expose:
+      - 8000
+    networks:
+      - main_network
+    depends_on:
+      solution_db:
+        condition: service_healthy
+
+  solution_db:
+    image: postgres:13.3
+    hostname: solution_db
+    environment:
+      POSTGRES_DB: solution_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    expose:
+      - "5432"
+    ports:
+      - "5503:5432"
+    networks:
+      - main_network
+    volumes:
+      - solution_pgdata:/var/lib/postgresql/
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d account_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+
+  api_gateway:
+    command: nginx -g "daemon off;"
+    depends_on:
+      - account_service
+      - contest_service
+      - solution_service
+    image: nginx:alpine
+    restart: on-failure
+    volumes:
+      - ./api_gateway_nginx.conf:/etc/nginx/nginx.conf
+#      - ~/sslcert/fullchain.pem:/etc/nginx/server.crt
+#      - ~/sslcert/privkey.pem:/etc/nginx/server.key
+    ports:
+#      - "443:443"
+      - "8888:80"
+    networks:
+      - main_network
+
+
 networks:
   main_network:
+    driver: bridge
+  judgelet_network:
     driver: bridge
 
 
 volumes:
-  pgdata:
   account_pgdata:
   contest_pgdata:
+  solution_pgdata:
+  rabbitmq_data:
+

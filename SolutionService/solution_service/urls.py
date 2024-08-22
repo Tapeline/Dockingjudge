@@ -1,5 +1,5 @@
 """
-URL configuration for account_service project.
+URL configuration for solution_service project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.0/topics/http/urls/
@@ -19,10 +19,12 @@ from django.urls import path
 from api import views
 
 urlpatterns = [
-    path("api/accounts/ping/", views.PingView.as_view()),
-    path("api/accounts/register/", views.RegisterView.as_view()),
-    path("api/accounts/login/", views.LoginView.as_view()),
-    path("api/accounts/profile/", views.ProfileView.as_view()),
-    path("api/accounts/authorize/", views.ProfileView.as_view()),
-    path("api/accounts/user/<str:username>/", views.GetUserByName.as_view()),
+    path("/api/solutions/my/",
+         views.ListMySolutionsView.as_view()),
+    path("/api/solutions/for-task/<str:task_type>/<int:task_id>/",
+         views.ListMySolutionsView.as_view()),
+    path("/api/solutions/<int:pk>/",
+         views.RetrieveSolutionView.as_view()),
+    path("/api/solutions/post/",
+         views.SubmitSolutionView.as_view())
 ]

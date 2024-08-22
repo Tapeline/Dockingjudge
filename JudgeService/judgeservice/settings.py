@@ -1,3 +1,4 @@
+import logging
 import os
 
 
@@ -6,3 +7,6 @@ IO_ENCODING = os.getenv("IO_ENCODING") if "IO_ENCODING" in os.environ else "utf-
 RMQ_ADDRESS = os.getenv("RMQ_ADDRESS")
 RMQ_USER = os.getenv("RMQ_USER")
 RMQ_PASSWORD = os.getenv("RMQ_PASSWORD")
+CONFIG_PATH = os.getenv("CONFIG_PATH") or "config.yml"
+
+logging.info("Using config on %s", CONFIG_PATH)

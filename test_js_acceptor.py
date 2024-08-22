@@ -20,7 +20,7 @@ channel.queue_bind(exchange='judge_answers_exchange', queue='receive', routing_k
 message = {
     "id": "abc123",
     "code": "try:\n    print(int(input()) ** 2)\nexcept ValueError:\n    print('err')",
-    "compiler": "cpp20",
+    "compiler": "python",
     "suite": [
         {
             "name": "A",
