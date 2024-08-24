@@ -8,6 +8,13 @@ from account_service import settings
 USER_OBJECT_EXCHANGE = "user_object_events"
 
 
+def init():
+    connection = _connect()
+    channel = connection.channel()
+    _init_exchange(channel)
+    connection.close()
+
+
 def _init_exchange(channel):
     channel.exchange_declare(exchange=USER_OBJECT_EXCHANGE, durable=True)
 

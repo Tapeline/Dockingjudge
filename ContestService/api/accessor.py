@@ -20,6 +20,10 @@ def get_object_or_null(model: Type[Model], *args, **kwargs) -> Model | None:
         return None
 
 
+def user_can_apply_for_contest(user, contest):
+    return is_contest_open(contest)
+
+
 def user_applied_for_contest(user: int, contest) -> bool:
     return models.ContestSession.objects.filter(user=user, contest=contest).exists()
 

@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rest_framework",
     "api"
 ]
 
@@ -98,6 +99,9 @@ DATABASES = {
     }
 }
 DATABASES["default"] = DATABASES[MODE]
+logging.info(f"Using database {DATABASES[MODE]['USER']}@"
+             f"{DATABASES[MODE]['HOST']}/"
+             f"{DATABASES[MODE]['NAME']}")
 
 
 # Password validation
@@ -146,6 +150,9 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'api.exceptions.custom_exception_handler',
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_RENDERER_CLASSES": (
+        'rest_framework.renderers.JSONRenderer',
     )
 }
 

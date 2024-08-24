@@ -8,6 +8,13 @@ from contest_service import settings
 CONTEST_OBJECT_EXCHANGE = "contest_object_events"
 
 
+def init():
+    connection = connect()
+    channel = connection.channel()
+    _init_exchange(channel)
+    connection.close()
+
+
 def _init_exchange(channel):
     channel.exchange_declare(exchange=CONTEST_OBJECT_EXCHANGE, durable=True)
 

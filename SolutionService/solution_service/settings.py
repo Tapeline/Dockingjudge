@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+import logging
 import os
 from pathlib import Path
 
@@ -24,7 +25,9 @@ SECRET_KEY = 'django-insecure-q)7s3i5efr*vd75=w9lpoz)4%+2e=33$g#$*edel+o^617a)ht
 
 # SECURITY WARNING: don't run with debug turned on in production!
 MODE = os.getenv("MODE") or "local"
-DEBUG = MODE == "local"
+DEBUG = (MODE == "local") or ("-d" in MODE)
+
+MODE = MODE.split()[0]
 
 ALLOWED_HOSTS = []
 if "ALLOWED_HOSTS" in os.environ:
@@ -40,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rest_framework",
     "api"
 ]
 
@@ -96,6 +100,10 @@ DATABASES = {
     }
 }
 DATABASES["default"] = DATABASES[MODE]
+logging.info(f"Using database {DATABASES[MODE]['USER']}@"
+             f"{DATABASES[MODE]['HOST']}/"
+             f"{DATABASES[MODE]['NAME']}")
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -141,10 +149,13 @@ REST_FRAMEWORK = {
     # 'EXCEPTION_HANDLER': 'api.exceptions.custom_exception_handler',
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "api.auth.RemoteAuthentication",
+    ),
+    "DEFAULT_RENDERER_CLASSES": (
+        'rest_framework.renderers.JSONRenderer',
     )
 }
-ACCOUNT_SERVICE = "http://localhost:8001/api/accounts/"
-CONTEST_SERVICE = "http://localhost:8002/api/"
+ACCOUNT_SERVICE = os.getenv("ACCOUNT_SERVICE") or "http://localhost:8001/api/accounts/"
+CONTEST_SERVICE = os.getenv("CONTEST_SERVICE") or "http://localhost:8002/api/"
 
 RMQ_ADDRESS = os.getenv("RMQ_ADDRESS") or "localhost"
 RMQ_USER = os.getenv("RMQ_USER") or "rm_user"

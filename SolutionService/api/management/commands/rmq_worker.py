@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.management import BaseCommand
 
 from api import rmq, models
-from contest_service import settings
+from solution_service import settings
 
 
 class Command(BaseCommand):

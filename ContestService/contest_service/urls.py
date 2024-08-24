@@ -40,6 +40,8 @@ urlpatterns = [
          views.CanSubmitSolutionToTask.as_view()),
     path('api/contests/<int:contest_id>/time-left/',
          views.GetTimeLeft.as_view()),
+    path('api/contests/<int:contest_id>/apply/',
+         views.ApplyForContestView.as_view()),
 
     path('internal/contests/tasks/quiz/<int:pk>/',
          views.InternalRetrieveQuizTaskView.as_view()),

@@ -25,7 +25,7 @@ class IsContestAdminOrReadOnly(BasePermission):
         return (
                 (request.method in ('GET', 'HEAD', 'OPTIONS'))
                 or
-                (obj.owner == request.user.id)
+                (obj.author == request.user.id)
         )
 
 
@@ -35,4 +35,4 @@ class IsContestAdminOrReadOnlyForParticipants(BasePermission):
             request.method in ('GET', 'HEAD', 'OPTIONS')
             and
             can_view_this_page(request.user.id, obj)
-        ) or obj.owner == request.user.id
+        ) or obj.author == request.user.id

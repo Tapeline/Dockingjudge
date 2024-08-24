@@ -2,6 +2,7 @@ import logging
 from typing import Union
 
 from django.db.models import Model
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView, get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -166,6 +167,16 @@ class CanSubmitSolutionToTask(APIView):
         return Response({
             "can_submit": True
         })
+
+
+class ApplyForContestView(APIView):
+    def post(self, request, *args, **kwargs):
+        contest_id = kwargs.get("contest_id")
+        contest = models.Contest.objects.get(id=contest_id)
+        if not accessor.user_can_apply_for_contest(request.user, contest):
+            raise PermissionDenied(detail="You cannot apply for this contest", code="CANNOT_APPLY")
+        models.ContestSession.objects.create(user=request.user.id, contest=contest)
+        return Response(status=204)
 
 
 class GetTimeLeft(APIView):

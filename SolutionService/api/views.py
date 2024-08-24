@@ -59,13 +59,16 @@ class SubmitSolutionView(APIView):
         return solution
 
     def _submit_code_answer(self, request, task: tasks.TaskMock):
+        if not isinstance(request.data.get("compiler"), str):
+            raise ValidationError("no field compiler", "NO_COMPILER")
         solution = models.Solution(
             author=request.user.id,
             task_type=task.type,
             task_id=task.id,
             points=0,
             is_solved=False,
-            text=request.data["text"]
+            text=request.data["text"],
+            compiler=request.data["compiler"]
         )
         solution.save()
         rmq.queue_code_solution(task, solution)

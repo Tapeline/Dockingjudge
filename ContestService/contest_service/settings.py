@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+import logging
 import os
 from pathlib import Path
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rest_framework",
     "api"
 ]
 
@@ -95,6 +97,10 @@ DATABASES = {
     }
 }
 DATABASES["default"] = DATABASES[MODE]
+logging.info(f"Using database {DATABASES[MODE]['USER']}@"
+             f"{DATABASES[MODE]['HOST']}/"
+             f"{DATABASES[MODE]['NAME']}")
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -140,6 +146,9 @@ REST_FRAMEWORK = {
     # 'EXCEPTION_HANDLER': 'api.exceptions.custom_exception_handler',
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "api.auth.RemoteAuthentication",
+    ),
+    "DEFAULT_RENDERER_CLASSES": (
+        'rest_framework.renderers.JSONRenderer',
     )
 }
 ACCOUNT_SERVICE = os.getenv("ACCOUNT_SERVICE") or "http://localhost:8001/api/accounts"

@@ -1,7 +1,7 @@
 import requests
 from rest_framework import authentication
 
-from contest_service import settings
+from solution_service import settings
 
 
 class UserMock:

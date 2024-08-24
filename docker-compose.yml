@@ -76,6 +76,8 @@ services:
         condition: service_healthy
       judgelet_py_1:
         condition: service_healthy
+    links:
+      - rabbitmq
     networks:
       - main_network
       - judgelet_network
@@ -83,7 +85,7 @@ services:
 
   account_service:
     build: AccountService
-    hostname: account_service
+    hostname: account.service
     environment:
       SECRET_KEY: ${SECRET_KEY}
       PG_USER: ${DB_USER}
@@ -95,6 +97,7 @@ services:
       RMQ_USER: ${RMQ_USER}
       RMQ_PASS: ${RMQ_PASS}
       ENCODING: ${GLOBAL_ENCODING}
+      ALLOWED_HOSTS: "*"
     ports:
       - "8001:8000"
     expose:
@@ -131,7 +134,7 @@ services:
 
   contest_service:
     build: ContestService
-    hostname: contest_service
+    hostname: contest.service
     environment:
       SECRET_KEY: ${SECRET_KEY}
       PG_USER: ${DB_USER}
@@ -143,7 +146,8 @@ services:
       RMQ_USER: ${RMQ_USER}
       RMQ_PASS: ${RMQ_PASS}
       ENCODING: ${GLOBAL_ENCODING}
-      ACCOUNT_SERVICE: "http://account_service:8000/api/accounts"
+      ACCOUNT_SERVICE: "http://account.service:8000/api/accounts"
+      ALLOWED_HOSTS: "*"
     ports:
       - "8002:8000"
     expose:
@@ -153,6 +157,10 @@ services:
     depends_on:
       contest_db:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      account_service:
+        condition: service_started
 
   contest_db:
     image: postgres:13.3
@@ -180,7 +188,7 @@ services:
 
   solution_service:
     build: SolutionService
-    hostname: solution_service
+    hostname: solution.service
     environment:
       SECRET_KEY: ${SECRET_KEY}
       PG_USER: ${DB_USER}
@@ -192,8 +200,9 @@ services:
       RMQ_USER: ${RMQ_USER}
       RMQ_PASS: ${RMQ_PASS}
       ENCODING: ${GLOBAL_ENCODING}
-      ACCOUNT_SERVICE: "account_service:8000/api/accounts"
-      CONTEST_SERVICE: "contest_service:8000/api"
+      ACCOUNT_SERVICE: "account.service:8000/api/accounts"
+      CONTEST_SERVICE: "contest.service:8000/api"
+      ALLOWED_HOSTS: "*"
     ports:
       - "8003:8000"
     expose:
@@ -203,6 +212,12 @@ services:
     depends_on:
       solution_db:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      account_service:
+        condition: service_started
+      contest_service:
+        condition: service_started
 
   solution_db:
     image: postgres:13.3

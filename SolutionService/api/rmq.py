@@ -3,11 +3,18 @@ import json
 import pika
 
 from .tasks import TaskMock
-from contest_service import settings
+from solution_service import settings
 
 
 UNCHECKED_SOLUTIONS_EXCHANGE = "solutions_exchange"
 CHECKED_SOLUTIONS_EXCHANGE = "judge_answers_exchange"
+
+
+def init():
+    connection = connect()
+    channel = connection.channel()
+    _init_exchange(channel)
+    connection.close()
 
 
 def _init_exchange(channel):
@@ -42,5 +49,5 @@ def queue_code_solution(task: TaskMock, solution) -> None:
         "id": f"{solution.task_type}/{solution.task_id}/{solution.id}",
         "code": solution.text,
         "compiler": solution.compiler,
-        "suite": task.data["test_suite"]
+        "suite": task.data["test_suite"]["groups"]
     })
