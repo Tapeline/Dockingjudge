@@ -20,13 +20,15 @@ class TestGroup:
         self.points = points
         self.score_only_on_full_pass = score_only_on_full_pass
 
-    async def get_result(self, compiler_name: str, file_name: str) \
+    async def get_result(self, compiler_name: str, file_name: str, solution_dir: str) \
             -> tuple[bool, int, list[tuple[RunResult, ValidatorAnswer]], str]:
         passed = 0
         protocol = []
         verdict = None
         for testcase in self.test_cases:
-            run_result, result = await testcase.perform_test_case(compiler_name, file_name)
+            run_result, result = await testcase.perform_test_case(compiler_name,
+                                                                  file_name,
+                                                                  solution_dir)
             protocol.append((run_result, result))
             if result.success:
                 passed += 1

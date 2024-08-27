@@ -31,11 +31,22 @@ class TestGroup(BaseModel):
     cases: list[TestCase]
 
 
+class PrecompileCheckerModel(BaseModel):
+    type: str
+    parameters: dict = {}
+
+
+class TestSuite(BaseModel):
+    place_files: Optional[str] = None
+    precompile: list[PrecompileCheckerModel]
+    groups: list[TestGroup]
+
+
 class RunRequest(BaseModel):
-    id: Optional[str]
-    code: str
+    id: str
+    code: dict
     compiler: str
-    suite: list[TestGroup]
+    suite: TestSuite
 
 
 class TestCaseResult(BaseModel):
@@ -51,4 +62,3 @@ class RunAnswer(BaseModel):
     verdict: str
     group_scores: dict[str, int]
     protocol: list[list[TestCaseResult]]
-

@@ -9,20 +9,22 @@ class PythonInterpreter(Compiler):
     file_ext = "py"
 
     async def prepare(self, file_path: str, file_input: dict[str, str],
-                      required_back_files: set[str]) -> UtilityRunResult:
+                      required_back_files: set[str], solution_dir) -> UtilityRunResult:
         self.save_files(file_input)
         return UtilityRunResult.ok()
 
     async def compile(self, file_path: str, file_input: dict[str, str],
-                      required_back_files: set[str]) -> UtilityRunResult:
+                      required_back_files: set[str], solution_dir) -> UtilityRunResult:
         return UtilityRunResult.ok()
 
     async def test(self, file_path: str, proc_input: str,
                    file_input: dict[str, str], required_back_files: set[str],
-                   timeout: int, mem_limit_mb: int) -> RunResult:
+                   timeout: int, mem_limit_mb: int,
+                   solution_dir) -> RunResult:
         try:
             process = subprocess.run(["python", file_path], input=proc_input.encode(IO_ENCODING),
-                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout)
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout,
+                                     cwd=solution_dir)
             # proc = await asyncio.create_subprocess_shell(
             #     f"python {file_path}",
             #     stdout=asyncio.subprocess.PIPE,

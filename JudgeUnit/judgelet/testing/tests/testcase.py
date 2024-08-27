@@ -22,14 +22,15 @@ class TestCase:
         self.time_limit = time_limit
         self.memory_limit_mb = memory_limit_mb
 
-    async def perform_test_case(self, compiler_name: str, file_name: str) -> tuple[RunResult, ValidatorAnswer]:
+    async def perform_test_case(self, compiler_name: str, file_name: str,
+                                solution_dir: str) -> tuple[RunResult, ValidatorAnswer]:
         if compiler_name not in Compiler.COMPILERS:
             return ValidatorAnswer.err("Compiler not found")
         compiler = Compiler.COMPILERS[compiler_name]()
         compiler_result = await compiler.launch_and_get_output(
             file_name, self.stdin_data, self.files,
             self.required_back_files, self.time_limit,
-            self.memory_limit_mb
+            self.memory_limit_mb, solution_dir
         )
         for validator in self.validators:
             validator_answer = validator.perform_full_validation(compiler_result)

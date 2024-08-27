@@ -1,11 +1,14 @@
 import asyncio
+import logging
 import os
-import shutil
 import uuid
 
 from judgelet.compilers.abc_compiler import Compiler, RunResult, register_default_compilers
+from judgelet.data.container import ZipSolutionContainer, SolutionContainer
 from judgelet.exceptions import CompilerNotFoundException
 from judgelet.models import TestCaseResult, RunRequest, RunAnswer
+from judgelet.runner import SolutionRunner
+from judgelet.testing.precompile.abc_precompile_checker import register_default_precompile_checkers
 from judgelet.testing.tests.testsuite import TestSuite
 from judgelet.testing.validators.abc_validator import ValidatorAnswer, register_default_validators
 
@@ -16,22 +19,7 @@ class JudgeletApplication:
             asyncio.set_event_loop(asyncio.ProactorEventLoop())
         register_default_compilers()
         register_default_validators()
-
-    def shutdown(self):
-        shutil.rmtree("solution")
-
-    def prepare_solution_environment(self, uid, code, compiler_extension):
-        try:
-            os.mkdir("solution")
-        except FileExistsError:
-            pass
-        os.mkdir(f"solution/{uid}")
-        with open(f"solution/{uid}/program.{compiler_extension}", "w") as file:
-            file.write(code)
-        return f"solution/{uid}/program.{compiler_extension}"
-
-    def purge_solution_environment(self, uid):
-        shutil.rmtree(f"solution/{uid}")
+        register_default_precompile_checkers()
 
     def serialize_protocol(self, protocol: list[list[tuple[RunResult, ValidatorAnswer]]]):
         full_protocol = []
@@ -53,12 +41,17 @@ class JudgeletApplication:
             raise CompilerNotFoundException
 
     async def execute_request(self, request: RunRequest) -> RunAnswer:
+        self.ensure_compiler_exists(request.compiler)
         uid = str(uuid.uuid4())
-        file_name = self.prepare_solution_environment(
-            uid, request.code, Compiler.COMPILERS[request.compiler].file_ext
-        )
+        place_before = None
+        if request.suite.place_files is not None:
+            place_before = ZipSolutionContainer.from_b64(request.suite.place_files, "")
+        solution_json = request.code
+        solution_json["name"] = f"main.{Compiler.COMPILERS[request.compiler].file_ext}"
+        solution = SolutionContainer.from_json(solution_json)
         test_suite = TestSuite.deserialize(request.suite)
-        score, protocol, group_scores, verdict = await test_suite.run_suite(request.compiler, file_name)
+        runner = SolutionRunner(uid, place_before, solution, request.compiler, test_suite)
+        score, protocol, group_scores, verdict = await runner.run()
         converted_protocol = self.serialize_protocol(protocol)
         return RunAnswer(
             score=score,
@@ -66,3 +59,15 @@ class JudgeletApplication:
             verdict=verdict,
             group_scores=group_scores
         )
+
+    async def execute_request_and_handle_errors(self, request: RunRequest):
+        try:
+            return await self.execute_request(request)
+        except Exception as e:
+            logging.exception(e)
+            return RunAnswer(
+                score=0,
+                protocol=[],
+                verdict="TSF",
+                group_scores={}
+            )

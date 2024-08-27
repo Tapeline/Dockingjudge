@@ -19,52 +19,62 @@ channel.queue_bind(exchange='judge_answers_exchange', queue='receive', routing_k
 
 message = {
     "id": "abc123",
-    "code": "try:\n    print(int(input()) ** 2)\nexcept ValueError:\n    print('err')",
+    "code": {
+        "type": "string",
+        "code": "try:\n    print(int(input()) ** 2)\nexcept ValueError:\n    print('err')"
+    },
     "compiler": "python",
-    "suite": [
-        {
-            "name": "A",
-            "depends_on": [],
-            "points": 20,
-            "scoring_rule": "polar",
-            "cases": [
-                {
-                    "validators": [
-                        {
-                            "type": "stdout",
-                            "args": {"expected": "9"}
-                        }
-                    ],
-                    "stdin": "3\n",
-                    "files_in": {},
-                    "files_out": [],
-                    "time_limit": 2,
-                    "mem_limit_mb": 0
-                }
-            ]
-        },
-        {
-            "name": "B",
-            "depends_on": ["A"],
-            "points": 30,
-            "scoring_rule": "polar",
-            "cases": [
-                {
-                    "validators": [
-                        {
-                            "type": "stdout",
-                            "args": {"expected": "err"}
-                        }
-                    ],
-                    "stdin": "a\n",
-                    "files_in": {},
-                    "files_out": [],
-                    "time_limit": 2,
-                    "mem_limit_mb": 0
-                }
-            ]
-        }
-    ]
+    "suite": {
+        "precompile": [
+            {
+                "type": "no_import"
+            }
+        ],
+        "groups": [
+            {
+                "name": "A",
+                "depends_on": [],
+                "points": 20,
+                "scoring_rule": "polar",
+                "cases": [
+                    {
+                        "validators": [
+                            {
+                                "type": "stdout",
+                                "args": {"expected": "9"}
+                            }
+                        ],
+                        "stdin": "3\n",
+                        "files_in": {},
+                        "files_out": [],
+                        "time_limit": 2,
+                        "mem_limit_mb": 0
+                    }
+                ]
+            },
+            {
+                "name": "B",
+                "depends_on": ["A"],
+                "points": 30,
+                "scoring_rule": "polar",
+                "cases": [
+                    {
+                        "validators": [
+                            {
+                                "type": "stdout",
+                                "args": {"expected": "err"}
+                            }
+                        ],
+                        "stdin": "a\n",
+                        "files_in": {},
+                        "files_out": [],
+                        "time_limit": 2,
+                        "mem_limit_mb": 0
+                    }
+                ]
+            }
+        ],
+    }
 }
 message_str = json.dumps(message)
 channel.basic_publish(exchange='solutions_exchange',

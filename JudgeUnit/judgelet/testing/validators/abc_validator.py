@@ -1,3 +1,5 @@
+from abc import abstractmethod
+
 from judgelet.compilers.abc_compiler import RunResult, RunVerdict
 from judgelet.exceptions import SerializationException
 from judgelet.models import Validator as ValidatorModel
@@ -57,8 +59,9 @@ class Validator:
             return ValidatorAnswer.err_runtime_error()
         return None
 
+    @abstractmethod
     def validate_run_result(self, result: RunResult) -> ValidatorAnswer:
-        pass
+        raise NotImplementedError
 
     def perform_full_validation(self, result: RunResult) -> ValidatorAnswer:
         pre_check_result = self.perform_error_check(result)

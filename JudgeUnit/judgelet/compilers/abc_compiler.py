@@ -95,33 +95,35 @@ class Compiler(ABC):
     async def launch_and_get_output(self, file_path: str, proc_input: str,
                                     file_input: dict[str, str],
                                     required_back_files: set[str],
-                                    timeout: int, mem_limit_mb: int) -> RunResult:
-        result = await self.prepare(file_path, file_input, required_back_files)
+                                    timeout: int, mem_limit_mb: int,
+                                    solution_dir: str) -> RunResult:
+        result = await self.prepare(file_path, file_input, required_back_files, solution_dir)
         if not result.success:
             return result.to_run_result()
 
-        result = await self.compile(file_path, file_input, required_back_files)
+        result = await self.compile(file_path, file_input, required_back_files, solution_dir)
         if not result.success:
             return result.to_run_result()
 
         return await self.test(file_path, proc_input, file_input,
-                               required_back_files, timeout, mem_limit_mb)
+                               required_back_files, timeout, mem_limit_mb, solution_dir)
 
     @abstractmethod
     async def prepare(self, file_path: str, file_input: dict[str, str],
-                      required_back_files: set[str]) -> UtilityRunResult:
+                      required_back_files: set[str], solution_dir) -> UtilityRunResult:
         pass
 
     @abstractmethod
     async def compile(self, file_path: str, file_input: dict[str, str],
-                      required_back_files: set[str]) -> UtilityRunResult:
+                      required_back_files: set[str], solution_dir) -> UtilityRunResult:
         pass
 
     @abstractmethod
     async def test(self, file_path: str, proc_input: str,
                    file_input: dict[str, str],
                    required_back_files: set[str],
-                   timeout: int, mem_limit_mb: int) -> RunResult:
+                   timeout: int, mem_limit_mb: int,
+                   solution_dir) -> RunResult:
         pass
 
 
