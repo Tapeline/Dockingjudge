@@ -12,8 +12,8 @@ class TaskMock:
 
 def get_task(task_type, task_id) -> TaskMock | None:
     response = requests.get(
-        f"{settings.CONTEST_SERVICE}"
-        f"/internal/contests/tasks/{task_type}/{task_id}"
+        f"{settings.CONTEST_SERVICE_INTERNAL}"
+        f"/contests/tasks/{task_type}/{task_id}"
     )
     if response.status_code != 200:
         return None

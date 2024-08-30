@@ -71,7 +71,7 @@ def validate_page_in_list(page: dict):
         "code": models.CodeTask,
         "quiz": models.QuizTask
     }[page["type"]]
-    if not model.filter(id=page["id"]).exists():
+    if not model.objects.filter(id=page["id"]).exists():
         raise ValidationError(
             "Invalid page: id does not exist",
             "INVALID_PAGE_ID_NOT_EXISTS"

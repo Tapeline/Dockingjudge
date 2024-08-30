@@ -10,9 +10,12 @@ class ContestSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
     def __init__(self, instance=None, data=empty,
-                 display_only_enter_pages=False, **kwargs):
+                 display_only_enter_pages=False,
+                 display_sensitive_info=False,
+                 **kwargs):
         super().__init__(instance, data, **kwargs)
         self.display_only_enter_pages = display_only_enter_pages
+        self.display_sensitive_info = display_sensitive_info
 
     def _get_page_repr(self, page_type, page_id):
         model = {
@@ -22,19 +25,20 @@ class ContestSerializer(serializers.ModelSerializer):
         }[page_type]
         serializer = {
             "text": TextPageSerializer,
-            "quiz": UserQuizTaskSerializer,
-            "code": UserCodeTaskSerializer
+            "quiz": UserQuizTaskSerializer if not self.display_sensitive_info
+            else FullQuizTaskSerializer,
+            "code": UserCodeTaskSerializer if not self.display_sensitive_info
+            else FullCodeTaskSerializer,
         }[page_type]
-        return serializer(model.object.get(id=page_id)).data
+        return serializer(model.objects.get(id=page_id)).data
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        if not self.display_only_enter_pages:
-            return data
-        data["pages"] = [
-            page for page in data["pages"]
-            if page.get("is_enter_page") is True
-        ]
+        if self.display_only_enter_pages:
+            data["pages"] = [
+                page for page in data["pages"]
+                if page.get("is_enter_page") is True
+            ]
         for page in data["pages"]:
             page["content"] = self._get_page_repr(page["type"], page["id"])
         return data
@@ -72,8 +76,12 @@ class UserCodeTaskSerializer(serializers.ModelSerializer):
     def to_representation(self, instance):
         data = super().to_representation(instance)
         suite = data["test_suite"]
-        data["max_points"] = sum(group["points"] for group in suite)
-        for group in suite:
+        if "precompile" in suite:
+            del suite["precompile"]
+        if "place_files" in suite:
+            del suite["place_files"]
+        data["max_points"] = sum(group["points"] for group in suite["groups"])
+        for group in suite["groups"]:
             group["cases"] = len(group["cases"])
         data["test_suite"] = suite
         return data

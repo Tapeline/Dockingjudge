@@ -19,12 +19,18 @@ from django.urls import path
 from api import views
 
 urlpatterns = [
-    path("api/solutions/my/",
-         views.ListMySolutionsView.as_view()),
-    path("api/solutions/for-task/<str:task_type>/<int:task_id>/",
-         views.ListMySolutionsView.as_view()),
+    path("api/solutions/my/code/",
+         views.ListMyCodeSolutionsView.as_view()),
+    path("api/solutions/my/quiz/",
+         views.ListMyQuizSolutionsView.as_view()),
+    path("api/solutions/for-task/code/<int:task_id>/",
+         views.ListTaskCodeSolutionsView.as_view()),
+    path("api/solutions/for-task/quiz/<int:task_id>/",
+         views.ListTaskQuizSolutionsView.as_view()),
     path("api/solutions/post/<str:task_type>/<int:task_id>/",
          views.SubmitSolutionView.as_view()),
-    path("api/solutions/get/<int:pk>/",
-         views.RetrieveSolutionView.as_view()),
+    path("api/solutions/get/code/<int:pk>/",
+         views.RetrieveCodeSolutionView.as_view()),
+    path("api/solutions/get/quiz/<int:pk>/",
+         views.RetrieveQuizSolutionView.as_view()),
 ]

@@ -3,9 +3,9 @@ from rest_framework import serializers
 from . import models
 
 
-class SolutionSerializer(serializers.ModelSerializer):
+class CodeSolutionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Solution
+        model = models.CodeSolution
         fields = ("id", "task_type", "task_id", "points", "is_solved", "status",
                   "verdict", "group_points", "submitted_at", "compiler", "protocol")
 
@@ -18,7 +18,19 @@ class SolutionSerializer(serializers.ModelSerializer):
         return data
 
 
-class FullSolutionSerializer(serializers.ModelSerializer):
+class FullCodeSolutionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = models.Solution
+        model = models.CodeSolution
+        fields = "__all__"
+
+
+class QuizSolutionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.QuizSolution
+        fields = ("id", "task_id", "points", "submitted_at", "is_solved")
+
+
+class FullQuizSolutionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.QuizSolution
         fields = "__all__"

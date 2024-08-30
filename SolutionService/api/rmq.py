@@ -45,9 +45,22 @@ def publish_message(exchange: str, routing_key: str, data: dict) -> None:
 
 
 def queue_code_solution(task: TaskMock, solution) -> None:
+    code = None
+    if solution.submission_type == "str":
+        code = {
+            "type": "string",
+            "code": solution.submission_data
+        }
+    elif solution.submission_type == "zip":
+        data, main_file = solution.submission_data.split(":")
+        code = {
+            "type": "zip",
+            "b64": data,
+            "main": main_file
+        }
     publish_message(UNCHECKED_SOLUTIONS_EXCHANGE, "solution_to_check", {
-        "id": f"{solution.task_type}/{solution.task_id}/{solution.id}",
-        "code": solution.text,
+        "id": f"code/{solution.task_id}/{solution.id}",
+        "code": code,
         "compiler": solution.compiler,
-        "suite": task.data["test_suite"]["groups"]
+        "suite": task.data["test_suite"]
     })

@@ -154,8 +154,9 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
-ACCOUNT_SERVICE = os.getenv("ACCOUNT_SERVICE") or "http://localhost:8001/api/accounts/"
-CONTEST_SERVICE = os.getenv("CONTEST_SERVICE") or "http://localhost:8002/api/"
+ACCOUNT_SERVICE = os.getenv("ACCOUNT_SERVICE") or "http://localhost:8001/api/accounts"
+CONTEST_SERVICE = os.getenv("CONTEST_SERVICE") or "http://localhost:8002/api"
+CONTEST_SERVICE_INTERNAL = os.getenv("CONTEST_SERVICE_INTERNAL") or "http://localhost:8002/internal"
 
 RMQ_ADDRESS = os.getenv("RMQ_ADDRESS") or "localhost"
 RMQ_USER = os.getenv("RMQ_USER") or "rm_user"

@@ -69,8 +69,19 @@ class RetrieveUpdateDestroyContestView(NotifyOnDeleteMixin,
             *args, **kwargs,
             display_only_enter_pages=not permissions.can_view_all_pages(
                 self.request.user.id, self.get_object()
+            ),
+            display_sensitive_info=permissions.can_manage_contest(
+                self.request.user.id, self.get_object()
             )
         )
+
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        response = super().delete(request, *args, **kwargs)
+        rmq.notify_contest_deleted(
+            serializers.ContestSerializer(obj, display_sensitive_info=True).data
+        )
+        return response
 
 
 class ListCreateTextPageView(ContestFieldInjectorOnCreation,

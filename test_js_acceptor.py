@@ -73,7 +73,7 @@ message = {
                     }
                 ]
             }
-        ],
+        ]
     }
 }
 message_str = json.dumps(message)
