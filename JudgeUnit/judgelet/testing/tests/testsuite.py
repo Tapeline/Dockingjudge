@@ -17,14 +17,19 @@ SuiteResult = tuple[
 class TestSuite:
     groups: list[TestGroup]
     group_dependencies: dict[TargetGroup := str, Dependencies := set[str]]
+    default_time_lim: int
+    default_mem_lim: int
 
     def __init__(self,
                  groups: list[TestGroup],
                  group_dependencies: dict[str, set[str]],
-                 precompile_checks: list[AbstractPrecompileChecker]):
+                 precompile_checks: list[AbstractPrecompileChecker],
+                 default_time_lim: int, default_mem_lim: int):
         self.groups = groups
         self.group_dependencies = group_dependencies
         self.precompile_checks = precompile_checks
+        self.default_time_lim = default_time_lim
+        self.default_mem_lim = default_mem_lim
 
     async def run_suite(self, compiler_name: str, file_name: str,
                         solution_dir: str, file_names: list[str]) -> SuiteResult:
@@ -70,7 +75,7 @@ class TestSuite:
     @staticmethod
     def deserialize(data: models.TestSuite) -> "TestSuite":
         groups = [
-            TestGroup.deserialize(group)
+            TestGroup.deserialize(group, data.time_limit, data.mem_limit_mb)
             for group in data.groups
         ]
         deps = {group.name: set() for group in groups}
@@ -81,4 +86,4 @@ class TestSuite:
             AbstractPrecompileChecker.deserialize(checker)
             for checker in data.precompile
         ]
-        return TestSuite(groups, deps, precompile)
+        return TestSuite(groups, deps, precompile, data.time_limit, data.mem_limit_mb)

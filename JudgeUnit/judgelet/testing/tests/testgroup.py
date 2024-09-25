@@ -10,15 +10,20 @@ class TestGroup:
     test_cases: list[TestCase]
     points: int
     score_only_on_full_pass: bool = False
+    default_time_lim: int
+    default_mem_lim: int
 
     def __init__(self, name: str, depends_on: list[str],
                  test_cases: list[TestCase], points: int,
+                 default_time_lim: int, default_mem_lim: int,
                  score_only_on_full_pass: bool = False):
         self.name = name
         self.depends_on = depends_on
         self.test_cases = test_cases
         self.points = points
         self.score_only_on_full_pass = score_only_on_full_pass
+        self.default_mem_lim = default_mem_lim
+        self.default_time_lim = default_time_lim
 
     async def get_result(self, compiler_name: str, file_name: str, solution_dir: str) \
             -> tuple[bool, int, list[tuple[RunResult, ValidatorAnswer]], str]:
@@ -26,6 +31,10 @@ class TestGroup:
         protocol = []
         verdict = None
         for testcase in self.test_cases:
+            if testcase.memory_limit_mb is None:
+                testcase.memory_limit_mb = self.default_mem_lim
+            if testcase.time_limit is None:
+                testcase.time_limit = self.default_time_lim
             run_result, result = await testcase.perform_test_case(compiler_name,
                                                                   file_name,
                                                                   solution_dir)
@@ -41,7 +50,7 @@ class TestGroup:
         return False, int(self.points / len(self.test_cases) * passed), protocol, verdict or "OK"
 
     @staticmethod
-    def deserialize(data: models.TestGroup) -> "TestGroup":
+    def deserialize(data: models.TestGroup, default_time_limit, default_memory_limit) -> "TestGroup":
         cases = [TestCase.deserialize(case_data)
                  for case_data in data.cases]
         return TestGroup(
@@ -49,5 +58,6 @@ class TestGroup:
             data.depends_on,
             cases,
             data.points,
+            default_time_limit, default_memory_limit,
             data.scoring_rule == models.ScoringRuleEnum.polar
         )

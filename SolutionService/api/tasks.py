@@ -30,3 +30,11 @@ def can_sumbit(task_type, task_id, user_id) -> dict:
         f"/contests/tasks/{task_type}/{task_id}/can-submit/{user_id}/"
     )
     return response.json()
+
+
+def get_contest_participants(contest_id):
+    response = requests.get(
+        f"{settings.CONTEST_SERVICE}"
+        f"/contests/{contest_id}/participants/"
+    )
+    return response.json()

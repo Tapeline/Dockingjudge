@@ -42,6 +42,12 @@ urlpatterns = [
          views.GetTimeLeft.as_view()),
     path('api/contests/<int:contest_id>/apply/',
          views.ApplyForContestView.as_view()),
+    path('api/contests/compilers/',
+         views.GetAvailableCompilersView.as_view()),
+    path('api/contests/<int:pk>/can-manage/',
+         views.CanIManageContestView.as_view()),
+    path('api/contests/<int:contest_id>/participants/',
+         views.GetContestParticipants.as_view()),
 
     path('internal/contests/tasks/quiz/<int:pk>/',
          views.InternalRetrieveQuizTaskView.as_view()),

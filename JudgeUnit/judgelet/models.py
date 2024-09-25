@@ -19,8 +19,8 @@ class TestCase(BaseModel):
     stdin: str
     files_in: dict = {}
     files_out: list = []
-    time_limit: int
-    mem_limit_mb: int
+    time_limit: Optional[int] = None
+    mem_limit_mb: Optional[int] = None
 
 
 class TestGroup(BaseModel):
@@ -40,6 +40,9 @@ class TestSuite(BaseModel):
     place_files: Optional[str] = None
     precompile: list[PrecompileCheckerModel]
     groups: list[TestGroup]
+    public_cases: list[dict]
+    time_limit: int
+    mem_limit_mb: int
 
 
 class RunRequest(BaseModel):

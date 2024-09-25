@@ -22,5 +22,7 @@ class AbstractPrecompileChecker(ABC):
 def register_default_precompile_checkers():
     from judgelet.testing.precompile.no_import_checker import NoImportPrecompileChecker
     from judgelet.testing.precompile.no_pattern_checker import NoPatternPrecompileChecker
+    from judgelet.testing.precompile.contains_pattern_checker import ContainsPatternPrecompileChecker
     AbstractPrecompileChecker.CHECKERS["no_import"] = NoImportPrecompileChecker
     AbstractPrecompileChecker.CHECKERS["no_pattern"] = NoPatternPrecompileChecker
+    AbstractPrecompileChecker.CHECKERS["contains_pattern"] = ContainsPatternPrecompileChecker

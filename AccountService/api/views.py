@@ -1,12 +1,16 @@
 from django.http import HttpResponse
 from rest_framework import status
-from rest_framework.generics import CreateAPIView, get_object_or_404, RetrieveUpdateDestroyAPIView
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import CreateAPIView, get_object_or_404, RetrieveUpdateDestroyAPIView, UpdateAPIView, \
+    ListAPIView
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.exceptions import TokenError, InvalidToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from account_service import settings
 from api import serializers, rmq
 from api import models
 from api.models import User
@@ -22,6 +26,8 @@ class RegisterView(CreateAPIView):
     permission_classes = (AllowAny,)
 
     def create(self, request, *args, **kwargs):
+        if not settings.ALLOW_REGISTRATION:
+            raise PermissionDenied(detail="Registration temporarily disabled", code="REGISTRATION_DISABLED")
         try:
             User.objects.get(username=request.data.get("username"))
             return Response({"error_message": "user already exists"}, 400)
@@ -79,3 +85,25 @@ class GetUserByName(APIView):
             ).data,
             status=200
         )
+
+
+class SetProfilePicture(UpdateAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.UserProfilePicSerializer
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_object(self):
+        return self.request.user
+
+
+class GetAllUsers(ListAPIView):
+    permission_classes = (IsAuthenticated, )
+    serializer_class = serializers.UserSerializer
+    queryset = models.User.objects.all()
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if "id" in self.request.query_params:
+            ids = [int(i) for i in self.request.query_params.getlist("id")]
+            qs = qs.filter(id__in=ids)
+        return qs

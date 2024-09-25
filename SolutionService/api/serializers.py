@@ -6,7 +6,7 @@ from . import models
 class CodeSolutionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CodeSolution
-        fields = ("id", "task_type", "task_id", "points", "is_solved", "status",
+        fields = ("id", "task_id", "points", "is_solved", "status",
                   "verdict", "group_points", "submitted_at", "compiler", "protocol")
 
     def to_representation(self, instance):

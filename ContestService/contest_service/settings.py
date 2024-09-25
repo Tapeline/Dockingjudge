@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "corsheaders",
     "rest_framework",
     "api"
 ]
@@ -48,6 +49,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "api.middleware.SyncCorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -157,3 +159,9 @@ RMQ_ADDRESS = os.getenv("RMQ_ADDRESS") or "localhost"
 RMQ_USER = os.getenv("RMQ_USER") or "rm_user"
 RMQ_PASS = os.getenv("RMQ_PASS") or "rm_password"
 ENCODING = os.getenv("ENCODING") or "utf-8"
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+AVAILABLE_COMPILERS = [x.split(":") for x in os.getenv("COMPILERS").split(";")]
+
+ALLOW_CONTEST_CREATION_TO = os.getenv("ALLOW_CONTEST_CREATION_TO") or "*"

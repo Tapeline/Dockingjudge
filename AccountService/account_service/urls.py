@@ -23,6 +23,9 @@ urlpatterns = [
     path("api/accounts/register/", views.RegisterView.as_view()),
     path("api/accounts/login/", views.LoginView.as_view()),
     path("api/accounts/profile/", views.ProfileView.as_view()),
+    path("api/accounts/profile/pic/", views.SetProfilePicture.as_view()),
     path("api/accounts/authorize/", views.ProfileView.as_view()),
+    path("api/accounts/user/<str:username>/", views.GetUserByName.as_view()),
+    path("api/accounts/all/", views.GetAllUsers.as_view()),
     path("api/accounts/user/<str:username>/", views.GetUserByName.as_view()),
 ]

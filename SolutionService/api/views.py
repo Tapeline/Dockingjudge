@@ -33,7 +33,8 @@ class ListTaskCodeSolutionsView(ListAPIView):
 
     def get_queryset(self):
         return super().get_queryset().filter(
-            task_id=self.kwargs["task_id"]
+            task_id=self.kwargs["task_id"],
+            author=self.request.user.id
         )
 
 
@@ -44,7 +45,8 @@ class ListTaskQuizSolutionsView(ListAPIView):
 
     def get_queryset(self):
         return super().get_queryset().filter(
-            task_id=self.kwargs["task_id"]
+            task_id=self.kwargs["task_id"],
+            author=self.request.user.id
         )
 
 
@@ -129,3 +131,30 @@ class SubmitSolutionView(APIView):
             return Response(
                 serializers.FullCodeSolutionSerializer(solution).data
             )
+
+
+def _get_user_score(self, user_id, task_type, task_id):
+    model = {
+        "code": models.CodeSolution,
+        "quiz": models.QuizSolution
+    }[task_type]
+    solutions = model.objects.filter(author=user_id,
+                                     task_id=int(task_id))
+    if len(solutions) == 0:
+        return None, None, False
+    max_sol = solutions[0]
+    for s in solutions:
+        if s.points >= max_sol:
+            max_sol = s
+    return max_sol.id, max_sol.points, max_sol.is_solved
+
+
+class GetTasksScoreForUserView(APIView):
+    parser_classes = (JSONParser,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, *args, **kwargs):
+        t = [task.split(":") for task in request.GET["tasks"]]
+        return Response(
+            [_get_user_score(self.kwargs["user_id"], *task) for task in t]
+        )

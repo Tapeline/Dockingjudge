@@ -34,13 +34,13 @@ class ContestSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
+        for page in data["pages"]:
+            page["content"] = self._get_page_repr(page["type"], page["id"])
         if self.display_only_enter_pages:
             data["pages"] = [
                 page for page in data["pages"]
-                if page.get("is_enter_page") is True
+                if page["content"].get("is_enter_page") is True
             ]
-        for page in data["pages"]:
-            page["content"] = self._get_page_repr(page["type"], page["id"])
         return data
 
 

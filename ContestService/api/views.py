@@ -1,14 +1,17 @@
 import logging
-from typing import Union
+from typing import Union, Callable
 
+import requests
 from django.db.models import Model
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import ListCreateAPIView, RetrieveUpdateDestroyAPIView, RetrieveAPIView, get_object_or_404
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from . import serializers, models, accessor, permissions, validation, rmq
+from contest_service import settings
 
 
 class NotifyOnDeleteMixin:
@@ -23,6 +26,42 @@ class NotifyOnDeleteMixin:
             self.notify_function(data)
         except Exception as e:
             logging.error("Failed to notify deletion of %s: %s", obj, e)
+        return response
+
+
+class EnsureContestStructureIntegrityOnDeleteMixin:
+    def delete(self, request, *args, **kwargs):
+        obj: Model = self.get_object()
+        page_type = None
+        if isinstance(obj, models.TextPage):
+            page_type = "text"
+        if isinstance(obj, models.QuizTask):
+            page_type = "quiz"
+        if isinstance(obj, models.CodeTask):
+            page_type = "code"
+        contest = obj.contest
+        contest.pages = [
+            page
+            for page in contest.pages
+            if not (page["id"] == obj.id and page["type"] == page_type)
+        ]
+        contest.save()
+        return super().delete(request, *args, **kwargs)
+
+
+class EnsureContestStructureIntegrityOnCreateMixin:
+    creating_page_type: str
+
+    def contest_id_getter(self):
+        return self.kwargs["contest_id"]
+
+    def create(self, request, *args, **kwargs):
+        response: Response = super().create(request, *args, **kwargs)
+        if response.status_code != 201:
+            return response
+        contest = models.Contest.objects.get(id=self.contest_id_getter())
+        contest.pages = contest.pages + [{"type": self.creating_page_type, "id": response.data["id"]}]
+        contest.save()
         return response
 
 
@@ -50,7 +89,7 @@ class ContestFieldInjectorOnCreation:
 class ListCreateContestView(ListCreateAPIView):
     serializer_class = serializers.ContestSerializer
     queryset = models.Contest.objects.all()
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, permissions.CanCreateContest)
 
     def create(self, request, *args, **kwargs):
         request.data["author"] = request.user.id
@@ -84,15 +123,18 @@ class RetrieveUpdateDestroyContestView(NotifyOnDeleteMixin,
         return response
 
 
-class ListCreateTextPageView(ContestFieldInjectorOnCreation,
+class ListCreateTextPageView(EnsureContestStructureIntegrityOnCreateMixin,
+                             ContestFieldInjectorOnCreation,
                              ListCreateAPIView):
     serializer_class = serializers.TextPageSerializer
     queryset = models.TextPage.objects.all()
     permission_classes = (IsAuthenticated,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
+    creating_page_type = "text"
 
 
-class RetrieveUpdateDestroyTextPageView(NotifyOnDeleteMixin,
+class RetrieveUpdateDestroyTextPageView(EnsureContestStructureIntegrityOnDeleteMixin,
+                                        NotifyOnDeleteMixin,
                                         ContestFieldInjectorOnCreation,
                                         RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.TextPageSerializer
@@ -103,7 +145,8 @@ class RetrieveUpdateDestroyTextPageView(NotifyOnDeleteMixin,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
 
 
-class ListCreateQuizTaskView(ContestFieldInjectorOnCreation,
+class ListCreateQuizTaskView(EnsureContestStructureIntegrityOnCreateMixin,
+                             ContestFieldInjectorOnCreation,
                              SerializerSwitchingMixin,
                              ListCreateAPIView,
                              ContestMixin):
@@ -112,9 +155,11 @@ class ListCreateQuizTaskView(ContestFieldInjectorOnCreation,
     queryset = models.QuizTask.objects.all()
     permission_classes = (IsAuthenticated,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
+    creating_page_type = "quiz"
 
 
-class RetrieveUpdateDestroyQuizTaskView(NotifyOnDeleteMixin,
+class RetrieveUpdateDestroyQuizTaskView(EnsureContestStructureIntegrityOnDeleteMixin,
+                                        NotifyOnDeleteMixin,
                                         ContestFieldInjectorOnCreation,
                                         SerializerSwitchingMixin,
                                         RetrieveUpdateDestroyAPIView,
@@ -128,7 +173,8 @@ class RetrieveUpdateDestroyQuizTaskView(NotifyOnDeleteMixin,
     notify_function = rmq.notify_quiz_task_deleted
 
 
-class ListCreateCodeTaskView(ContestFieldInjectorOnCreation,
+class ListCreateCodeTaskView(EnsureContestStructureIntegrityOnCreateMixin,
+                             ContestFieldInjectorOnCreation,
                              SerializerSwitchingMixin,
                              ListCreateAPIView,
                              ContestMixin):
@@ -137,9 +183,11 @@ class ListCreateCodeTaskView(ContestFieldInjectorOnCreation,
     queryset = models.CodeTask.objects.all()
     permission_classes = (IsAuthenticated,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
+    creating_page_type = "code"
 
 
-class RetrieveUpdateDestroyCodeTaskView(NotifyOnDeleteMixin,
+class RetrieveUpdateDestroyCodeTaskView(EnsureContestStructureIntegrityOnDeleteMixin,
+                                        NotifyOnDeleteMixin,
                                         ContestFieldInjectorOnCreation,
                                         SerializerSwitchingMixin,
                                         RetrieveUpdateDestroyAPIView,
@@ -151,6 +199,9 @@ class RetrieveUpdateDestroyCodeTaskView(NotifyOnDeleteMixin,
                           permissions.IsContestAdminOrReadOnlyForParticipants)
     notification_serializer = full_serializer_class
     notify_function = rmq.notify_code_task_deleted
+
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
 
 
 class CanSubmitSolutionToTask(APIView):
@@ -185,7 +236,11 @@ class ApplyForContestView(APIView):
         contest_id = kwargs.get("contest_id")
         contest = models.Contest.objects.get(id=contest_id)
         if not accessor.user_can_apply_for_contest(request.user, contest):
-            raise PermissionDenied(detail="You cannot apply for this contest", code="CANNOT_APPLY")
+            raise PermissionDenied(detail="You cannot apply for this contest",
+                                   code="CANNOT_APPLY")
+        if accessor.user_applied_for_contest(request.user.id, contest):
+            raise PermissionDenied(detail="You have already applied for this contest",
+                                   code="ALREADY_APPLIED")
         models.ContestSession.objects.create(user=request.user.id, contest=contest)
         return Response(status=204)
 
@@ -198,6 +253,28 @@ class GetTimeLeft(APIView):
         return Response({
             "time_left": accessor.user_get_time_left(request.user.id, contest)
         })
+
+
+class GetAvailableCompilersView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response(settings.AVAILABLE_COMPILERS)
+
+
+class CanIManageContestView(APIView):
+    def get(self, request, *args, **kwargs):
+        return Response({
+            "can_manage": models.Contest.objects.get(id=kwargs["pk"]).author == request.user.id
+        })
+
+
+class GetContestParticipants(APIView):
+    def get(self, request, *args, **kwargs):
+        sessions = models.ContestSession.objects.filter(
+            contest__id=kwargs["contest_id"])
+        return Response([
+            session.user
+            for session in sessions
+        ])
 
 
 class InternalRetrieveQuizTaskView(RetrieveAPIView):

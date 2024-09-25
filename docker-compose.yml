@@ -98,6 +98,7 @@ services:
       RMQ_PASS: ${RMQ_PASS}
       ENCODING: ${GLOBAL_ENCODING}
       ALLOWED_HOSTS: "*"
+      ALLOW_REGISTRATION: True
     ports:
       - "8001:8000"
     expose:
@@ -117,6 +118,8 @@ services:
       POSTGRES_DB: account_db
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "5500:5432"
     expose:
       - "5432"
     networks:
@@ -148,6 +151,8 @@ services:
       ENCODING: ${GLOBAL_ENCODING}
       ACCOUNT_SERVICE: "http://account.service:8000/api/accounts"
       ALLOWED_HOSTS: "*"
+      COMPILERS: "python:python"
+      ALLOW_CONTEST_CREATION_TO: "Tapeline"
     ports:
       - "8002:8000"
     expose:
@@ -200,8 +205,9 @@ services:
       RMQ_USER: ${RMQ_USER}
       RMQ_PASS: ${RMQ_PASS}
       ENCODING: ${GLOBAL_ENCODING}
-      ACCOUNT_SERVICE: "account.service:8000/api/accounts"
-      CONTEST_SERVICE: "contest.service:8000/api"
+      ACCOUNT_SERVICE: "http://account.service:8000/api/accounts"
+      CONTEST_SERVICE: "http://contest.service:8000/api"
+      CONTEST_SERVICE_INTERNAL: "http://contest.service:8000/internal"
       ALLOWED_HOSTS: "*"
     ports:
       - "8003:8000"
@@ -243,7 +249,20 @@ services:
     restart: unless-stopped
 
 
+  frontend_service:
+    build: Frontend
+    hostname: frontend.service
+    expose:
+      - 3000
+    networks:
+      - main_network
+    depends_on:
+      api_gateway:
+        condition: service_started
+
+
   api_gateway:
+    hostname: api.service
     command: nginx -g "daemon off;"
     depends_on:
       - account_service
@@ -253,11 +272,11 @@ services:
     restart: on-failure
     volumes:
       - ./api_gateway_nginx.conf:/etc/nginx/nginx.conf
-#      - ~/sslcert/fullchain.pem:/etc/nginx/server.crt
-#      - ~/sslcert/privkey.pem:/etc/nginx/server.key
+      - ./sslcert/fullchain.pem:/etc/nginx/server.crt
+      - ./sslcert/privkey.pem:/etc/nginx/server.key
     ports:
-#      - "443:443"
-      - "8888:80"
+      - "443:443"
+    #  - "8888:80"
     networks:
       - main_network
 

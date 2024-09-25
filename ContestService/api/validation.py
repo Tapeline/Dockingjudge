@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Optional
 
 from django.db.models import Model
 from pydantic import BaseModel
@@ -23,9 +24,8 @@ class TestCase(BaseModel):
     stdin: str
     files_in: dict = {}
     files_out: list = []
-    time_limit: int
-    mem_limit_mb: int
-    public: bool = False
+    time_limit: Optional[int] = None
+    mem_limit_mb: Optional[int] = None
 
 
 class TestGroup(BaseModel):
@@ -36,8 +36,18 @@ class TestGroup(BaseModel):
     cases: list[TestCase]
 
 
+class PrecompileCheckerModel(BaseModel):
+    type: str
+    parameters: dict = {}
+
+
 class TestSuite(BaseModel):
+    place_files: Optional[str] = None
+    precompile: list[PrecompileCheckerModel]
     groups: list[TestGroup]
+    public_cases: list[dict]
+    time_limit: int
+    mem_limit_mb: int
 
 
 class QuizValidationType(str, Enum):
