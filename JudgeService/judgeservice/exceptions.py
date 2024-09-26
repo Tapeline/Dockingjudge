@@ -1,3 +1,7 @@
+"""Provides exception classes"""
+# pylint: disable=missing-class-docstring
+
+
 class ImproperlyConfiguredException(ValueError):
     pass
 
