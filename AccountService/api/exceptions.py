@@ -1,12 +1,18 @@
-from rest_framework.exceptions import AuthenticationFailed
-from rest_framework.response import Response
-from rest_framework.views import exception_handler
+"""
+Provides API exception classes
+"""
+# pylint: disable=missing-class-docstring
+
+from rest_framework import status
+from rest_framework.exceptions import PermissionDenied, APIException
 
 
-def custom_exception_handler(exc, context):
-    response = exception_handler(exc, context)
+class RegistrationDisabledException(PermissionDenied):
+    detail = "Registration temporarily disabled"
+    code = "REGISTRATION_DISABLED"
 
-    if isinstance(exc, AuthenticationFailed):
-        return Response({"error": response.data, "error_message": exc.detail}, response.status_code)
 
-    return response
+class UserAlreadyExistsException(APIException):
+    detail = "User with such name is already registered"
+    code = "ALREADY_REGISTERED"
+    status_code = status.HTTP_400_BAD_REQUEST

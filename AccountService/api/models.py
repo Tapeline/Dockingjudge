@@ -1,3 +1,7 @@
+"""
+ORM models
+"""
+
 import uuid
 
 from django.contrib.auth.models import AbstractUser
@@ -30,6 +34,7 @@ class User(AbstractUser):
             return
         if len(self.profile_pic.name) < 1:
             return
+        # pylint: disable=no-member
         image = Image.open(self.profile_pic.path)
         image.save(self.profile_pic.path, quality=20, optimize=True)
 

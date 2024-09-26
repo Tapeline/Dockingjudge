@@ -1,3 +1,7 @@
+"""
+Provides various middleware
+"""
+
 from corsheaders.middleware import CorsMiddleware
 
 

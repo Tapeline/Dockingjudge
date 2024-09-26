@@ -1,3 +1,10 @@
+"""
+DRF serializers
+"""
+# pylint: disable=missing-class-docstring
+# pylint: disable=missing-function-docstring
+# pylint: disable=too-few-public-methods
+
 from typing import Dict, Any
 
 from rest_framework import serializers
@@ -35,6 +42,7 @@ class UserProfilePicSerializer(serializers.ModelSerializer):
 
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    # pylint: disable=abstract-method
     def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]:
         data = super().validate(attrs)
         data["user"] = self.user
