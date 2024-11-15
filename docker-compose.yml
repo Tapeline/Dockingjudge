@@ -95,7 +95,7 @@ services:
       MODE: production
       RMQ_ADDRESS: rabbitmq
       RMQ_USER: ${RMQ_USER}
-      RMQ_PASS: ${RMQ_PASS}
+      RMQ_PASS: ${RMQ_PASSWORD}
       ENCODING: ${GLOBAL_ENCODING}
       ALLOWED_HOSTS: "*"
       ALLOW_REGISTRATION: True
@@ -147,7 +147,7 @@ services:
       MODE: production
       RMQ_ADDRESS: rabbitmq
       RMQ_USER: ${RMQ_USER}
-      RMQ_PASS: ${RMQ_PASS}
+      RMQ_PASS: ${RMQ_PASSWORD}
       ENCODING: ${GLOBAL_ENCODING}
       ACCOUNT_SERVICE: "http://account.service:8000/api/accounts"
       ALLOWED_HOSTS: "*"
@@ -203,7 +203,7 @@ services:
       MODE: production
       RMQ_ADDRESS: rabbitmq
       RMQ_USER: ${RMQ_USER}
-      RMQ_PASS: ${RMQ_PASS}
+      RMQ_PASS: ${RMQ_PASSWORD}
       ENCODING: ${GLOBAL_ENCODING}
       ACCOUNT_SERVICE: "http://account.service:8000/api/accounts"
       CONTEST_SERVICE: "http://contest.service:8000/api"
@@ -293,4 +293,3 @@ volumes:
   contest_pgdata:
   solution_pgdata:
   rabbitmq_data:
-

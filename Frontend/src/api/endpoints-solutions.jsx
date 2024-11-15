@@ -53,3 +53,12 @@ export function getCodeSolution(token, solutionId) {
         "Authorization: Bearer " + token
     )
 }
+
+export function getStandings(token, contestId) {
+    return sendRequest(
+        "GET",
+        apiUrl(`solutions/standings/${contestId}/`),
+        {},
+        "Authorization: Bearer " + token
+    )
+}

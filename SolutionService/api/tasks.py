@@ -24,7 +24,7 @@ def get_task(task_type, task_id) -> TaskMock | None:
     )
 
 
-def can_sumbit(task_type, task_id, user_id) -> dict:
+def can_submit(task_type, task_id, user_id) -> dict:
     response = requests.get(
         f"{settings.CONTEST_SERVICE}"
         f"/contests/tasks/{task_type}/{task_id}/can-submit/{user_id}/"
@@ -37,4 +37,14 @@ def get_contest_participants(contest_id):
         f"{settings.CONTEST_SERVICE}"
         f"/contests/{contest_id}/participants/"
     )
+    return response.json()
+
+
+def get_all_tasks(contest_id):
+    response = requests.get(
+        f"{settings.CONTEST_SERVICE_INTERNAL}"
+        f"/contests/{contest_id}/tasks/"
+    )
+    if response.status_code != 200:
+        return []
     return response.json()

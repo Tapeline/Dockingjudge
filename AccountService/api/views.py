@@ -105,7 +105,7 @@ class SetProfilePictureView(UpdateAPIView):
 
 
 class GetAllUsersView(ListAPIView):
-    permission_classes = (IsAuthenticated, )
+    permission_classes = (AllowAny, )
     serializer_class = serializers.UserSerializer
     queryset = models.User.objects.all()
 

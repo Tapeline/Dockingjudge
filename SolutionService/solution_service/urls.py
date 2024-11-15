@@ -35,4 +35,6 @@ urlpatterns = [
          views.RetrieveQuizSolutionView.as_view()),
     path("api/solutions/get-score/",
          views.GetTasksScoreForUserView.as_view()),
+    path("api/solutions/standings/<int:contest_id>/",
+         views.GetStandingsForContest.as_view()),
 ]

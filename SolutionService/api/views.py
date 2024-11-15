@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from . import serializers, permissions, models, tasks, quiz_checker, rmq
+from . import serializers, permissions, models, tasks, quiz_checker, rmq, auth
 
 
 class ListMyCodeSolutionsView(ListAPIView):
@@ -111,7 +111,7 @@ class SubmitSolutionView(APIView):
     def post(self, request, *args, **kwargs):
         if not isinstance(request.data.get("text"), str):
             raise ValidationError("no field text", "NO_TEXT")
-        response = tasks.can_sumbit(
+        response = tasks.can_submit(
             self.kwargs["task_type"],
             self.kwargs["task_id"],
             self.request.user.id
@@ -133,7 +133,7 @@ class SubmitSolutionView(APIView):
             )
 
 
-def _get_user_score(self, user_id, task_type, task_id):
+def _get_user_score(user_id, task_type, task_id):
     model = {
         "code": models.CodeSolution,
         "quiz": models.QuizSolution
@@ -144,7 +144,7 @@ def _get_user_score(self, user_id, task_type, task_id):
         return None, None, False
     max_sol = solutions[0]
     for s in solutions:
-        if s.points >= max_sol:
+        if s.points >= max_sol.points:
             max_sol = s
     return max_sol.id, max_sol.points, max_sol.is_solved
 
@@ -158,3 +158,27 @@ class GetTasksScoreForUserView(APIView):
         return Response(
             [_get_user_score(self.kwargs["user_id"], *task) for task in t]
         )
+
+
+class GetStandingsForContest(APIView):
+    parser_classes = (JSONParser, )
+    permission_classes = (IsAuthenticated, )
+
+    def get(self, request, *args, **kwargs):
+        participants_ids = tasks.get_contest_participants(kwargs["contest_id"])
+        participants = auth.get_users_by_ids(participants_ids)
+        task_list = tasks.get_all_tasks(kwargs["contest_id"])
+        table = [
+            [participant] + [
+                _get_user_score(participant["id"], task["type"], task["id"])
+                for task in task_list
+            ]
+            for participant in participants
+        ]
+        return Response({
+            "tasks": [{"type": t.type, "id": t.id, "title": t.title} for t in task_list],
+            "table": table,
+        })
+
+
+

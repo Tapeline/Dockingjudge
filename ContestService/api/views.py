@@ -287,3 +287,16 @@ class InternalRetrieveCodeTaskView(RetrieveAPIView):
     queryset = models.CodeTask.objects.all()
 
 
+class InternalGetAllTasksView(APIView):
+    def get(self, request, *args, **kwargs):
+        quiz_tasks = models.QuizTask.objects.filter(contest__id=kwargs["contest_id"])
+        code_tasks = models.CodeTask.objects.filter(contest__id=kwargs["contest_id"])
+        quiz_tasks = [
+            {"type": "quiz", **serializers.FullQuizTaskSerializer(t).data}
+            for t in quiz_tasks
+        ]
+        code_tasks = [
+            {"type": "code", **serializers.FullCodeTaskSerializer(t).data}
+            for t in code_tasks
+        ]
+        return Response(quiz_tasks + code_tasks)

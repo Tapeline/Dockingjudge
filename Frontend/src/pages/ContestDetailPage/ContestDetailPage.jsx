@@ -64,7 +64,7 @@ function ContestDetailPage(props) {
                 <Typography variant="display2">
                     {pageData.name}
                     {
-                        contestData.author == localStorage.getItem("accountId")
+                        contestData.author === localStorage.getItem("accountId")
                             ? <Button mini style={{marginLeft: 16}}
                                 href={`/contests/${contestId}/${pageType}/${pageId}/edit`}
                             ><Edit/></Button>

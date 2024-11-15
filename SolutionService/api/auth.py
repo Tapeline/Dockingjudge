@@ -33,3 +33,11 @@ class RemoteAuthentication(authentication.BaseAuthentication):
                 data["profile_pic"]
             ), None
         return None
+
+
+def get_users_by_ids(ids: list[int]):
+    response = requests.get(
+        f"{settings.ACCOUNT_SERVICE}/all",
+        params={"id": ids}
+    )
+    return response.json()

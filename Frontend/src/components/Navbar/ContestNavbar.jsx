@@ -15,7 +15,7 @@ import {
     withStyles
 } from "@material-ui/core";
 import Navbar from "./Navbar.jsx";
-import {Edit, Settings} from "@material-ui/icons";
+import {Edit, Equalizer, Settings} from "@material-ui/icons";
 
 const styles = theme => ({
     root: {
@@ -90,6 +90,13 @@ function ContestNavbar(props) {
                         </ListItem>
                         : ""
                 }
+                <ListItem button onClick={() => {
+                    navigate(`/contests/${contestId}/standings`);
+                    setTimeout(() => setIsMobileDrawerOpen(false), 100);
+                }}>
+                    <ListItemIcon><Equalizer/></ListItemIcon>
+                    <ListItemText primary="Standings"/>
+                </ListItem>
             </List>
         </div>
     );

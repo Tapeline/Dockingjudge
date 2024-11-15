@@ -21,6 +21,7 @@ import EditQuizTaskPage from "./pages/EditTaskPage/EditQuizTaskPage.jsx";
 import EditCodeTaskPage from "./pages/EditTaskPage/EditCodeTaskPage.jsx";
 import EditTextPage from "./pages/EditTaskPage/EditTextPage.jsx";
 import EditContestPage from "./pages/EditContestPage/EditContestPage.jsx";
+import ContestStandingsPage from "./pages/ContestStandingsPage/ContestStandingsPage.jsx";
 
 const router = createBrowserRouter([
     {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
             {
                 path: "/contests/:contestId",
                 element: <LoginRequiredRoute><ContestDetailPage/></LoginRequiredRoute>
+            },
+            {
+                path: "/contests/:contestId/standings",
+                element: <LoginRequiredRoute><ContestStandingsPage/></LoginRequiredRoute>
             },
             {
                 path: "/contests/:contestId/edit",

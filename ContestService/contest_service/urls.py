@@ -53,5 +53,7 @@ urlpatterns = [
          views.InternalRetrieveQuizTaskView.as_view()),
     path('internal/contests/tasks/code/<int:pk>/',
          views.InternalRetrieveCodeTaskView.as_view()),
+    path('internal/contests/<int:contest_id>/tasks/',
+         views.InternalGetAllTasksView.as_view()),
 
 ]
