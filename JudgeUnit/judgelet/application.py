@@ -7,7 +7,7 @@ import logging
 import os
 import uuid
 
-from judgelet.compilers.abc_compiler import (Compiler, RunResult,
+from judgelet.compilers.abc_compiler import (AbstractCompiler, RunResult,
                                              register_default_compilers)
 from judgelet.data.container import ZipSolutionContainer, SolutionContainer
 from judgelet.exceptions import CompilerNotFoundException
@@ -49,7 +49,7 @@ class JudgeletApplication:
 
     def ensure_compiler_exists(self, compiler) -> None:
         """Compiler validation"""
-        if compiler not in Compiler.COMPILERS:
+        if compiler not in AbstractCompiler.COMPILERS:
             raise CompilerNotFoundException
 
     async def execute_request(self, request: RunRequest) -> RunAnswer:
@@ -60,7 +60,7 @@ class JudgeletApplication:
         if request.suite.place_files is not None:
             place_before = ZipSolutionContainer.from_b64(request.suite.place_files, "")
         solution_json = request.code
-        solution_json["name"] = f"main.{Compiler.COMPILERS[request.compiler].file_ext}"
+        solution_json["name"] = f"main.{AbstractCompiler.COMPILERS[request.compiler].file_ext}"
         solution = SolutionContainer.from_json(solution_json)
         test_suite = TestSuite.deserialize(request.suite)
         runner = SolutionRunner(uid, place_before, solution, request.compiler, test_suite)

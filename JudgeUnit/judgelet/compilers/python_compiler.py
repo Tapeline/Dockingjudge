@@ -4,11 +4,11 @@ Python language support
 
 import subprocess
 
-from judgelet.compilers.abc_compiler import Compiler, RunResult, RunVerdict, UtilityRunResult
+from judgelet.compilers.abc_compiler import AbstractCompiler, RunResult, RunVerdict, UtilityRunResult
 from judgelet.settings import IO_ENCODING
 
 
-class PythonInterpreter(Compiler):
+class PythonInterpreter(AbstractCompiler):
     """Python interpreter"""
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments

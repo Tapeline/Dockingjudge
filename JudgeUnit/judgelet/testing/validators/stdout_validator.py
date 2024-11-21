@@ -2,10 +2,10 @@
 
 from judgelet.compilers.abc_compiler import RunResult
 from judgelet.exceptions import SerializationException
-from judgelet.testing.validators.abc_validator import Validator, ValidatorAnswer, ValidatorModel
+from judgelet.testing.validators.abc_validator import AbstractValidator, ValidatorAnswer, ValidatorModel
 
 
-class StdoutValidator(Validator):
+class StdoutValidator(AbstractValidator):
     """Validates stdout"""
     expected: str
     apply_strip: bool = True
@@ -21,8 +21,7 @@ class StdoutValidator(Validator):
         expected = self.expected.strip() if self.apply_strip else self.expected
         if output == expected:
             return ValidatorAnswer.ok()
-        else:
-            return ValidatorAnswer.err_wrong_answer()
+        return ValidatorAnswer.err_wrong_answer()
 
     @staticmethod
     def deserialize(validator: ValidatorModel):

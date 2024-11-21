@@ -26,3 +26,4 @@ VALIDATORS = {
     "stdout": "judgelet.testing.validators.stdout_validator.StdoutValidator",
     "file": "judgelet.testing.validators.file_validator.FileValidator"
 }
+

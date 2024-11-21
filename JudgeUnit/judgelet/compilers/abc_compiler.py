@@ -79,7 +79,7 @@ class RunResult:
                 "files": self.files}
 
 
-class Compiler(ABC):
+class AbstractCompiler(ABC):
     """ABC for any compiler"""
 
     COMPILERS: dict = {}
@@ -147,4 +147,4 @@ class Compiler(ABC):
 def register_default_compilers():
     """Dependency injection mechanism"""
     for compiler_name, compiler_module in settings.COMPILERS.items():
-        Compiler.COMPILERS[compiler_name] = load_class(compiler_module, Compiler)
+        AbstractCompiler.COMPILERS[compiler_name] = load_class(compiler_module, AbstractCompiler)

@@ -8,11 +8,12 @@ from judgelet.models import PrecompileCheckerModel
 from judgelet.testing.precompile.abc_precompile_checker import AbstractPrecompileChecker
 
 
-class NoPatternPrecompileChecker(AbstractPrecompileChecker):
-    """Does not contain regex pattern checker impl"""
+class PatternPrecompileChecker(AbstractPrecompileChecker):
+    """Regex pattern checker impl"""
 
-    def __init__(self, patterns: dict[str, list[str]]):
+    def __init__(self, patterns: dict[str, list[str]], positive: bool):
         self._patterns = patterns
+        self._is_positive = positive
 
     async def perform_check(self, solution_dir, files: list[str]) -> bool:
         return all(self._perform_check_on_file(solution_dir, file) for file in files)
@@ -27,11 +28,25 @@ class NoPatternPrecompileChecker(AbstractPrecompileChecker):
             data = f.read()
             for pattern in patterns:
                 if re.search(pattern, data):
-                    return False
-        return True
+                    return self._is_positive
+        return not self._is_positive
 
+
+class NoPatternPrecompileChecker(PatternPrecompileChecker):
+    # pylint: disable=missing-class-docstring
     @staticmethod
     def deserialize(checker: PrecompileCheckerModel):
         if not isinstance(checker.parameters.get("patterns"), dict):
             raise SerializationException
-        return NoPatternPrecompileChecker(checker.parameters["patterns"])
+        return NoPatternPrecompileChecker(checker.parameters["patterns"],
+                                          positive=False)
+
+
+class ContainsPatternPrecompileChecker(PatternPrecompileChecker):
+    # pylint: disable=missing-class-docstring
+    @staticmethod
+    def deserialize(checker: PrecompileCheckerModel):
+        if not isinstance(checker.parameters.get("patterns"), dict):
+            raise SerializationException
+        return NoPatternPrecompileChecker(checker.parameters["patterns"],
+                                          positive=True)

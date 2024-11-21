@@ -2,10 +2,10 @@
 
 from judgelet.compilers.abc_compiler import RunResult
 from judgelet.exceptions import SerializationException
-from judgelet.testing.validators.abc_validator import Validator, ValidatorAnswer, ValidatorModel
+from judgelet.testing.validators.abc_validator import AbstractValidator, ValidatorAnswer, ValidatorModel
 
 
-class FileValidator(Validator):
+class FileValidator(AbstractValidator):
     """Validates file output"""
     file_path: str
     expected: str

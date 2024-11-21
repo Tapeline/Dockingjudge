@@ -2,7 +2,7 @@
 Provides classes and functions for validating output
 """
 
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 
 from judgelet import settings
 from judgelet.class_loader import load_class
@@ -53,10 +53,9 @@ class ValidatorAnswer:
         return ValidatorAnswer(False, "ML")
 
 
-class Validator:
-    # TODO: ABC
+class AbstractValidator(ABC):
     """Represents a validator"""
-    VALIDATORS: dict[str, type["Validator"]] = {}
+    VALIDATORS: dict[str, type["AbstractValidator"]] = {}
 
     def perform_error_check(self, result: RunResult) -> ValidatorAnswer | None:
         """Convert RunResult to answer"""
@@ -85,15 +84,15 @@ class Validator:
     @staticmethod
     def deserialize(validator: ValidatorModel):
         """Create from pydantic"""
-        if validator.type not in Validator.VALIDATORS:
+        if validator.type not in AbstractValidator.VALIDATORS:
             raise SerializationException("Validator not found")
-        cls = Validator.VALIDATORS[validator.type]
+        cls = AbstractValidator.VALIDATORS[validator.type]
         return cls.deserialize(validator)
 
 
 def register_default_validators():
     """Dependency injection mechanism"""
     for validator_name, validator_module in settings.VALIDATORS.items():
-        Validator.VALIDATORS[validator_name] = load_class(
-            validator_module, Validator
+        AbstractValidator.VALIDATORS[validator_name] = load_class(
+            validator_module, AbstractValidator
         )

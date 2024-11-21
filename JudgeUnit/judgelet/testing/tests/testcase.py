@@ -1,20 +1,20 @@
 """Provides classes for representing and running test cases"""
 
-from judgelet.compilers.abc_compiler import Compiler, RunResult
-from judgelet.testing.validators.abc_validator import Validator, ValidatorAnswer
+from judgelet.compilers.abc_compiler import AbstractCompiler, RunResult
+from judgelet.testing.validators.abc_validator import AbstractValidator, ValidatorAnswer
 from judgelet import models
 
 
 class TestCase:
     """Represents a single test case"""
-    validators: list[Validator]
+    validators: list[AbstractValidator]
     stdin_data: str
     files: dict[str, str]
     required_back_files: set[str]
     time_limit: int
     memory_limit_mb: int
 
-    def __init__(self, validators: list[Validator], stdin_data: str,
+    def __init__(self, validators: list[AbstractValidator], stdin_data: str,
                  files: dict[str, str], required_back_files: set[str],
                  time_limit: int, memory_limit_mb: int):
         # pylint: disable=too-many-arguments
@@ -29,9 +29,9 @@ class TestCase:
     async def perform_test_case(self, compiler_name: str, file_name: str,
                                 solution_dir: str) -> tuple[RunResult, ValidatorAnswer]:
         """Run and validate output"""
-        if compiler_name not in Compiler.COMPILERS:
+        if compiler_name not in AbstractCompiler.COMPILERS:
             return ValidatorAnswer.err("Compiler not found")
-        compiler = Compiler.COMPILERS[compiler_name]()
+        compiler = AbstractCompiler.COMPILERS[compiler_name]()
         compiler_result = await compiler.launch_and_get_output(
             file_name, self.stdin_data, self.files,
             self.required_back_files, self.time_limit,
@@ -47,7 +47,7 @@ class TestCase:
     @staticmethod
     def deserialize(data: models.TestCase) -> "TestCase":
         """Create from pydantic"""
-        validators = [Validator.deserialize(validator_data)
+        validators = [AbstractValidator.deserialize(validator_data)
                       for validator_data in data.validators]
         return TestCase(
             validators,
