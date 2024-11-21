@@ -1,3 +1,8 @@
+"""
+Provides classes for representing and running
+test suites - collections of test groups
+"""
+
 from judgelet.compilers.abc_compiler import RunResult
 from judgelet.testing.precompile.abc_precompile_checker import AbstractPrecompileChecker
 from judgelet.testing.tests.testgroup import TestGroup
@@ -15,6 +20,7 @@ SuiteResult = tuple[
 
 
 class TestSuite:
+    """Represents a test suite"""
     groups: list[TestGroup]
     group_dependencies: dict[TargetGroup := str, Dependencies := set[str]]
     default_time_lim: int
@@ -25,6 +31,8 @@ class TestSuite:
                  group_dependencies: dict[str, set[str]],
                  precompile_checks: list[AbstractPrecompileChecker],
                  default_time_lim: int, default_mem_lim: int):
+        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-positional-arguments
         self.groups = groups
         self.group_dependencies = group_dependencies
         self.precompile_checks = precompile_checks
@@ -33,17 +41,14 @@ class TestSuite:
 
     async def run_suite(self, compiler_name: str, file_name: str,
                         solution_dir: str, file_names: list[str]) -> SuiteResult:
+        """Run precompile checks and run tests"""
         is_precompile_ok = await self.run_precompile_checks(solution_dir, file_names)
         if not is_precompile_ok:
-            return (
-                score := 0,
-                full_protocol := [],
-                group_scores := {g.name: 0 for g in self.groups},
-                verdict := "PCF"
-            )
+            return 0, [], {g.name: 0 for g in self.groups}, "PCF"
         return await self.run_tests(compiler_name, file_name, solution_dir)
 
     async def run_precompile_checks(self, solution_dir: str, file_names: list[str]) -> bool:
+        # pylint: disable=missing-function-docstring
         for checker in self.precompile_checks:
             if not await checker.perform_check(solution_dir, file_names):
                 return False
@@ -51,6 +56,7 @@ class TestSuite:
 
     async def run_tests(self, compiler_name: str, file_name: str, solution_dir: str) \
             -> tuple[int, list[list[tuple[RunResult, ValidatorAnswer]]], dict, str]:
+        """Run all groups and calculate result"""
         score = 0
         fully_passed = set()
         full_protocol = []
@@ -74,6 +80,7 @@ class TestSuite:
 
     @staticmethod
     def deserialize(data: models.TestSuite) -> "TestSuite":
+        """Create from pydantic"""
         groups = [
             TestGroup.deserialize(group, data.time_limit, data.mem_limit_mb)
             for group in data.groups

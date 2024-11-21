@@ -1,13 +1,15 @@
+"""Contains pattern checker impl"""
+
 import os.path
 import re
 
-from judgelet import settings
 from judgelet.exceptions import SerializationException
 from judgelet.models import PrecompileCheckerModel
 from judgelet.testing.precompile.abc_precompile_checker import AbstractPrecompileChecker
 
 
 class ContainsPatternPrecompileChecker(AbstractPrecompileChecker):
+    """Contains pattern checker impl"""
     def __init__(self, patterns: dict[str, list[str]]):
         self._patterns = patterns
 
@@ -15,6 +17,7 @@ class ContainsPatternPrecompileChecker(AbstractPrecompileChecker):
         return all(self._perform_check_on_file(solution_dir, file) for file in files)
 
     def _perform_check_on_file(self, solution_dir, file: str):
+        """Test singular file"""
         extension = os.path.basename(file).split(".")[-1]
         if extension not in self._patterns:
             return True

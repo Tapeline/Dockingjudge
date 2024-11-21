@@ -1,11 +1,19 @@
+"""
+Provides classes and functions for validating output
+"""
+
 from abc import abstractmethod
 
+from judgelet import settings
+from judgelet.class_loader import load_class
 from judgelet.compilers.abc_compiler import RunResult, RunVerdict
 from judgelet.exceptions import SerializationException
 from judgelet.models import Validator as ValidatorModel
 
 
 class ValidatorAnswer:
+    # pylint: disable=missing-class-docstring
+    # pylint: disable=missing-function-docstring
     success: bool
     message: str
 
@@ -46,9 +54,12 @@ class ValidatorAnswer:
 
 
 class Validator:
+    # TODO: ABC
+    """Represents a validator"""
     VALIDATORS: dict[str, type["Validator"]] = {}
 
     def perform_error_check(self, result: RunResult) -> ValidatorAnswer | None:
+        """Convert RunResult to answer"""
         if result.verdict == RunVerdict.TL:
             return ValidatorAnswer.err_time_limit()
         if result.verdict == RunVerdict.ML:
@@ -61,9 +72,11 @@ class Validator:
 
     @abstractmethod
     def validate_run_result(self, result: RunResult) -> ValidatorAnswer:
+        # pylint: disable=missing-function-docstring
         raise NotImplementedError
 
     def perform_full_validation(self, result: RunResult) -> ValidatorAnswer:
+        # pylint: disable=missing-function-docstring
         pre_check_result = self.perform_error_check(result)
         if pre_check_result is not None:
             return pre_check_result
@@ -71,6 +84,7 @@ class Validator:
 
     @staticmethod
     def deserialize(validator: ValidatorModel):
+        """Create from pydantic"""
         if validator.type not in Validator.VALIDATORS:
             raise SerializationException("Validator not found")
         cls = Validator.VALIDATORS[validator.type]
@@ -78,9 +92,8 @@ class Validator:
 
 
 def register_default_validators():
-    from judgelet.testing.validators.file_validator import FileValidator
-    from judgelet.testing.validators.stdout_validator import StdoutValidator
-    Validator.VALIDATORS["stdout"] = StdoutValidator
-    Validator.VALIDATORS["file"] = FileValidator
-
-
+    """Dependency injection mechanism"""
+    for validator_name, validator_module in settings.VALIDATORS.items():
+        Validator.VALIDATORS[validator_name] = load_class(
+            validator_module, Validator
+        )

@@ -1,3 +1,5 @@
+"""Provides classes for representing and running groups of test cases"""
+
 from judgelet.compilers.abc_compiler import RunResult
 from judgelet.testing.tests.testcase import TestCase
 from judgelet.testing.validators.abc_validator import ValidatorAnswer
@@ -5,6 +7,7 @@ from judgelet import models
 
 
 class TestGroup:
+    """Represents a TestCase group"""
     name: str
     depends_on: list[str]
     test_cases: list[TestCase]
@@ -17,6 +20,8 @@ class TestGroup:
                  test_cases: list[TestCase], points: int,
                  default_time_lim: int, default_mem_lim: int,
                  score_only_on_full_pass: bool = False):
+        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-positional-arguments
         self.name = name
         self.depends_on = depends_on
         self.test_cases = test_cases
@@ -27,6 +32,7 @@ class TestGroup:
 
     async def get_result(self, compiler_name: str, file_name: str, solution_dir: str) \
             -> tuple[bool, int, list[tuple[RunResult, ValidatorAnswer]], str]:
+        """Run all test cases and calculate the result"""
         passed = 0
         protocol = []
         verdict = None
@@ -47,10 +53,14 @@ class TestGroup:
             return False, 0, protocol, verdict or "OK"
         if passed == len(self.test_cases):
             return True, self.points, protocol, verdict or "OK"
-        return False, int(self.points / len(self.test_cases) * passed), protocol, verdict or "OK"
+        return (False, int(self.points / len(self.test_cases) * passed),
+                protocol, verdict or "OK")
 
     @staticmethod
-    def deserialize(data: models.TestGroup, default_time_limit, default_memory_limit) -> "TestGroup":
+    def deserialize(data: models.TestGroup,
+                    default_time_limit,
+                    default_memory_limit) -> "TestGroup":
+        """Create from pydantic"""
         cases = [TestCase.deserialize(case_data)
                  for case_data in data.cases]
         return TestGroup(
@@ -59,5 +69,5 @@ class TestGroup:
             cases,
             data.points,
             default_time_limit, default_memory_limit,
-            data.scoring_rule == models.ScoringRuleEnum.polar
+            data.scoring_rule == models.ScoringRuleEnum.POLAR
         )

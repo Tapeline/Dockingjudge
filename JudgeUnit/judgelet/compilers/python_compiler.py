@@ -1,4 +1,7 @@
-import asyncio
+"""
+Python language support
+"""
+
 import subprocess
 
 from judgelet.compilers.abc_compiler import Compiler, RunResult, RunVerdict, UtilityRunResult
@@ -6,6 +9,10 @@ from judgelet.settings import IO_ENCODING
 
 
 class PythonInterpreter(Compiler):
+    """Python interpreter"""
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-positional-arguments
+
     file_ext = "py"
 
     async def prepare(self, file_path: str, file_input: dict[str, str],
@@ -22,9 +29,13 @@ class PythonInterpreter(Compiler):
                    timeout: int, mem_limit_mb: int,
                    solution_dir) -> RunResult:
         try:
-            process = subprocess.run(["python", file_path], input=proc_input.encode(IO_ENCODING),
-                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=timeout,
+            process = subprocess.run(["python", file_path],
+                                     input=proc_input.encode(IO_ENCODING),
+                                     stdout=subprocess.PIPE,
+                                     stderr=subprocess.PIPE,
+                                     timeout=timeout,
                                      cwd=solution_dir)
+            # Cannot make this work for some reason
             # proc = await asyncio.create_subprocess_shell(
             #     f"python {file_path}",
             #     stdout=asyncio.subprocess.PIPE,
@@ -51,5 +62,5 @@ class PythonInterpreter(Compiler):
                 returning_files
             )
         except subprocess.TimeoutExpired:
-        #except asyncio.exceptions.TimeoutError:
+            # except asyncio.exceptions.TimeoutError:
             return RunResult(-1, "", "", RunVerdict.TL, {})

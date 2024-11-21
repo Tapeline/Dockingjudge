@@ -1,9 +1,12 @@
+"""Provides class for validating stdout"""
+
 from judgelet.compilers.abc_compiler import RunResult
 from judgelet.exceptions import SerializationException
 from judgelet.testing.validators.abc_validator import Validator, ValidatorAnswer, ValidatorModel
 
 
 class StdoutValidator(Validator):
+    """Validates stdout"""
     expected: str
     apply_strip: bool = True
 
@@ -22,7 +25,8 @@ class StdoutValidator(Validator):
             return ValidatorAnswer.err_wrong_answer()
 
     @staticmethod
-    def deserialize(data: ValidatorModel):
-        if "expected" not in data.args:
+    def deserialize(validator: ValidatorModel):
+        if "expected" not in validator.args:
             raise SerializationException
-        return StdoutValidator(str(data.args["expected"]), data.args.get("apply_strip"))
+        return StdoutValidator(str(validator.args["expected"]),
+                               validator.args.get("apply_strip"))

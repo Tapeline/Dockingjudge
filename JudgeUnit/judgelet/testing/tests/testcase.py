@@ -1,10 +1,12 @@
+"""Provides classes for representing and running test cases"""
+
 from judgelet.compilers.abc_compiler import Compiler, RunResult
-from judgelet.exceptions import SerializationException
 from judgelet.testing.validators.abc_validator import Validator, ValidatorAnswer
 from judgelet import models
 
 
 class TestCase:
+    """Represents a single test case"""
     validators: list[Validator]
     stdin_data: str
     files: dict[str, str]
@@ -15,6 +17,8 @@ class TestCase:
     def __init__(self, validators: list[Validator], stdin_data: str,
                  files: dict[str, str], required_back_files: set[str],
                  time_limit: int, memory_limit_mb: int):
+        # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-positional-arguments
         self.validators = validators
         self.stdin_data = stdin_data
         self.files = files
@@ -24,6 +28,7 @@ class TestCase:
 
     async def perform_test_case(self, compiler_name: str, file_name: str,
                                 solution_dir: str) -> tuple[RunResult, ValidatorAnswer]:
+        """Run and validate output"""
         if compiler_name not in Compiler.COMPILERS:
             return ValidatorAnswer.err("Compiler not found")
         compiler = Compiler.COMPILERS[compiler_name]()
@@ -41,6 +46,7 @@ class TestCase:
 
     @staticmethod
     def deserialize(data: models.TestCase) -> "TestCase":
+        """Create from pydantic"""
         validators = [Validator.deserialize(validator_data)
                       for validator_data in data.validators]
         return TestCase(

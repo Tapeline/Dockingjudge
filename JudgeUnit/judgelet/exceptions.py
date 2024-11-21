@@ -1,6 +1,11 @@
+"""
+Provides exception classes
+"""
+
+
 class SerializationException(Exception):
-    pass
+    """Thrown when any entity cannot be serialized or deserialized"""
 
 
 class CompilerNotFoundException(Exception):
-    pass
+    """Thrown if requested compiler is not found on the judgelet"""
