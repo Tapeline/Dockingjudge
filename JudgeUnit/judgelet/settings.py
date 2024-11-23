@@ -13,7 +13,8 @@ NO_IMPORT_PRECOMPILE_CHECKER_PATTERNS = {
 }
 
 COMPILERS = {
-    "python": "judgelet.compilers.python_compiler.PythonInterpreter"
+    "python": "judgelet.compilers.python_compiler.PythonInterpreter",
+    "cpp": "judgelet.compilers.cpp_compiler.CppCompiler"
 }
 
 PRECOMPILE_CHECKERS = {

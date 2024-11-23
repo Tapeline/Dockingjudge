@@ -54,6 +54,7 @@ class TestSuite(BaseModel):
     public_cases: list[dict] = []
     time_limit: int
     mem_limit_mb: int
+    compile_timeout: int = 5
 
 
 class RunRequest(BaseModel):
@@ -79,3 +80,4 @@ class RunAnswer(BaseModel):
     verdict: str
     group_scores: dict[str, int]
     protocol: list[list[TestCaseResult]]
+    compilation_error: str | None = None

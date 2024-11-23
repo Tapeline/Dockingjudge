@@ -10,6 +10,7 @@ import uuid
 from judgelet.compilers.abc_compiler import (AbstractCompiler, RunResult,
                                              register_default_compilers)
 from judgelet.data.container import ZipSolutionContainer, SolutionContainer
+from judgelet.encoding import try_to_decode
 from judgelet.exceptions import CompilerNotFoundException
 from judgelet.models import TestCaseResult, RunRequest, RunAnswer
 from judgelet.runner import SolutionRunner
@@ -64,13 +65,14 @@ class JudgeletApplication:
         solution = SolutionContainer.from_json(solution_json)
         test_suite = TestSuite.deserialize(request.suite)
         runner = SolutionRunner(uid, place_before, solution, request.compiler, test_suite)
-        score, protocol, group_scores, verdict = await runner.run()
-        converted_protocol = self.serialize_protocol(protocol)
+        result = await runner.run()
+        converted_protocol = self.serialize_protocol(result.protocol)
         return RunAnswer(
-            score=score,
+            score=result.score,
             protocol=converted_protocol,
-            verdict=verdict,
-            group_scores=group_scores
+            verdict=result.verdict,
+            group_scores=result.group_scores,
+            compilation_error=try_to_decode(result.compilation_error)
         )
 
     async def execute_request_and_handle_errors(self, request: RunRequest):

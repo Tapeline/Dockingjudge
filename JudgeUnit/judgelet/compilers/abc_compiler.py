@@ -86,8 +86,10 @@ class AbstractCompiler(ABC):
 
     file_ext: str = ""
 
-    def __init__(self):
-        pass
+    def __init__(self, context: dict | None = None):
+        if context is None:
+            context = {}
+        self._context = context
 
     def save_files(self, files_config: dict[str, str]) -> None:
         """Save solution filese"""
@@ -123,7 +125,7 @@ class AbstractCompiler(ABC):
         """Prepare solution for compilation"""
 
     @abstractmethod
-    async def compile(self, file_path: str, solution_dir) -> UtilityRunResult:
+    async def compile(self, file_path: str, compile_timeout, solution_dir) -> UtilityRunResult:
         """Compile solution"""
 
     @abstractmethod

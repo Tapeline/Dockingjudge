@@ -26,12 +26,12 @@ class TestCase:
         self.time_limit = time_limit
         self.memory_limit_mb = memory_limit_mb
 
-    async def perform_test_case(self, compiler_name: str, file_name: str,
+    async def perform_test_case(self, context, compiler_name: str, file_name: str,
                                 solution_dir: str) -> tuple[RunResult, ValidatorAnswer]:
         """Run and validate output"""
         if compiler_name not in AbstractCompiler.COMPILERS:
             return ValidatorAnswer.err("Compiler not found")
-        compiler = AbstractCompiler.COMPILERS[compiler_name]()
+        compiler = AbstractCompiler.COMPILERS[compiler_name](context)
         compiler_result = await compiler.launch_and_get_output(
             file_name, self.stdin_data, self.files,
             self.required_back_files, self.time_limit,

@@ -30,7 +30,7 @@ class TestGroup:
         self.default_mem_lim = default_mem_lim
         self.default_time_lim = default_time_lim
 
-    async def get_result(self, compiler_name: str, file_name: str, solution_dir: str) \
+    async def get_result(self, context, compiler_name: str, file_name: str, solution_dir: str) \
             -> tuple[bool, int, list[tuple[RunResult, ValidatorAnswer]], str]:
         """Run all test cases and calculate the result"""
         passed = 0
@@ -41,7 +41,8 @@ class TestGroup:
                 testcase.memory_limit_mb = self.default_mem_lim
             if testcase.time_limit is None:
                 testcase.time_limit = self.default_time_lim
-            run_result, result = await testcase.perform_test_case(compiler_name,
+            run_result, result = await testcase.perform_test_case(context,
+                                                                  compiler_name,
                                                                   file_name,
                                                                   solution_dir)
             protocol.append((run_result, result))
