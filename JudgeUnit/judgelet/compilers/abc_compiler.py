@@ -113,26 +113,17 @@ class AbstractCompiler(ABC):
                                     required_back_files: set[str],
                                     timeout: int, mem_limit_mb: int,
                                     solution_dir: str) -> RunResult:
-        """Compile and run code"""
-        result = await self.prepare(file_path, file_input, required_back_files, solution_dir)
-        if not result.success:
-            return result.to_run_result()
-
-        result = await self.compile(file_path, file_input, required_back_files, solution_dir)
-        if not result.success:
-            return result.to_run_result()
-
+        """Test code"""
         return await self.test(file_path, proc_input, file_input,
-                               required_back_files, timeout, mem_limit_mb, solution_dir)
+                               required_back_files, timeout,
+                               mem_limit_mb, solution_dir)
 
     @abstractmethod
-    async def prepare(self, file_path: str, file_input: dict[str, str],
-                      required_back_files: set[str], solution_dir) -> UtilityRunResult:
+    async def prepare(self, file_path: str, solution_dir) -> UtilityRunResult:
         """Prepare solution for compilation"""
 
     @abstractmethod
-    async def compile(self, file_path: str, file_input: dict[str, str],
-                      required_back_files: set[str], solution_dir) -> UtilityRunResult:
+    async def compile(self, file_path: str, solution_dir) -> UtilityRunResult:
         """Compile solution"""
 
     @abstractmethod

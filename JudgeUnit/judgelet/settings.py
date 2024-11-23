@@ -18,8 +18,8 @@ COMPILERS = {
 
 PRECOMPILE_CHECKERS = {
     "no_import": "judgelet.testing.precompile.no_import_checker.NoImportPrecompileChecker",
-    "no_pattern": "judgelet.testing.precompile.no_pattern_checker.NoPatternPrecompileChecker",
-    "contains_pattern": "judgelet.testing.precompile.contains_pattern_checker.ContainsPatternPrecompileChecker",
+    "no_pattern": "judgelet.testing.precompile.pattern_checker.NoPatternPrecompileChecker",
+    "contains_pattern": "judgelet.testing.precompile.pattern_checker.ContainsPatternPrecompileChecker",
 }
 
 VALIDATORS = {

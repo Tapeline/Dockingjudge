@@ -25,6 +25,8 @@ message = {
     },
     "compiler": "python",
     "suite": {
+        "mem_limit_mb": 256,
+        "time_limit": 2,
         "precompile": [
             {
                 "type": "no_import"
