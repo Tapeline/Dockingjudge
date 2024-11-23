@@ -1,0 +1,17 @@
+--- Judgelet ---
+TODO: refactor judgelet architecture
+TODO: unit test judgelet
+TODO: integration test judgelet
+
+
+--- Contest service ---
+TODO: fix security issues with nested resources
+
+
+--- Solution service ---
+TODO: fix security issues with nested resources
+
+
+--- Frontend ---
+TODO: small design adjustments
+TODO: create profile page
