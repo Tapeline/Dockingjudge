@@ -5,12 +5,10 @@ TODO: integration test judgelet
 
 
 --- Contest service ---
-TODO: fix security issues with nested resources
 TODO: integration test
 
 
 --- Solution service ---
-TODO: fix security issues with nested resources
 TODO: integration test
 
 
