@@ -1,17 +1,20 @@
 --- Judgelet ---
-TODO: refactor judgelet architecture
+TODO: add sandbox
 TODO: unit test judgelet
 TODO: integration test judgelet
 
 
 --- Contest service ---
 TODO: fix security issues with nested resources
+TODO: integration test
 
 
 --- Solution service ---
 TODO: fix security issues with nested resources
+TODO: integration test
 
 
 --- Frontend ---
 TODO: small design adjustments
 TODO: create profile page
+TODO: ui testsuite editor
