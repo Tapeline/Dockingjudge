@@ -16,7 +16,7 @@ class TestCase:
 
     def __init__(self, validators: list[AbstractValidator], stdin_data: str,
                  files: dict[str, str], required_back_files: set[str],
-                 time_limit: int, memory_limit_mb: int):
+                 time_limit: int | None, memory_limit_mb: int | None):
         # pylint: disable=too-many-arguments
         # pylint: disable=too-many-positional-arguments
         self.validators = validators

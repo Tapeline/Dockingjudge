@@ -132,7 +132,7 @@ class AbstractCompiler(ABC):
     async def test(self, file_path: str, proc_input: str,
                    file_input: dict[str, str],
                    required_back_files: set[str],
-                   timeout: int, mem_limit_mb: int,
+                   timeout: float, mem_limit_mb: float,
                    solution_dir) -> RunResult:
         """Run solution"""
 

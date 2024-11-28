@@ -1,14 +1,13 @@
 """
 C++ language support
 """
-import asyncio
 
-from judgelet.compilers import shell_executor
-from judgelet.compilers.abc_compiler import AbstractCompiler, RunResult, RunVerdict, UtilityRunResult
-from judgelet.settings import IO_ENCODING
+from judgelet.compilers.abc_compiler import RunVerdict, UtilityRunResult
+from judgelet.compilers.default_compiler import DefaultCompiler
+from judgelet.sandbox.sandbox import Sandbox, SandboxResult
 
 
-class CppCompiler(AbstractCompiler):
+class CppCompiler(DefaultCompiler):
     """C++17 Compiler"""
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-positional-arguments
@@ -19,46 +18,29 @@ class CppCompiler(AbstractCompiler):
 
     async def compile(self, file_path: str, compile_timeout,
                       solution_dir) -> UtilityRunResult:
-        result = await shell_executor.execute_in_shell(
+        sandbox = Sandbox(solution_dir)
+        result = await sandbox.run(
             f"g++ -std=c++17 -O2 -o solution {file_path}",
-            timeout=10,
-            cwd=solution_dir
+            proc_input="",
+            timeout_s=10,
+            memory_limit_mb=512
         )
+        sandbox.close()
         self._context["compiled"] = "solution"
         if result.return_code != 0:
             return UtilityRunResult.err(
                 RunVerdict.CE,
-                b"stdout >>>>>\n" + result.stdout +
-                b"\n\nstderr >>>>>\n" + result.stderr
+                "stdout >>>>>\n" + result.stdout +
+                "\n\nstderr >>>>>\n" + result.stderr
             )
         return UtilityRunResult.ok()
 
-    async def test(self, file_path: str, proc_input: str,
-                   file_input: dict[str, str], required_back_files: set[str],
-                   timeout: int, mem_limit_mb: int,
-                   solution_dir) -> RunResult:
-        try:
-            result = await shell_executor.execute_in_shell(
-                f"./{self._context['compiled']}",
-                proc_input=proc_input,
-                timeout=timeout,
-                cwd=solution_dir
-            )
-            returning_files = self.load_files(required_back_files)
-            if returning_files is None:
-                return RunResult(
-                    result.return_code,
-                    result.stdout.decode(IO_ENCODING).replace('\r\n', '\n'),
-                    result.stderr.decode(IO_ENCODING).replace('\r\n', '\n'),
-                    RunVerdict.REQUIRED_FILE_NOT_FOUND,
-                    {}
-                )
-            return RunResult(
-                result.return_code,
-                result.stdout.decode(IO_ENCODING).replace('\r\n', '\n'),
-                result.stderr.decode(IO_ENCODING).replace('\r\n', '\n'),
-                RunVerdict.OK,
-                returning_files
-            )
-        except asyncio.exceptions.TimeoutError:
-            return RunResult(-1, "", "", RunVerdict.TL, {})
+    async def test_impl(self, file_path: str, proc_input: str,
+                        timeout: float, mem_limit_mb: float,
+                        sandbox: Sandbox) -> SandboxResult:
+        return await sandbox.run(
+            f"./{self._context['compiled']}",
+            proc_input=proc_input,
+            timeout_s=timeout,
+            memory_limit_mb=mem_limit_mb
+        )

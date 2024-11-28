@@ -48,9 +48,7 @@ message = {
                         ],
                         "stdin": "3\n",
                         "files_in": {},
-                        "files_out": [],
-                        "time_limit": 2,
-                        "mem_limit_mb": 0
+                        "files_out": []
                     }
                 ]
             },
@@ -69,9 +67,7 @@ message = {
                         ],
                         "stdin": "a\n",
                         "files_in": {},
-                        "files_out": [],
-                        "time_limit": 2,
-                        "mem_limit_mb": 0
+                        "files_out": []
                     }
                 ]
             }

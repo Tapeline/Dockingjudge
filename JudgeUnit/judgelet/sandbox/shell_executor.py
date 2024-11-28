@@ -3,7 +3,7 @@ from collections import namedtuple
 from typing import Any
 
 from judgelet import settings
-
+from judgelet.encoding import try_to_decode
 
 ShellResult = namedtuple("ShellResult", ["stdout", "stderr", "return_code"])
 
@@ -11,7 +11,6 @@ ShellResult = namedtuple("ShellResult", ["stdout", "stderr", "return_code"])
 async def execute_in_shell(
         command: str, *,
         proc_input: str = "",
-        timeout: float | None = None,
         cwd: str | None = None,
         env: Any | None = None,
         io_encoding: str = settings.IO_ENCODING
@@ -27,8 +26,8 @@ async def execute_in_shell(
     proc.stdin.write_eof()
     proc.stdin.close()
     return_code = await proc.wait()
-    stdout = await proc.stdout.read()
-    stderr = await proc.stderr.read()
+    stdout = try_to_decode(await proc.stdout.read(), preferred=io_encoding)
+    stderr = try_to_decode(await proc.stderr.read(), preferred=io_encoding)
     try:
         proc.terminate()
         proc.kill()
