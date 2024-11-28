@@ -18,26 +18,32 @@ function ContestDetailPage(props) {
     const [isContestNotFound, setContestNotFound] = useState(false);
     const [contestData, setContestData] = useState(null);
     const [pageData, setPageData] = useState(null);
+    const [receivedPageType, setReceivedPageType] = useState(pageType);
+    const [receivedPageId, setReceivedPageId] = useState(pageId);
 
     useEffect(() => {
         getContest(accessToken, contestId).then(response => {
             if (response.success) {
                 setContestData(response.data);
-                if (pageType === null || pageType === undefined) {
-                    window.location.href = "/contests/" + contestId +
-                        "/" + response.data.pages[0].type + "/" + response.data.pages[0].id;
+                if (receivedPageType === null || receivedPageType === undefined) {
+                    setReceivedPageType(response.data.pages[0].type);
+                    setReceivedPageId(response.data.pages[0].id);
                 }
             } else setContestNotFound(true);
         });
     }, []);
 
     useEffect(() => {
-        if (pageType === null || pageType === undefined) return;
-        getContestPage(accessToken, contestId, pageType, pageId).then(response => {
+        if (receivedPageType === null || receivedPageType === undefined) return;
+        if (pageType !== undefined) {
+            setReceivedPageType(pageType);
+            setReceivedPageId(pageId);
+        }
+        getContestPage(accessToken, contestId, receivedPageType, receivedPageId).then(response => {
             if (response.success)
                 setPageData(response.data);
         })
-    }, [pageType, pageId]);
+    }, [receivedPageType, receivedPageId, pageType, pageId]);
 
     const isFullyLoaded = () => {
         return !(contestData === null || pageData === null);
@@ -48,7 +54,7 @@ function ContestDetailPage(props) {
             if (response.success) {
                 toastSuccess("Successfully entered contest");
                 window.location.href = `/contests/${contestId}/${pageType}/${pageId}`;
-            } else toastError(response.errorCode);
+            } else toastError(response.reason);
         })
     }
 
@@ -58,7 +64,7 @@ function ContestDetailPage(props) {
     if (!isFullyLoaded())
         return <CircularProgress className={classes.progress}/>;
 
-    if (pageType === "text") {
+    if (receivedPageType === "text") {
         return (
             <div>
                 <Typography variant="display2">
@@ -66,20 +72,22 @@ function ContestDetailPage(props) {
                     {
                         contestData.author === localStorage.getItem("accountId")
                             ? <Button mini style={{marginLeft: 16}}
-                                href={`/contests/${contestId}/${pageType}/${pageId}/edit`}
+                                href={`/contests/${contestId}/${receivedPageType}/${receivedPageId}/edit`}
                             ><Edit/></Button>
                             : ""
                     }
                 </Typography>
+                <VWhitespace/>
                 <Typography variant="body1">{pageData.text}</Typography>
+                <VWhitespace/>
                 {pageData?.is_enter_page
-                    ? <Button onClick={onEnterClick}>Enter contest</Button>
+                    ? <Button variant="outlined" onClick={onEnterClick}>Enter contest</Button>
                     : ""}
             </div>
         );
-    } else if (pageType === "quiz") {
+    } else if (receivedPageType === "quiz") {
         return <QuizDetailPage contestData={contestData} pageData={pageData}/>;
-    } else if (pageType === "code") {
+    } else if (receivedPageType === "code") {
         return <CodeDetailPage contestData={contestData} pageData={pageData}/>;
     }
 

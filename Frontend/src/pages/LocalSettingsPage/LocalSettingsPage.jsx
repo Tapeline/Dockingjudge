@@ -19,7 +19,7 @@ function LocalSettingsPage(props) {
         = useState(localSettings.getStr("locale"));
 
     return (
-        <div>
+        <div className="dj-container">
             <Typography variant="display2" style={{marginBottom: 16}}>
                 Local settings
             </Typography>

@@ -4,8 +4,10 @@ import Preloader from "../../components/Preloader/Preloader.jsx";
 import {getAllContests} from "../../api/endpoints-contests.jsx";
 import ContestCard from "../../components/ContestCard/ContestCard.jsx";
 import CreateContestDialog from "../../components/Dialogs/CreateContestDialog/CreateContestDialog.jsx";
-import {CircularProgress, Typography, withStyles} from "@material-ui/core";
+import {CircularProgress, Grid, Typography, withStyles} from "@material-ui/core";
 import HWhitespace from "../../utils/HWhitespace.jsx";
+import {Row} from "react-bootstrap";
+import VWhitespace from "../../utils/VWhitespace.jsx";
 
 const styles = theme => ({});
 
@@ -25,17 +27,20 @@ function ContestListPage(props) {
         contestList === null?
         <CircularProgress className={classes.progress}/>
         :
-        <div>
+        <div className="dj-container">
             <Typography variant="display2" style={{marginBottom: 16}}>
                 All contests
                 <HWhitespace width={1}/>
                 <CreateContestDialog/>
             </Typography>
-            {
+            <VWhitespace width={2}/>
+            <Grid container spacing={24}>{
                 contestList?.map(function (data, id) {
-                    return <ContestCard key={id} data={data}/>;
+                    return <Grid item xs={12} md={6} xl={3} key={id}>
+                        <ContestCard data={data}/>
+                    </Grid>;
                 })
-            }
+            }</Grid>
         </div>
     );
 }

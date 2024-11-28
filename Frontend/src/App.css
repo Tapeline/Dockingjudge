@@ -45,3 +45,29 @@ code {
     border: 1px solid #AAA;
     border-radius: 4px;
 }
+
+main {
+    padding-left: 3rem;
+    padding-right: 3rem;
+    padding-top: 1rem;
+}
+
+.dj-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-top: 1rem;
+}
+
+@media screen and (max-width: 768px){
+    main {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+        padding-top: 1rem;
+    }
+
+    .dj-container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        padding-top: 1rem;
+    }
+}

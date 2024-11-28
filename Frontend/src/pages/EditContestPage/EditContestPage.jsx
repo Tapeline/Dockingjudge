@@ -182,11 +182,17 @@ function EditContestPage(props) {
                                  indicatorColor="primary"
                                  textColor="primary"
                         >
-                            <CreateTextPageDialog contestId={contestId}/>
-                            <HWhitespace/>
-                            <CreateQuizPageDialog contestId={contestId}/>
-                            <HWhitespace/>
-                            <CreateCodePageDialog contestId={contestId}/>
+                            <Grid container spacing={24}>
+                                <Grid item xs={4} sm={2}>
+                                    <CreateTextPageDialog contestId={contestId}/>
+                                </Grid>
+                                <Grid item xs={4} sm={2}>
+                                    <CreateQuizPageDialog contestId={contestId}/>
+                                </Grid>
+                                <Grid item xs={4} sm={2}>
+                                    <CreateCodePageDialog contestId={contestId}/>
+                                </Grid>
+                            </Grid>
                         </Toolbar>
                         <List>{
                             contestData.pages.map((data, index) => {

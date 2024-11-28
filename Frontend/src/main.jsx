@@ -33,10 +33,6 @@ const router = createBrowserRouter([
                 element: <LoginRequiredRoute><ProfilePage/></LoginRequiredRoute>
             },
             {
-                path: "/profile/:page",
-                element: <LoginRequiredRoute><ProfilePage/></LoginRequiredRoute>
-            },
-            {
                 path: "/contests",
                 element: <LoginRequiredRoute><ContestListPage/></LoginRequiredRoute>
             },

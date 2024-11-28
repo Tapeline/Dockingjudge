@@ -54,7 +54,7 @@ function DialogImpl(props) {
 
     return (
         <>
-            <Button variant="raised" onClick={handleShow} size="small"><Add/> Quiz page</Button>
+            <Button variant="outlined" onClick={handleShow} size="small"  style={{width: "100%"}}><Add/> Quiz</Button>
             <Dialog
                 open={show}
                 onClose={handleClose}

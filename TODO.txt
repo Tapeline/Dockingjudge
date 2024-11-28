@@ -13,6 +13,8 @@ TODO: integration test
 
 
 --- Frontend ---
-TODO: small design adjustments
-TODO: create profile page
 TODO: ui testsuite editor
+
+
+--- Overall ---
+TODO: timer

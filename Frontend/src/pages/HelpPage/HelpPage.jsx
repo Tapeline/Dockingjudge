@@ -16,6 +16,7 @@ import {
 } from "@material-ui/core";
 import HWhitespace from "../../utils/HWhitespace.jsx";
 import locales from "../../locales.jsx";
+import VWhitespace from "../../utils/VWhitespace.jsx";
 
 const styles = theme => ({});
 
@@ -25,14 +26,15 @@ function HelpPage(props) {
     const {classes, theme} = props;
 
     return (
-        <div>
+        <div className="dj-container">
             <Typography variant="display2" style={{marginBottom: 16}}>
                 {locales.helpPage.title}
             </Typography>
             <Typography variant="title">
                 {locales.helpPage.titleVerdicts}
             </Typography>
-            <Paper className={classes.root}>
+            <VWhitespace/>
+            <Paper className={classes.root} style={{overflowX: "scroll"}}>
                 <Table className={classes.table}>
                     <TableBody>
                         <TableRow>

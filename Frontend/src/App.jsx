@@ -16,7 +16,6 @@ const styles = theme => ({
     content: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
-        padding: theme.spacing.unit * 4,
         minWidth: 0,
         minHeight: '100vh',
         paddingTop: 80
