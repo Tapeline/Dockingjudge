@@ -81,11 +81,13 @@ class TestSuite:
                 await group.get_result(self.context, compiler_name, file_name, solution_dir)
             full_protocol.append(group_protocol)
             if group.name not in self.group_dependencies:
-                fully_passed.add(group.name)
+                if has_passed:
+                    fully_passed.add(group.name)
                 score += group_score
                 group_scores[group.name] = group_score
             elif all(dep in fully_passed for dep in self.group_dependencies[group.name]):
-                fully_passed.add(group.name)
+                if has_passed:
+                    fully_passed.add(group.name)
                 score += group_score
                 group_scores[group.name] = group_score
             if not has_passed and verdict is None:

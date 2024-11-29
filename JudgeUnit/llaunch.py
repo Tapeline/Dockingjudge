@@ -17,6 +17,8 @@ _return_code = None
 
 
 def _will_terminate_by_timeout(time_limit_s: float) -> bool:
+    if time_limit_s < 0:
+        return False
     try:
         proc = psutil.Process(process.pid)
         elapsed = time.time() - proc.create_time()
@@ -26,6 +28,8 @@ def _will_terminate_by_timeout(time_limit_s: float) -> bool:
 
 
 def _will_terminate_by_memory_limit(mem_limit_bytes: int) -> bool:
+    if mem_limit_bytes < 0:
+        return False
     try:
         proc = psutil.Process(process.pid)
         mem_bytes = proc.memory_info().rss

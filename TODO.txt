@@ -1,6 +1,5 @@
 --- Judgelet ---
 TODO: add sandbox
-TODO: unit test judgelet
 TODO: integration test judgelet
 
 

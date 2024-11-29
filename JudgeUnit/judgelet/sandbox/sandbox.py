@@ -1,9 +1,11 @@
 import enum
+import os
 import shutil
 from dataclasses import dataclass
 from enum import Enum
 from typing import Final
 
+from judgelet import settings
 from judgelet.sandbox import shell_executor
 
 
@@ -29,7 +31,7 @@ class Sandbox:
     def __init__(
             self,
             sandbox_dir: str,
-            encoding: str | None = None,
+            encoding: str | None = settings.IO_ENCODING,
             environment: dict[str, str] | None = None
     ):
         self.sandbox_dir = sandbox_dir
