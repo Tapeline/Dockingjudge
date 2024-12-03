@@ -1,28 +1,28 @@
-"""
-Provides classes for testing solutions
-"""
+"""Provides classes for testing solutions"""
 
-import os
 import shutil
+from pathlib import Path
 
-from judgelet.data.container import (SolutionContainer,
-                                     ZipSolutionContainer,
+from judgelet.data.container import (SolutionContainer, ZipSolutionContainer,
                                      place_all_solution_files)
-from judgelet.testing.tests.testsuite import TestSuite, SuiteResult
+from judgelet.testing.tests.testsuite import SuiteResult, TestSuite
 
 
 class SolutionRunner:
-    """Runs and tests solutions"""
     # pylint: disable=too-many-arguments
     # pylint: disable=too-few-public-methods
     # pylint: disable=too-many-positional-arguments
+    """Runs and tests solutions"""
 
-    def __init__(self,
-                 uid: str,
-                 place_before: ZipSolutionContainer | None,
-                 solution: SolutionContainer,
-                 compiler_name: str,
-                 test_suite: TestSuite):
+    def __init__(  # noqa: WPS211 (too many args)
+        self,
+        uid: str,  # TODO: consider encapsulating in SolutionRunner
+        place_before: ZipSolutionContainer | None,
+        solution: SolutionContainer,
+        compiler_name: str,
+        test_suite: TestSuite
+    ):
+        """Create runner for solution"""
         self._uid = uid
         self._compiler_name = compiler_name
         self._place_before = place_before
@@ -30,13 +30,17 @@ class SolutionRunner:
         self._working_dir = f"solution/{self._uid}"
         self._suite = test_suite
 
+    async def run(self) -> SuiteResult:
+        """Test solution"""
+        self._prepare_solution_environment()
+        main_file = self._place_solution_files()
+        run_result = await self._run_suite(main_file)
+        self._clean_up()
+        return run_result
+
     def _prepare_solution_environment(self):
         """Create solution directory and place additional files"""
-        try:
-            os.mkdir("solution")
-        except FileExistsError:
-            pass
-        os.mkdir(self._working_dir)
+        Path(self._working_dir).mkdir(parents=True, exist_ok=True)
         if self._place_before is not None:
             place_all_solution_files(self._place_before, self._working_dir)
 
@@ -51,17 +55,9 @@ class SolutionRunner:
             self._compiler_name,
             main_file,
             self._working_dir,
-            [file.name for file in self._solution.get_files()]
+            [solution_file.name for solution_file in self._solution.get_files()]
         )
 
     def _clean_up(self):
         """Delete solution directory"""
         shutil.rmtree(self._working_dir)
-
-    async def run(self) -> SuiteResult:
-        """Test solution"""
-        self._prepare_solution_environment()
-        main_file = self._place_solution_files()
-        result = await self._run_suite(main_file)
-        self._clean_up()
-        return result

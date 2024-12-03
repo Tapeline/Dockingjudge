@@ -1,8 +1,6 @@
-"""
-Provides classes and functions for validating output
-"""
+"""Provides classes and functions for validating output"""
 
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 
 from judgelet import settings
 from judgelet.class_loader import load_class
@@ -11,83 +9,90 @@ from judgelet.exceptions import SerializationException
 from judgelet.models import Validator as ValidatorModel
 
 
-class ValidatorAnswer:
-    # pylint: disable=missing-class-docstring
-    # pylint: disable=missing-function-docstring
-    success: bool
-    message: str
+class ValidatorAnswer:  # noqa: WPS214 (too many methods)
+    """Checking result"""
 
     def __init__(self, success: bool, message: str):
+        """Create answer"""
         self.success = success
         self.message = message
 
     def to_dict(self):
+        """Serialize"""
         return {"success": self.success, "message": self.message}
 
     @classmethod
     def ok(cls):
-        return ValidatorAnswer(True, "OK")
+        """OK checker message"""
+        return ValidatorAnswer(success=True, message="OK")
 
     @classmethod
     def err(cls, message: str):
-        return ValidatorAnswer(False, message)
+        """Error checker message"""
+        return ValidatorAnswer(success=False, message=message)
 
     @classmethod
     def err_wrong_answer(cls):
-        return ValidatorAnswer(False, "WA")
+        """WA checker message"""
+        return ValidatorAnswer(success=False, message="WA")
 
     @classmethod
     def err_presentation_error(cls):
-        return ValidatorAnswer(False, "PE")
+        """PE checker message"""
+        return ValidatorAnswer(success=False, message="PE")
 
     @classmethod
     def err_runtime_error(cls):
-        return ValidatorAnswer(False, "RE")
+        """RE checker message"""
+        return ValidatorAnswer(success=False, message="RE")
 
     @classmethod
     def err_time_limit(cls):
-        return ValidatorAnswer(False, "TL")
+        """TL checker message"""
+        return ValidatorAnswer(success=False, message="TL")
 
     @classmethod
     def err_mem_limit(cls):
-        return ValidatorAnswer(False, "ML")
+        """ML checker message"""
+        return ValidatorAnswer(success=False, message="ML")
 
 
 class AbstractValidator(ABC):
     """Represents a validator"""
+
     VALIDATORS: dict[str, type["AbstractValidator"]] = {}
 
-    def perform_error_check(self, result: RunResult) -> ValidatorAnswer | None:
+    def perform_error_check(self, run_result: RunResult) -> ValidatorAnswer | None:
         """Convert RunResult to answer"""
-        if result.verdict == RunVerdict.TL:
+        if run_result.verdict == RunVerdict.TL:
             return ValidatorAnswer.err_time_limit()
-        if result.verdict == RunVerdict.ML:
+        if run_result.verdict == RunVerdict.ML:
             return ValidatorAnswer.err_mem_limit()
-        if result.verdict == RunVerdict.REQUIRED_FILE_NOT_FOUND:
+        if run_result.verdict == RunVerdict.REQUIRED_FILE_NOT_FOUND:
             return ValidatorAnswer.err_presentation_error()
-        if result.return_code != 0:
+        if run_result.return_code != 0:
             return ValidatorAnswer.err_runtime_error()
         return None
 
-    @abstractmethod
-    def validate_run_result(self, result: RunResult) -> ValidatorAnswer:
-        # pylint: disable=missing-function-docstring
-        raise NotImplementedError
-
-    def perform_full_validation(self, result: RunResult) -> ValidatorAnswer:
-        # pylint: disable=missing-function-docstring
-        pre_check_result = self.perform_error_check(result)
+    def perform_full_validation(self, run_result: RunResult) -> ValidatorAnswer:
+        """Validate run result (including pre-validation errors)"""
+        pre_check_result = self.perform_error_check(run_result)
         if pre_check_result is not None:
             return pre_check_result
-        return self.validate_run_result(result)
+        return self.validate_run_result(run_result)
+
+    @abstractmethod
+    def validate_run_result(self, run_result: RunResult) -> ValidatorAnswer:
+        """Validate single program run output"""
+        raise NotImplementedError
 
     @staticmethod
     def deserialize(validator: ValidatorModel):
         """Create from pydantic"""
         if validator.type not in AbstractValidator.VALIDATORS:
             raise SerializationException("Validator not found")
-        cls = AbstractValidator.VALIDATORS[validator.type]
-        return cls.deserialize(validator)
+        validator_class = AbstractValidator.VALIDATORS[validator.type]
+        return validator_class.deserialize(validator)
 
 
 def register_default_validators():

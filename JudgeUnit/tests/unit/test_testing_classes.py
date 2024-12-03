@@ -1,10 +1,13 @@
 from judgelet import models
-from judgelet.compilers.abc_compiler import UtilityRunResult, AbstractCompiler, RunResult
+from judgelet.compilers.abc_compiler import (AbstractCompiler, RunResult,
+                                             UtilityRunResult)
 from judgelet.compilers.default_compiler import DefaultCompiler
-from judgelet.models import ScoringRuleEnum, Validator as ValidatorModel
-from judgelet.sandbox.sandbox import Sandbox, SandboxResult, SandboxExitCause
+from judgelet.models import ScoringRuleEnum
+from judgelet.models import Validator as ValidatorModel
+from judgelet.sandbox.sandbox import Sandbox, SandboxExitCause, SandboxResult
 from judgelet.testing.tests.testsuite import TestSuite
-from judgelet.testing.validators.abc_validator import AbstractValidator, ValidatorAnswer
+from judgelet.testing.validators.abc_validator import (AbstractValidator,
+                                                       ValidatorAnswer)
 
 
 class MockCompiler(DefaultCompiler):
@@ -21,7 +24,7 @@ class MockCompiler(DefaultCompiler):
 
 class MockOkValidator(AbstractValidator):
 
-    def validate_run_result(self, result: RunResult) -> ValidatorAnswer:
+    def validate_run_result(self, run_result: RunResult) -> ValidatorAnswer:
         return ValidatorAnswer.ok()
 
     @staticmethod
@@ -30,7 +33,7 @@ class MockOkValidator(AbstractValidator):
 
 
 class MockWAValidator(AbstractValidator):
-    def validate_run_result(self, result: RunResult) -> ValidatorAnswer:
+    def validate_run_result(self, run_result: RunResult) -> ValidatorAnswer:
         return ValidatorAnswer.err_wrong_answer()
 
     @staticmethod

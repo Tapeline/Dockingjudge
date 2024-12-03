@@ -1,6 +1,4 @@
-"""
-Provides pydantic models
-"""
+"""Provides pydantic models"""
 
 
 from enum import Enum
@@ -9,20 +7,23 @@ from typing import Optional
 from pydantic import BaseModel
 
 
-class ScoringRuleEnum(str, Enum):
+class ScoringRuleEnum(str, Enum):  # noqa: WPS600 (subclassing str)
     """Determines whether scoring is for a single test or for a full group"""
-    POLAR = 'polar'
-    GRADED = 'graded'
+
+    POLAR = "polar"
+    GRADED = "graded"
 
 
 class Validator(BaseModel):
     """Output checker"""
+
     type: str
     args: dict
 
 
 class TestCase(BaseModel):
     """Test case model"""
+
     validators: list[Validator]
     stdin: str
     files_in: dict = {}
@@ -33,6 +34,7 @@ class TestCase(BaseModel):
 
 class TestGroup(BaseModel):
     """Test group model"""
+
     name: str
     depends_on: list[str] = []
     points: int
@@ -42,12 +44,14 @@ class TestGroup(BaseModel):
 
 class PrecompileCheckerModel(BaseModel):
     """Checks code before running"""
+
     type: str
-    parameters: dict = {}
+    parameters: dict = {}  # noqa: WPS110 (bad name)
 
 
 class TestSuite(BaseModel):
     """Test configuration"""
+
     place_files: Optional[str] = None
     precompile: list[PrecompileCheckerModel]
     groups: list[TestGroup]
@@ -59,6 +63,7 @@ class TestSuite(BaseModel):
 
 class RunRequest(BaseModel):
     """Request model"""
+
     id: str
     code: dict
     compiler: str
@@ -67,6 +72,7 @@ class RunRequest(BaseModel):
 
 class TestCaseResult(BaseModel):
     """Result for a test case"""
+
     return_code: int
     stdout: str
     stderr: str
@@ -76,6 +82,7 @@ class TestCaseResult(BaseModel):
 
 class RunAnswer(BaseModel):
     """Response model"""
+
     score: int
     verdict: str
     group_scores: dict[str, int]

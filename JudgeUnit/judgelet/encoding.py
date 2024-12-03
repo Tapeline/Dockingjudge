@@ -1,16 +1,29 @@
-def try_to_decode(s: bytes, preferred=None):
-    if s is None:
+"""Utils for dealing with encoding."""
+
+
+def try_to_decode(string: bytes, preferred: str | None = None):
+    """
+    Try different encoding to somehow decode a string
+    on a Windows machine
+
+    Args:
+        string: decoding target
+        preferred: preferred encoding
+    Returns:
+        *hopefully* decoded string
+    """
+    if string is None:
         return None
     try:
-        return s.decode(encoding=preferred)
+        return string.decode(encoding=preferred)
     except UnicodeDecodeError:
-        pass
+        pass  # noqa: WPS420 (wrong keyword)
     try:
-        return s.decode("cp866")
+        return string.decode("cp866")
     except UnicodeDecodeError:
-        pass
+        pass  # noqa: WPS420 (wrong keyword)
     try:
-        return s.decode("cp1251")
+        return string.decode("cp1251")
     except UnicodeDecodeError:
-        pass
-    return s.decode(encoding=preferred, errors="replace")
+        pass  # noqa: WPS420 (wrong keyword)
+    return string.decode(encoding=preferred, errors="replace")

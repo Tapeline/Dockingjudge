@@ -1,6 +1,4 @@
-"""
-Abstractions for precompile checks
-"""
+"""Abstractions for precompile checks"""
 
 from abc import ABC, abstractmethod
 
@@ -12,6 +10,7 @@ from judgelet.models import PrecompileCheckerModel
 
 class AbstractPrecompileChecker(ABC):
     """ABC for precompile checkers"""
+
     CHECKERS: dict[str, type["AbstractPrecompileChecker"]] = {}
 
     @abstractmethod
@@ -24,8 +23,8 @@ class AbstractPrecompileChecker(ABC):
         """Create checker from pydantic"""
         if checker.type not in AbstractPrecompileChecker.CHECKERS:
             raise SerializationException("Precompile checker not found")
-        cls = AbstractPrecompileChecker.CHECKERS[checker.type]
-        return cls.deserialize(checker)
+        validator_class = AbstractPrecompileChecker.CHECKERS[checker.type]
+        return validator_class.deserialize(checker)
 
 
 def register_default_precompile_checkers():

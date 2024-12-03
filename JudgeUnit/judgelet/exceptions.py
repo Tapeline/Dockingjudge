@@ -1,6 +1,4 @@
-"""
-Provides exception classes
-"""
+"""Provides exception classes"""
 
 
 class SerializationException(Exception):

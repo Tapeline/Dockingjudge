@@ -1,13 +1,12 @@
-"""
-Main module
-"""
+"""Main module"""
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.responses import PlainTextResponse
 
+from judgelet import settings
 from judgelet.application import JudgeletApplication
-from judgelet.models import RunRequest, RunAnswer
+from judgelet.models import RunAnswer, RunRequest
 
 app = FastAPI()
 judgelet = JudgeletApplication()
@@ -26,4 +25,4 @@ async def ping():
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="127.0.0.1", port=settings.SERVE_PORT)

@@ -7,7 +7,6 @@ from typing import Final
 
 import psutil
 
-
 MEMORY_LIMIT_EXIT_CODE: Final[int] = 170
 TIMEOUT_EXIT_CODE: Final[int] = 171
 
@@ -47,6 +46,7 @@ def _checker(target,
              mem_limit_mb: float):
     global _return_code, process
     mem_limit_bytes = int(mem_limit_mb * 1024 * 1024)
+    t_start = time.time()
     process = subprocess.Popen(
         target,
         stdin=sys.stdin,
@@ -56,6 +56,7 @@ def _checker(target,
     while process.poll() is None:
         if _will_terminate_by_timeout(time_limit_s):
             _kill_process()
+            print(time.time() - t_start)
             _return_code = TIMEOUT_EXIT_CODE
             if os.getenv("LLAUNCH_MESSAGES") == "1":
                 print("TL")
