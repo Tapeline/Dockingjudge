@@ -4,8 +4,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN apk --no-cache add curl
-RUN apk add g++
+RUN apk add curl
+RUN apk add g++ gcc python3-dev musl-dev linux-headers
 
 RUN pip install -r requirements.txt
 ENV PYTHONPATH /app

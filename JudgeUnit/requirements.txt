@@ -4,3 +4,4 @@ fastapi==0.111.1
 pylint
 mypy
 psutil
+requests

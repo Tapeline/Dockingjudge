@@ -63,7 +63,7 @@ class Sandbox:
         """
         clean_command = cmd.replace('"', r'\"')
         result = await shell_executor.execute_in_shell(  # noqa: WPS110 (bad name)
-            f'python -m llaunch {timeout_s} {memory_limit_mb} "{clean_command}"',
+            self._get_command(timeout_s, memory_limit_mb, clean_command),
             proc_input=proc_input,
             cwd=self.sandbox_dir,
             io_encoding=self.encoding,
@@ -85,6 +85,15 @@ class Sandbox:
             return_code=result.return_code,
             cause=SandboxExitCause.PROCESS_EXITED
         )
+
+    def _get_command(self, time_limit, mem_limit, target) -> str:
+        # return (f'firejail '
+        #         f'--noprofile '
+        #         f'--net=none '
+        #         f'--chroot="{self.sandbox_dir}" '
+        #         f'--private="{self.sandbox_dir}" '
+        #         f'python3 -m llaunch {time_limit} {mem_limit} "{target}"')
+        return f'python3 -m llaunch {time_limit} {mem_limit} "{target}"'
 
     def close(self):
         """Destroy the sandbox, but preserve files"""

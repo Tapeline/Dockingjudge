@@ -25,8 +25,8 @@ services:
       - main_network
 
 
-  judgelet_py_0:
-    hostname: jl_py_0
+  judgelet_0:
+    hostname: jl_0
     image: dockingjudge-unit
     expose: [8000]
     ports:
@@ -42,8 +42,8 @@ services:
     networks:
       - judgelet_network
 
-  judgelet_py_1:
-    hostname: jl_py_1
+  judgelet_1:
+    hostname: jl_1
     image: dockingjudge-unit
     expose: [8000]
     ports:
@@ -72,9 +72,9 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      judgelet_py_0:
+      judgelet_0:
         condition: service_healthy
-      judgelet_py_1:
+      judgelet_1:
         condition: service_healthy
     links:
       - rabbitmq

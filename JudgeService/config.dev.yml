@@ -2,6 +2,6 @@ judgelet_groups:
   - name: python
     selector: python|py
     nodes:
-      - http://jl_py_0:8000
-      - http://jl_py_1:8000
+      - http://jl_0:8000
+      - http://jl_1:8000
     load_balancing: round-robin

@@ -1,7 +1,7 @@
 """Utils for dealing with encoding."""
 
 
-def try_to_decode(string: bytes, preferred: str | None = None):
+def try_to_decode(string: bytes | str, preferred: str | None = None):
     """
     Try different encoding to somehow decode a string
     on a Windows machine
@@ -14,6 +14,8 @@ def try_to_decode(string: bytes, preferred: str | None = None):
     """
     if string is None:
         return None
+    if isinstance(string, str):
+        return string
     try:
         return string.decode(encoding=preferred)
     except UnicodeDecodeError:

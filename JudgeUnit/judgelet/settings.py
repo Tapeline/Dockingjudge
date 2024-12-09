@@ -6,7 +6,7 @@
 import os
 
 IO_ENCODING = os.getenv("IO_ENCODING") or "utf-8"
-SERVE_PORT = int(os.getenv("SERVE_PORT") or 8000)
+SERVE_PORT = 8000
 
 NO_IMPORT_PRECOMPILE_CHECKER_PATTERNS = {
     "py": ("import",),

@@ -46,17 +46,16 @@ def _checker(target,
              mem_limit_mb: float):
     global _return_code, process
     mem_limit_bytes = int(mem_limit_mb * 1024 * 1024)
-    t_start = time.time()
     process = subprocess.Popen(
         target,
         stdin=sys.stdin,
         stdout=sys.stdout,
-        stderr=sys.stderr
+        stderr=sys.stderr,
+        shell=True  # to make it work on linux
     )
     while process.poll() is None:
         if _will_terminate_by_timeout(time_limit_s):
             _kill_process()
-            print(time.time() - t_start)
             _return_code = TIMEOUT_EXIT_CODE
             if os.getenv("LLAUNCH_MESSAGES") == "1":
                 print("TL")
@@ -71,7 +70,7 @@ def _checker(target,
 
 
 def _get_args() -> tuple[float, float, str]:
-    time_limit, mem_limit, target = sys.argv[1:]
+    time_limit, mem_limit, *target = sys.argv[1:]
     return float(time_limit), float(mem_limit), target
 
 
