@@ -3,7 +3,7 @@ Provides tools for managing judgelets
 """
 
 import re
-from abc import abstractmethod, ABC
+from abc import ABC, abstractmethod
 from typing import Union
 
 import requests

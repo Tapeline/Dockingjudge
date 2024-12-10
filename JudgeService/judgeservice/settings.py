@@ -5,7 +5,6 @@ JudgeService settings
 import logging
 import os
 
-
 JUDGELET_ENDPOINT = "%s/run-suite/"
 IO_ENCODING = os.getenv("IO_ENCODING") or "utf-8"
 FILE_ENCODING = os.getenv("FILE_ENCODING") or "utf-8"

@@ -6,8 +6,10 @@ import yaml
 from pydantic import BaseModel
 
 from judgeservice import judgelet, settings
-from judgeservice.exceptions import ImproperlyConfiguredException, BadBalancingStrategy
-from judgeservice.judgelet import JudgeletGroup, Selector, Judgelet, SingleBalancedStrategy
+from judgeservice.exceptions import (BadBalancingStrategy,
+                                     ImproperlyConfiguredException)
+from judgeservice.judgelet import (Judgelet, JudgeletGroup, Selector,
+                                   SingleBalancedStrategy)
 
 
 class JudgeletGroupModel(BaseModel):

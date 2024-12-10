@@ -7,7 +7,8 @@ import logging
 import aiohttp
 
 from judgeservice import settings
-from judgeservice.exceptions import BadRequestFormatException, JudgeletAnswerException
+from judgeservice.exceptions import (BadRequestFormatException,
+                                     JudgeletAnswerException)
 
 
 def validate_request(request_data: dict) -> None:

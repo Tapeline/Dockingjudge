@@ -1,6 +1,4 @@
-"""
-Main application file
-"""
+"""Main application file"""
 
 import asyncio
 import json
@@ -8,11 +6,10 @@ import logging
 
 import aio_pika
 from aio_pika import Message
-from aio_pika.abc import (AbstractRobustChannel, AbstractRobustExchange,
-                          DeliveryMode, AbstractIncomingMessage)
+from aio_pika.abc import (AbstractIncomingMessage, AbstractRobustChannel,
+                          AbstractRobustExchange, DeliveryMode)
 
-from judgeservice import settings
-from judgeservice import handle
+from judgeservice import handle, settings
 from judgeservice.configuration import Configuration
 from judgeservice.exceptions import (JudgeletNotFoundException,
                                      RequestProcessingException)
@@ -39,8 +36,11 @@ def _validate_message(message: dict):
 
 class ServerApplication:
     """Application class"""
-    def __init__(self, logging_level=logging.DEBUG,
-                 config_path: str = settings.CONFIG_PATH):
+    def __init__(
+            self,
+            logging_level=logging.DEBUG,
+            config_path: str = settings.CONFIG_PATH
+    ):
         self._in_exchange = None
         self._out_exchange: AbstractRobustExchange | None = None
         self._in_queue = None
