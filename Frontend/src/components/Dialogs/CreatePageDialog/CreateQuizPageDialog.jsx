@@ -16,6 +16,7 @@ function DialogImpl(props) {
     const [show, setShow] = useState(false);
     const [pageTitle, setPageTitle] = useState("");
     const [pageDescription, setPageDescription] = useState("");
+    const [quizScore, setQuizScore] = useState("0");
     const [validatorJSON, setValidatorJSON] = useState(
         "{\n" +
         '  "type": "",\n' +
@@ -42,7 +43,8 @@ function DialogImpl(props) {
         createQuizPage(accessToken, contestId, {
             title: pageTitle,
             description: pageDescription,
-            validator: validatorParsed
+            validator: validatorParsed,
+            points: parseInt(quizScore)
         }).then((response) => {
             if (!response.success) toastError(response.reason);
             else {
@@ -69,6 +71,7 @@ function DialogImpl(props) {
                         label="Title"
                         type="text"
                         fullWidth
+                        required
                         onChange={e => setPageTitle(e.target.value)}
                     />
                     <TextField
@@ -77,7 +80,17 @@ function DialogImpl(props) {
                         label="Page text"
                         type="text"
                         fullWidth
+                        required
                         onChange={e => setPageDescription(e.target.value)}
+                    />
+                    <TextField
+                        margin="dense"
+                        id="score"
+                        label="Question points"
+                        type="text"
+                        fullWidth
+                        required
+                        onChange={e => setQuizScore(e.target.value)}
                     />
                     <VWhitespace/>
                     <Paper style={{padding: 16}}>

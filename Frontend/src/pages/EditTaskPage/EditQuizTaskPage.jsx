@@ -10,6 +10,7 @@ import {Editor} from "@monaco-editor/react";
 import {Save} from "@material-ui/icons";
 import {lightGreen} from "@material-ui/core/colors";
 import {toastError, toastSuccess} from "../../ui/toasts.jsx";
+import {Spinner} from "react-bootstrap";
 
 const styles = theme => ({});
 
@@ -23,12 +24,14 @@ function EditQuizTaskPage(props) {
     const [pageTitle, setPageTitle] = useState(null);
     const [pageDescription, setPageDescription] = useState(null);
     const [validatorJSON, setValidatorJSON] = useState(null);
+    const [quizScore, setQuizScore] = useState("0");
 
     useEffect(() => {
         getContestPage(accessToken, contestId, "quiz", pageId).then(response => {
             setPageData(response.data);
             setPageTitle(response.data.title);
             setPageDescription(response.data.description);
+            setQuizScore(response.data.points);
             setValidatorJSON(JSON.stringify(response.data.validator, null, 2));
         });
     }, []);
@@ -44,7 +47,8 @@ function EditQuizTaskPage(props) {
         modifyQuizPage(accessToken, contestId, pageId, {
             title: pageTitle,
             description: pageDescription,
-            validator: validatorParsed
+            validator: validatorParsed,
+            points: parseInt(quizScore)
         }).then(response => {
             if (!response.success) {
                 toastError(response.reason);
@@ -72,6 +76,7 @@ function EditQuizTaskPage(props) {
                     onChange={e => setPageTitle(e.target.value)}
                     margin="normal"
                     fullWidth
+                    required
                 />
                 <br/>
                 <TextField
@@ -82,6 +87,17 @@ function EditQuizTaskPage(props) {
                     onChange={e => setPageDescription(e.target.value)}
                     margin="normal"
                     fullWidth
+                    required
+                />
+                <br/>
+                <TextField
+                    margin="dense"
+                    id="score"
+                    label="Question points"
+                    type="text"
+                    fullWidth
+                    required
+                    onChange={e => setQuizScore(e.target.value)}
                 />
             </Grid>
             <Grid item md={8} xs={12}>
