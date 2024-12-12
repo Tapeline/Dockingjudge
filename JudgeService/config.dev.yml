@@ -1,7 +1,7 @@
 judgelet_groups:
-  - name: python
-    selector: python|py
+  - name: General
+    selector: .*
     nodes:
-      - http://jl_0:8000
-      - http://jl_1:8000
+      - http://judgelet_0:8000
+      - http://judgelet_1:8000
     load_balancing: round-robin

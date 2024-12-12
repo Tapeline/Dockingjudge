@@ -26,7 +26,6 @@ services:
 
 
   judgelet_0:
-    hostname: jl_0
     image: dockingjudge-unit
     expose: [8000]
     ports:
@@ -43,7 +42,6 @@ services:
       - judgelet_network
 
   judgelet_1:
-    hostname: jl_1
     image: dockingjudge-unit
     expose: [8000]
     ports:
@@ -272,7 +270,7 @@ services:
       #- ./sslcert/privkey.pem:/etc/nginx/server.key
     ports:
     #  - "443:443"
-    #  - "8888:80"
+      - "8888:80"
       - "80:80"
     networks:
       - main_network
