@@ -151,7 +151,7 @@ services:
       ENCODING: ${GLOBAL_ENCODING}
       ACCOUNT_SERVICE: "http://account.service:8000/api/accounts"
       ALLOWED_HOSTS: "*"
-      COMPILERS: "python:python"
+      COMPILERS: ${COMPILERS}
       ALLOW_CONTEST_CREATION_TO: "Tapeline"
     ports:
       - "8002:8000"
