@@ -5,8 +5,8 @@ export function getBaseUrl() {
     console.log(JSON.stringify(import.meta.env));
     //if (envUrl === null || envUrl === undefined)
     if (import.meta.env.DEV)
-        return "http://localhost:8888/api/";
-    return "https://dockingjudge.tapeline.dev/api/";
+        return "http://localhost:8888/api/v1/";
+    return "https://dockingjudge.tapeline.dev/api/v1/";
 }
 
 export function apiUrl(url) {

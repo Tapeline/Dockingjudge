@@ -168,7 +168,7 @@ RMQ_USER = os.getenv("RMQ_USER") or "rm_user"
 RMQ_PASS = os.getenv("RMQ_PASS") or "rm_password"
 ENCODING = os.getenv("ENCODING") or "utf-8"
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 
 ALLOW_REGISTRATION = str(os.getenv("ALLOW_REGISTRATION")).lower() != "false"
 print(ALLOW_REGISTRATION, os.getenv("ALLOW_REGISTRATION"))

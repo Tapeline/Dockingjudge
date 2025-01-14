@@ -19,13 +19,13 @@ from django.urls import path
 from api import views
 
 urlpatterns = [
-    path("api/accounts/ping/", views.PingView.as_view()),
-    path("api/accounts/register/", views.RegisterView.as_view()),
-    path("api/accounts/login/", views.LoginView.as_view()),
-    path("api/accounts/profile/", views.ProfileView.as_view()),
-    path("api/accounts/profile/pic/", views.SetProfilePictureView.as_view()),
-    path("api/accounts/authorize/", views.ProfileView.as_view()),
-    path("api/accounts/user/<str:username>/", views.GetUserByNameView.as_view()),
-    path("api/accounts/all/", views.GetAllUsersView.as_view()),
-    path("api/accounts/user/<str:username>/", views.GetUserByNameView.as_view()),
+    path("api/v1/accounts/ping/", views.PingView.as_view()),
+    path("api/v1/accounts/register/", views.RegisterView.as_view()),
+    path("api/v1/accounts/login/", views.LoginView.as_view()),
+    path("api/v1/accounts/profile/", views.ProfileView.as_view()),
+    path("api/v1/accounts/profile/pic/", views.SetProfilePictureView.as_view()),
+    path("api/v1/accounts/authorize/", views.ProfileView.as_view()),
+    path("api/v1/accounts/user/<str:username>/", views.GetUserByNameView.as_view()),
+    path("api/v1/accounts/all/", views.GetAllUsersView.as_view()),
+    path("api/v1/accounts/user/<str:username>/", views.GetUserByNameView.as_view()),
 ]

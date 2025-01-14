@@ -12,7 +12,7 @@ export function submitQuizSolution(token, taskId, text) {
 export function getQuizSolutions(token, taskId) {
     return sendRequest(
         "GET",
-        apiUrl(`solutions/for-task/quiz/${taskId}/`),
+        apiUrl(`solutions/my/code/${taskId}/`),
         {},
         "Authorization: Bearer " + token
     )
@@ -39,7 +39,7 @@ export function submitCodeSolution(token, taskId, text, compiler, format) {
 export function getCodeSolutions(token, taskId) {
     return sendRequest(
         "GET",
-        apiUrl(`solutions/for-task/code/${taskId}/`),
+        apiUrl(`solutions/my/code/${taskId}/`),
         {},
         "Authorization: Bearer " + token
     )
@@ -48,7 +48,7 @@ export function getCodeSolutions(token, taskId) {
 export function getCodeSolution(token, solutionId) {
     return sendRequest(
         "GET",
-        apiUrl(`solutions/get/code/${solutionId}/`),
+        apiUrl(`solutions/${solutionId}/`),
         {},
         "Authorization: Bearer " + token
     )

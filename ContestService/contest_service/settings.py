@@ -153,14 +153,14 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
-ACCOUNT_SERVICE = os.getenv("ACCOUNT_SERVICE") or "http://localhost:8001/api/accounts"
+ACCOUNT_SERVICE = os.getenv("ACCOUNT_SERVICE") or "http://localhost:8001/api/v1/accounts"
 
 RMQ_ADDRESS = os.getenv("RMQ_ADDRESS") or "localhost"
 RMQ_USER = os.getenv("RMQ_USER") or "rm_user"
 RMQ_PASS = os.getenv("RMQ_PASS") or "rm_password"
 ENCODING = os.getenv("ENCODING") or "utf-8"
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS_ALLOW_ALL_ORIGINS = True
 
 AVAILABLE_COMPILERS = [x.split(":") for x in os.getenv("COMPILERS").split(";")]
 

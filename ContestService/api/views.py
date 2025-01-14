@@ -186,22 +186,23 @@ class ListCreateCodeTaskView(EnsureContestStructureIntegrityOnCreateMixin,
     creating_page_type = "code"
 
 
-class RetrieveUpdateDestroyCodeTaskView(EnsureContestStructureIntegrityOnDeleteMixin,
-                                        NotifyOnDeleteMixin,
-                                        ContestFieldInjectorOnCreation,
-                                        SerializerSwitchingMixin,
-                                        RetrieveUpdateDestroyAPIView,
-                                        ContestMixin):
+class RetrieveUpdateDestroyCodeTaskView(
+    EnsureContestStructureIntegrityOnDeleteMixin,
+    NotifyOnDeleteMixin,
+    ContestFieldInjectorOnCreation,
+    SerializerSwitchingMixin,
+    RetrieveUpdateDestroyAPIView,
+    ContestMixin
+):
     serializer_class = serializers.UserCodeTaskSerializer
     full_serializer_class = serializers.FullCodeTaskSerializer
     queryset = models.CodeTask.objects.all()
-    permission_classes = (IsAuthenticated,
-                          permissions.IsContestAdminOrReadOnlyForParticipants)
+    permission_classes = (
+        IsAuthenticated,
+        permissions.IsContestAdminOrReadOnlyForParticipants
+    )
     notification_serializer = full_serializer_class
     notify_function = rmq.notify_code_task_deleted
-
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
 
 
 class CanSubmitSolutionToTask(APIView):

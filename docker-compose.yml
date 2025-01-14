@@ -147,7 +147,7 @@ services:
       RMQ_USER: ${RMQ_USER}
       RMQ_PASS: ${RMQ_PASSWORD}
       ENCODING: ${GLOBAL_ENCODING}
-      ACCOUNT_SERVICE: "http://account.service:8000/api/accounts"
+      ACCOUNT_SERVICE: "http://account.service:8000/api/v1/accounts"
       ALLOWED_HOSTS: "*"
       COMPILERS: ${COMPILERS}
       ALLOW_CONTEST_CREATION_TO: "Tapeline"
@@ -189,6 +189,30 @@ services:
     restart: unless-stopped
 
 
+  minio:
+    image: minio/minio:latest
+    command: server --console-address ":9001" /data/
+    hostname: minio
+    ports:
+      - "9900:9000"
+      - "9901:9001"
+    expose:
+      - 9000
+      - 9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASS}
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - main_network
+
+
   solution_service:
     build: SolutionService
     hostname: solution.service
@@ -203,9 +227,10 @@ services:
       RMQ_USER: ${RMQ_USER}
       RMQ_PASS: ${RMQ_PASSWORD}
       ENCODING: ${GLOBAL_ENCODING}
-      ACCOUNT_SERVICE: "http://account.service:8000/api/accounts"
-      CONTEST_SERVICE: "http://contest.service:8000/api"
+      ACCOUNT_SERVICE: "http://account.service:8000/api/v1/accounts"
+      CONTEST_SERVICE: "http://contest.service:8000/api/v1"
       CONTEST_SERVICE_INTERNAL: "http://contest.service:8000/internal"
+      MINIO_SERVICE: "http://minio"
       ALLOWED_HOSTS: "*"
     ports:
       - "8003:8000"
@@ -279,8 +304,8 @@ services:
         condition: service_started
       contest_service:
         condition: service_started
-      solution_service:
-        condition: service_started
+      #solution_service:
+      #  condition: service_started
 
 
 networks:
@@ -295,3 +320,4 @@ volumes:
   contest_pgdata:
   solution_pgdata:
   rabbitmq_data:
+  minio_data:
