@@ -35,7 +35,7 @@ function DialogImpl(props) {
 
     return (
         <>
-            <Button variant="fab" mini onClick={handleShow}><Add/></Button>
+            <Button style={{display: "block", width: "100%", height: "100%"}} onClick={handleShow}><Add/></Button>
             <Dialog
                 open={show}
                 onClose={handleClose}

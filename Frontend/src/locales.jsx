@@ -5,6 +5,10 @@ let locales = new LocalizedStrings({
         helpPage: {
             title: "Help",
             titleVerdicts: "Verdicts",
+            subtitleVerdicts: "Testing system answers explanation",
+            columnCode: "Verdict code",
+            columnShort: "Name",
+            columnDesc: "Full description",
             verdictNCShort: "Not Checked",
             verdictNCDesc: "Solution is waiting for it to be checked",
             verdictOKShort: "Accepted",
@@ -29,6 +33,10 @@ let locales = new LocalizedStrings({
         helpPage: {
             title: "Помощь",
             titleVerdicts: "Вердикты",
+            subtitleVerdicts: "Пояснения к ответам тестирующей системы",
+            columnCode: "Код вердикта",
+            columnShort: "Название",
+            columnDesc: "Описание",
             verdictNCShort: "Непроверено",
             verdictNCDesc: "Решение ожидает проверки",
             verdictOKShort: "Принято",

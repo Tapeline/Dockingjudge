@@ -17,7 +17,7 @@ body {
 code {
     padding: 1px;
     border: 1px solid #AAA;
-    border-radius: 4px;
+    border-radius: 2px;
 }
 
 .Toastify__toast {
@@ -40,16 +40,14 @@ code {
     border-radius: 0;
 }
 
-.rendered-md pre {
-    padding: 8px;
-    border: 1px solid #AAA;
-    border-radius: 4px;
-}
+/*.rendered-md pre {*/
+/*    padding: 8px;*/
+/*    border: 1px solid #AAA;*/
+/*    border-radius: 2px;*/
+/*}*/
 
 main {
-    padding-left: 3rem;
-    padding-right: 3rem;
-    padding-top: 1rem;
+    padding: 1rem 3rem 2rem;
 }
 
 .dj-container {
@@ -58,16 +56,72 @@ main {
     padding-top: 1rem;
 }
 
+.dj-quote {
+    padding: 1.2rem;
+    border-left: 8px solid #2f24c1;
+}
+
+.dj-beautiful-text {
+    padding-top: 0.4rem;
+    padding-bottom: 0.4rem;
+}
+
+.dj-drawer-stretch > div:first-child {
+    height: 100%;
+    min-height: 100vh;
+}
+
+.dj-drawer-stretch > div:first-child > div:first-child {
+    height: 100%;
+}
+
+.dj-under-card-bg {
+    width: 100vw;
+    height: 28vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+.dj-solution-paper {
+    max-width: 1200px;
+    width: 85vw;
+    padding: 1rem;
+    margin-top: 8vh;
+    z-index: 10;
+}
+
 @media screen and (max-width: 768px){
     main {
-        padding-left: 1.5rem;
-        padding-right: 1.5rem;
-        padding-top: 1rem;
-    }
-
-    .dj-container {
         padding-left: 1rem;
         padding-right: 1rem;
         padding-top: 1rem;
     }
+
+    .dj-container {
+        padding-left: 0.7rem;
+        padding-right: 0.7rem;
+        padding-top: 0.7rem;
+    }
+
+    .dj-solution-paper {
+        margin-top: 3vh;
+    }
 }
+
+@keyframes fadeIn {
+    0% {
+        opacity: 0.0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+.fade-content {
+    animation-name: fadeIn;
+    animation-duration: 0.5s;
+    animation-timing-function: ease-in-out;
+    transition: 0.5s ease-in-out;
+}
+

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {isValidElement, useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import {
     CircularProgress,
@@ -14,6 +14,10 @@ import {getCodeSolution, getQuizSolution} from "../../api/endpoints-solutions.js
 import {dateConverter} from "../../utils/time.jsx";
 import {Check, Close, Code, Stars, Timer} from "@material-ui/icons";
 import HWhitespace from "../../utils/HWhitespace.jsx";
+import Preloader from "../../components/Preloader/Preloader.jsx";
+import {amber, deepOrange, lightGreen, lime, orange} from "@material-ui/core/colors";
+import VWhitespace from "../../utils/VWhitespace.jsx";
+import {getScoreColor} from "../../utils/scoreColors.jsx";
 
 const styles = theme => ({
     paper: {
@@ -47,36 +51,38 @@ function QuizSolutionDetailPage(props) {
         return <h1>Solution not found</h1>;
 
     if (!isFullyLoaded())
-        return <CircularProgress className={classes.progress}/>;
+        return <Preloader/>;
 
     return (<>
-        <Grid container spacing={16}>
-            <Grid item md={3} xs={12}>
-                <Typography variant="display2">
-                    Solution #quiz/{solutionId}
+        <div style={{width: "100%", display: "flex", flexDirection: "column", alignItems: "center"}}>
+            <div className="dj-under-card-bg" style={{background: getScoreColor(solutionData.points)}}></div>
+            <Paper className="dj-solution-paper">
+                <Typography variant="headline">
+                    Quiz solution {solutionId}
                 </Typography>
-                <Typography variant="display1">
-                    <Stars/> Score: <code>{solutionData.points}</code>
+                <VWhitespace/>
+                <Typography variant="subheading" style={{display: "flex", alignItems: "center"}}>
+                    <Stars/>
+                    <HWhitespace width={1}/>
+                    Score: <HWhitespace width={0.5}/>
+                    <code>{solutionData.points}</code>
                     <HWhitespace width={1}/>
                     {solutionData.is_solved? <Check/> : <Close/>}
                 </Typography>
-                <Typography variant="caption" styles={{verticalAlign: 'center'}}>
-                    <Timer/> Submitted at: {dateConverter(solutionData.submitted_at)}
+                <Typography variant="caption" style={{display: "flex", alignItems: "center"}}>
+                    <Timer/>
+                    <HWhitespace width={1}/>
+                    Submitted at: <HWhitespace width={0.5}/>
+                    {dateConverter(solutionData.submitted_at)}
                 </Typography>
-            </Grid>
-            <Grid item md={9} xs={12}>
-                <Paper className={classes.paper}>
-                    <Typography variant="headline">
-                        Your answer
-                    </Typography>
-                    <pre>{solutionData.text}</pre>
-                </Paper>
-            </Grid>
-        </Grid>
-
-
+                <VWhitespace/>
+                <Typography variant="headline">
+                    Your answer
+                </Typography>
+                <pre>{solutionData.text}</pre>
+            </Paper>
+        </div>
     </>);
-
 }
 
 export default withStyles(styles, { withTheme: true })(QuizSolutionDetailPage);

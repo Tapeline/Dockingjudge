@@ -1,16 +1,18 @@
 import {Spinner} from "react-bootstrap";
+import {CircularProgress, withStyles} from "@material-ui/core";
+import React from "react";
 
-export default function Preloader(props) {
-    let {variant} = props;
-    if (variant === undefined || variant === null)
-        return <div className="d-flex justify-content-center h-100 w-100 align-items-center">
-            <Spinner animation="border" role="status">
-                <span className="visually-hidden">Loading...</span>
-            </Spinner>
-        </div>;
-    return <div className="d-flex justify-content-center h-100 w-100 align-items-center">
-            <Spinner animation="border" role="status" variant={variant}>
-                <span className="visually-hidden">Loading...</span>
-            </Spinner>
-        </div>;
+const styles = theme => ({});
+
+function Preloader(props) {
+    const {theme, classes} = props;
+    return <div style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+    }}><CircularProgress className={classes.progress}/></div>;
 }
+
+export default withStyles(styles, { withTheme: true })(Preloader);

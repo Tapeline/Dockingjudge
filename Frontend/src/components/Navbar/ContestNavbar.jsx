@@ -20,7 +20,6 @@ import {Edit, Equalizer, Settings} from "@material-ui/icons";
 const styles = theme => ({
     root: {
         flexGrow: 1,
-        height: 440,
         zIndex: 1,
         overflow: 'hidden',
         position: 'relative',
@@ -32,7 +31,7 @@ const styles = theme => ({
     drawerPaper: {
         position: 'relative',
         width: 240,
-        height: "100vh"
+        height: "100%"
     },
     content: {
         flexGrow: 1,
@@ -41,6 +40,9 @@ const styles = theme => ({
         minWidth: 0, // So the Typography noWrap works
     },
     toolbar: theme.mixins.toolbar,
+    drawer: {
+        height: "100%"
+    }
 });
 
 function ContestNavbar(props) {
@@ -108,6 +110,7 @@ function ContestNavbar(props) {
 
     return (<>
         <Navbar hasDrawer drawerToggleHandler={drawerToggleHandler}/>
+        <div className="dj-drawer-stretch">
         <Hidden mdUp>
             <Drawer
                 variant="temporary"
@@ -116,6 +119,7 @@ function ContestNavbar(props) {
                 onClose={drawerToggleHandler}
                 classes={{
                     paper: classes.drawerPaper,
+                    drawer: classes.drawer
                 }}
                 ModalProps={{
                     keepMounted: true, // Better open performance on mobile.
@@ -135,6 +139,7 @@ function ContestNavbar(props) {
                 {drawer}
             </Drawer>
         </Hidden>
+        </div>
     </>);
 }
 

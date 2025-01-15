@@ -19,6 +19,7 @@ import {Editor} from "@monaco-editor/react";
 import {Save} from "@material-ui/icons";
 import {lightGreen} from "@material-ui/core/colors";
 import {toastError, toastSuccess} from "../../ui/toasts.jsx";
+import VWhitespace from "../../utils/VWhitespace.jsx";
 
 const styles = theme => ({});
 
@@ -45,7 +46,7 @@ function EditTextPage(props) {
     const applyChanges = () => {
         modifyTextPage(accessToken, contestId, pageId, {
             title: pageTitle,
-            description: pageDescription,
+            text: pageDescription,
             is_enter_page: isEnterPage
         }).then(response => {
             if (!response.success) {
@@ -58,9 +59,11 @@ function EditTextPage(props) {
 
     return (
         pageData === null?
-        <CircularProgress className={classes.progress}/>
+        <Preloader/>
         :
-            <div>
+            <Paper style={{padding: "1rem", maxWidth: 1200}}>
+                <Typography variant="headline">Edit text page</Typography>
+                <VWhitespace/>
                 <Button onClick={applyChanges} mini fullWidth
                         style={{marginBottom: 8}}
                         variant="raised">
@@ -94,7 +97,7 @@ function EditTextPage(props) {
                     }
                     label="Is enter page?"
                 />
-            </div>
+            </Paper>
     );
 }
 

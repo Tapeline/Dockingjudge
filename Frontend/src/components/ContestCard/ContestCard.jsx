@@ -4,7 +4,8 @@ import {Button, Card, CardActions, CardContent, Typography, withStyles} from "@m
 
 const styles = theme => ({
     card: {
-        marginBottom: 8
+        marginBottom: 8,
+        height: "100%"
     }
 });
 

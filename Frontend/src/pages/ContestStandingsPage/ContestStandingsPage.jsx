@@ -17,6 +17,7 @@ import {
 import {Edit} from "@material-ui/icons";
 import {getStandings} from "../../api/endpoints-solutions.jsx";
 import {amber, lightGreen} from "@material-ui/core/colors";
+import Preloader from "../../components/Preloader/Preloader.jsx";
 
 const styles = theme => ({
     paper: {
@@ -62,7 +63,7 @@ function ContestStandingsPage(props) {
         return <h1>Contest not found</h1>;
 
     if (!isFullyLoaded())
-        return <CircularProgress className={classes.progress}/>;
+        return <Preloader/>;
 
     return (
         <div>
