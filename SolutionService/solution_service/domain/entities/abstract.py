@@ -59,12 +59,20 @@ class QuizSolution(GenericSolution):
     task_type = TaskType.QUIZ
 
 
+class SubmissionType(Enum):
+    STR = "str"
+    ZIP = "zip"
+
+
 @dataclass
 class CodeSolution(GenericSolution):
     type GroupName = str
 
     task_type = TaskType.CODE
     submission_url: str
+    submission_type: SubmissionType
+    compiler_name: str
+    main_file: str | None = None
     group_scores: dict[GroupName, int] = field(default_factory=dict)
     detailed_verdict: str = ""
 

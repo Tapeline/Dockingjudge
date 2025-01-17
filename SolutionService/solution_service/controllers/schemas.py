@@ -4,7 +4,7 @@ from typing import Annotated
 from pydantic import BaseModel
 
 from solution_service.application.interfaces.account import UserDTO
-from solution_service.domain.entities.abstract import TaskType
+from solution_service.domain.entities.abstract import TaskType, SubmissionType
 
 
 class QuizSolutionExtraSchema(BaseModel):
@@ -27,15 +27,11 @@ class SolutionSchema(BaseModel):
     data: QuizSolutionExtraSchema | CodeSolutionExtraSchema | None
 
 
-class SubmissionType(Enum):
-    STR = "str"
-    ZIP = "zip"
-
-
 class PostCodeSolutionSchema(BaseModel):
     compiler: str
     submission_type: SubmissionType
     text: str
+    main_file: str | None
 
 
 class PostQuizSolutionSchema(BaseModel):
@@ -55,3 +51,27 @@ class UserContestStatusSchema(BaseModel):
     tasks_solved: int
     solutions: list[SolutionSchema]
     total_score: int
+
+
+class TestCaseResult(BaseModel):
+    return_code: int
+    stdout: str
+    stderr: str
+    verdict: str
+    is_successful: bool
+
+
+class RunAnswer(BaseModel):
+    score: int
+    verdict: str
+    group_scores: dict[str, int]
+    protocol: list[list[TestCaseResult]]
+    compilation_error: str | None = None
+
+
+class MQSolutionAnswer(BaseModel):
+    answer_to: str
+    is_successful: bool
+    code: str | None = None
+    details: str | None = None
+    contents: RunAnswer | None = None

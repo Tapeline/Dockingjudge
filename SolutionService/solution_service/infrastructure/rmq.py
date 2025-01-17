@@ -16,8 +16,3 @@ def create_broker(rabbitmq_config: RabbitMQConfig) -> RabbitBroker:
         ),
         virtualhost="/",
     )
-
-
-class SolutionPublisherImpl(AbstractSolutionPublisher):
-    def publish(self, solution: CodeSolution) -> None:
-        print("Published", solution)

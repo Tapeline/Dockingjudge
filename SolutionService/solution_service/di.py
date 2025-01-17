@@ -1,6 +1,7 @@
 from typing import AsyncIterable
 
 from dishka import Provider, from_context, Scope, provide, AnyOf
+from faststream.rabbit import RabbitBroker
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 
 from solution_service.application import interfaces, interactors
@@ -9,13 +10,14 @@ from solution_service.application.interfaces.contest import AbstractContestServi
 from solution_service.application.interfaces.publisher import AbstractSolutionPublisher
 from solution_service.application.interfaces.storage import AbstractStorage
 from solution_service.config import Config
+from solution_service.controllers.mq import RMQSolutionPublisher
 from solution_service.infrastructure import persistence, contest_service, account_service
 from solution_service.infrastructure.persistence import s3_service
-from solution_service.infrastructure.rmq import SolutionPublisherImpl
 
 
 class AppProvider(Provider):
     config = from_context(provides=Config, scope=Scope.APP)
+    broker = from_context(provides=RabbitBroker, scope=Scope.APP)
 
     @provide(scope=Scope.APP)
     def get_session_maker(self, config: Config) -> async_sessionmaker[AsyncSession]:
@@ -97,7 +99,7 @@ class AppProvider(Provider):
     )
 
     publisher_impl = provide(
-        SolutionPublisherImpl,
+        RMQSolutionPublisher,
         provides=AbstractSolutionPublisher,
         scope=Scope.APP
     )

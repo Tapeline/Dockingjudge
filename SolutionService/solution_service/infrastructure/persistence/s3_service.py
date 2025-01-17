@@ -73,7 +73,7 @@ class S3Storage(AbstractStorage):
     async def get_file_url(self, name: str) -> URL:
         signed_url = self.client.get_presigned_url("GET", self.params.bucket_name, name)
         url = urlsplit(signed_url)
-        return self.outer_url + url.path
+        return url.path
 
     async def save_file(self, file: File) -> URL:
         fake_io = BytesIO(file.contents)
@@ -84,3 +84,19 @@ class S3Storage(AbstractStorage):
             length=len(file.contents)
         )
         return await self.get_file_url(file.name)
+
+    async def get_file(self, url: URL) -> File:
+        url = url.removeprefix("/").removesuffix("/")
+        bucket_name, object_id = url.split("/")
+        response = None
+        try:
+            response = self.client.get_object(bucket_name, object_id)
+            return File(
+                name=object_id,
+                contents=response.read()
+            )
+        finally:
+            if response is not None:
+                response.close()
+                response.release_conn()
+            raise

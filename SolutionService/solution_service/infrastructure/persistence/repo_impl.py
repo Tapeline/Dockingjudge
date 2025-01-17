@@ -30,6 +30,11 @@ def _transform_solution_model_to_entity(
             detailed_verdict=model.detailed_verdict or "NC",
             group_scores=model.group_scores or {},
             submission_url=model.answer,
+            main_file=model.main_file,
+            compiler_name=model.compiler_name,
+            submission_type=CodeSolution.SubmissionType(
+                model.code_solution_type
+            ),
             **commons
         )
     if model.task_type == TaskType.QUIZ:
@@ -193,12 +198,18 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
         answer = None
         group_scores = None
         detailed_verdict = None
+        compiler_name = None
+        main_file = None
+        submission_type = None
         if isinstance(solution, QuizSolution):
             answer = solution.submitted_answer
         else:
             answer = solution.submission_url
             group_scores = solution.group_scores
             detailed_verdict = solution.detailed_verdict
+            compiler_name = solution.compiler_name
+            main_file = solution.main_file
+            submission_type = solution.submission_type
         model = SolutionModel(
             contest_id=solution.contest_id,
             task_id=solution.task_id,
@@ -209,6 +220,9 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
             answer=answer,
             group_scores=group_scores,
             detailed_verdict=detailed_verdict,
+            compiler_name=compiler_name,
+            main_file=main_file,
+            code_solution_type=submission_type
         )
         print(model.__dict__, file=sys.stderr)
         self._session.add(model)

@@ -7,7 +7,7 @@ class RabbitMQConfig(BaseModel):
     host: str = Field(alias="RMQ_HOST", default="localhost")
     port: int = Field(alias="RMQ_PORT", default=5672)
     username: str = Field(alias="RMQ_USER", default="rm_user")
-    password: str = Field(alias="RMQ_PASS", default="rm_pass")
+    password: str = Field(alias="RMQ_PASS", default="rm_password")
 
 
 class PostgresConfig(BaseModel):

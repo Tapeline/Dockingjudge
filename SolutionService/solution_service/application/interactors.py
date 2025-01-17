@@ -208,10 +208,13 @@ class PostCodeSolution:
             score=0,
             short_verdict="NC",
             submission_url=solution_url,
+            compiler_name=solution.compiler,
+            main_file=solution.main_file,
+            submission_type=solution.submission_type,
         )
         solution_id = await self._solution_repo.create_solution(solution_entity)
         solution_entity.uid = solution_id
-        self._publisher.publish(solution_entity)
+        await self._publisher.publish(solution_entity, task.test_suite)
         return solution_entity
 
 

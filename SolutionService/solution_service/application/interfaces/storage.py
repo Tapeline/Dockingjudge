@@ -25,6 +25,10 @@ class AbstractStorage(ABC):
     async def save_file(self, file: File) -> URL:
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_file(self, url: URL) -> File:
+        raise NotImplementedError
+
 
 class DBSession(Protocol):
     @abstractmethod

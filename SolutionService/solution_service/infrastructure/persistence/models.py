@@ -1,8 +1,10 @@
+from typing import Optional
+
 from sqlalchemy import Integer, Enum, String, JSON, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 import uuid
 
-from solution_service.domain.entities.abstract import TaskType
+from solution_service.domain.entities.abstract import TaskType, SubmissionType
 from solution_service.infrastructure.persistence.database import Base
 
 
@@ -21,6 +23,22 @@ class SolutionModel(Base):
     score: Mapped[int] = mapped_column(Integer)
     short_verdict: Mapped[str] = mapped_column(String)
     answer: Mapped[str] = mapped_column(String)
+
+    code_solution_type: Mapped[str] = mapped_column(
+        Enum(SubmissionType),
+        nullable=True,
+        default=None
+    )
+    compiler_name: Mapped[str] = mapped_column(
+        String,
+        nullable=True,
+        default=None
+    )
+    main_file: Mapped[Optional[str]] = mapped_column(
+        String,
+        nullable=True,
+        default=None
+    )
     group_scores: Mapped[dict] = mapped_column(
         JSON,
         nullable=True,

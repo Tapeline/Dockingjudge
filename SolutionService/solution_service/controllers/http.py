@@ -122,6 +122,7 @@ class SolutionsController(Controller):
                 text=data.text,
                 submission_type=data.submission_type,
                 task_id=task_id,
+                main_file=data.main_file,
             ),
         )
         return _serialize_solution(solution)

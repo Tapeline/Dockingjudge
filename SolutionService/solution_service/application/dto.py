@@ -2,8 +2,10 @@ from dataclasses import dataclass
 from enum import Enum
 
 from solution_service.application.interfaces.account import UserDTO
-from solution_service.application.interfaces.solutions import UserContestStatus
-from solution_service.domain.entities.abstract import AnySolution, TaskType
+from solution_service.domain.entities.abstract import (
+    AnySolution,
+    SubmissionType
+)
 
 
 @dataclass
@@ -17,14 +19,11 @@ class EnrichedUserContestStatus:
 
 @dataclass
 class NewCodeSolution:
-    class SubmissionType(Enum):
-        STR = "str"
-        ZIP = "zip"
-
     task_id: int
     submission_type: SubmissionType
     text: str
     compiler: str
+    main_file: str | None = None
 
 
 @dataclass

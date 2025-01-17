@@ -61,7 +61,6 @@ class ServiceAuthenticationMiddleware(AbstractAuthenticationMiddleware):
             connection: ASGIConnection,
     ) -> AuthenticationResult:
         auth_header = connection.headers.get("authorization")
-        print("AUTH", auth_header, connection.headers)
         if not auth_header:
             raise NotAuthorizedException()
         async with aiohttp.ClientSession() as session:
