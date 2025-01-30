@@ -2,12 +2,12 @@ import sys
 from typing import Sequence, Iterable
 
 import sqlalchemy
-from sqlalchemy import select, text, and_, literal, or_
+from sqlalchemy import select, text, and_, literal, or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from solution_service.application.interfaces import solutions
 from solution_service.application.interfaces.solutions import PaginationParameters, UserContestStatus
-from solution_service.domain.entities.abstract import AnySolution, TaskType, CodeSolution, QuizSolution
+from solution_service.domain.entities.abstract import AnySolution, TaskType, CodeSolution, QuizSolution, SubmissionType
 from solution_service.infrastructure.persistence.models import SolutionModel
 
 
@@ -32,7 +32,7 @@ def _transform_solution_model_to_entity(
             submission_url=model.answer,
             main_file=model.main_file,
             compiler_name=model.compiler_name,
-            submission_type=CodeSolution.SubmissionType(
+            submission_type=SubmissionType(
                 model.code_solution_type
             ),
             **commons
@@ -224,7 +224,6 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
             main_file=main_file,
             code_solution_type=submission_type
         )
-        print(model.__dict__, file=sys.stderr)
         self._session.add(model)
         await self._session.commit()
         await self._session.refresh(model)
@@ -275,3 +274,22 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
                 best_solutions,
             )),
         )
+
+    async def store_solution_check_result(
+            self,
+            solution_id: str,
+            score: int,
+            detailed_verdict: str,
+            short_verdict: str,
+            group_scores: dict[str, int],
+            protocol: dict,
+    ) -> None:
+        query = update(SolutionModel).where(SolutionModel.uuid == solution_id)
+        query = query.values(
+            score=score,
+            short_verdict=short_verdict,
+            detailed_verdict=detailed_verdict,
+            group_scores=group_scores,
+        )
+        await self._session.execute(query)
+        await self._session.commit()

@@ -80,6 +80,11 @@ class AppProvider(Provider):
         scope=Scope.REQUEST
     )
 
+    store_solution_result_interactor = provide(
+        interactors.StoreCheckedSolution,
+        scope=Scope.REQUEST,
+    )
+
     account_service_impl = provide(
         account_service.AccountServiceImpl,
         provides=AbstractAccountService,

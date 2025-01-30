@@ -30,3 +30,12 @@ class NewCodeSolution:
 class NewQuizSolution:
     task_id: int
     text: str
+
+
+@dataclass
+class SolutionCheckResult:
+    score: int
+    detailed_verdict: str
+    short_verdict: str
+    group_scores: dict[str, int]
+    protocol: dict

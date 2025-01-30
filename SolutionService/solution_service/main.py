@@ -1,7 +1,8 @@
 import asyncio
-from typing import Awaitable, Any
+import sys
+if sys.platform == "win32":
+    from asyncio import WindowsSelectorEventLoopPolicy
 
-import uvicorn
 from dishka import make_async_container
 from dishka.integrations import faststream as faststream_integration
 from dishka.integrations import litestar as litestar_integration
@@ -78,8 +79,13 @@ def get_litestar_app() -> Litestar:
 
 
 def get_app():
+    if sys.platform == "win32":
+        asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
     faststream_app = get_faststream_app()
     litestar_app = get_litestar_app()
     litestar_app.on_startup.append(faststream_app.broker.start)
     litestar_app.on_shutdown.append(faststream_app.broker.close)
     return litestar_app
+
+
+app = get_app()

@@ -33,11 +33,11 @@ class JudgeletApplication:
 
     def _serialize_protocol(
             self,
-            protocol: list[testgroup.TestGroupProtocol]
-    ) -> list[list[TestCaseResult]]:
+            protocol: dict[str, testgroup.TestGroupProtocol]
+    ) -> dict[str, list[TestCaseResult]]:
         """Serialize testing protocol to pydantic-serializable structure"""
-        full_protocol = []
-        for group_protocol in protocol:
+        full_protocol = {}
+        for group_name, group_protocol in protocol.items():
             full_group_protocol = []
             for case in group_protocol:
                 full_group_protocol.append(TestCaseResult(
@@ -47,7 +47,7 @@ class JudgeletApplication:
                     verdict=case[1].message,
                     is_successful=case[1].success
                 ))
-            full_protocol.append(full_group_protocol)
+            full_protocol[group_name] = full_group_protocol
         return full_protocol
 
     def _ensure_compiler_exists(self, compiler: str) -> None:

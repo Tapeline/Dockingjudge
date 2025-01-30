@@ -78,10 +78,10 @@ class SolutionContainer(ABC):
         # TODO: shouldn't pydantic be used here?
         if "type" not in json_data:
             raise SerializationException
-        if json_data["type"] not in {"string", "zip"}:
+        if json_data["type"] not in {"str", "zip"}:
             raise SerializationException
         return {
-            "string": StringSolutionContainer,
+            "str": StringSolutionContainer,
             "zip": ZipSolutionContainer
         }[json_data["type"]].deserialize(json_data)
 

@@ -4,6 +4,7 @@ from collections.abc import Collection, Sequence
 
 from solution_service.application import dto
 from solution_service.application.checker_loader import load_checker
+from solution_service.application.dto import SolutionCheckResult
 from solution_service.application.exceptions import NotFoundException
 from solution_service.application.interfaces import (
     account,
@@ -268,3 +269,25 @@ class PostQuizSolution:
         solution_id = await self._solution_repo.create_solution(solution_entity)
         solution_entity.uid = solution_id
         return solution_entity
+
+
+class StoreCheckedSolution:
+    def __init__(
+            self,
+            solution_repository: solutions.AbstractSolutionRepository,
+    ) -> None:
+        self.solution_repo = solution_repository
+
+    async def __call__(
+            self,
+            solution_id: str,
+            check_result: SolutionCheckResult
+    ) -> None:
+        await self.solution_repo.store_solution_check_result(
+            solution_id,
+            check_result.score,
+            check_result.detailed_verdict,
+            check_result.short_verdict,
+            check_result.group_scores,
+            check_result.protocol,
+        )

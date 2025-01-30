@@ -88,3 +88,15 @@ class AbstractSolutionRepository(ABC):
             solution: AnySolution
     ) -> str:
         raise NotImplementedError
+
+    @abstractmethod
+    async def store_solution_check_result(
+            self,
+            solution_id: str,
+            score: int,
+            detailed_verdict: str,
+            short_verdict: str,
+            group_scores: dict[str, int],
+            protocol: dict,
+    ) -> None:
+        raise NotImplementedError

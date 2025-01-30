@@ -31,7 +31,7 @@ class PostCodeSolutionSchema(BaseModel):
     compiler: str
     submission_type: SubmissionType
     text: str
-    main_file: str | None
+    main_file: str | None = None
 
 
 class PostQuizSolutionSchema(BaseModel):
@@ -61,17 +61,11 @@ class TestCaseResult(BaseModel):
     is_successful: bool
 
 
-class RunAnswer(BaseModel):
-    score: int
-    verdict: str
-    group_scores: dict[str, int]
-    protocol: list[list[TestCaseResult]]
-    compilation_error: str | None = None
-
-
 class MQSolutionAnswer(BaseModel):
-    answer_to: str
-    is_successful: bool
-    code: str | None = None
-    details: str | None = None
-    contents: RunAnswer | None = None
+    id: str
+    score: int
+    detailed_verdict: str
+    short_verdict: str
+    group_scores: dict[str, int]
+    protocol: dict[str, list[TestCaseResult]]
+    compilation_error: str | None = None

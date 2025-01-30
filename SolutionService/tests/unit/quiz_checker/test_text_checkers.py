@@ -14,6 +14,7 @@ def _dummy_solution(answer: str) -> QuizSolution:
         short_verdict="NC",
         submitted_answer=answer,
         task_type=TaskType.QUIZ,
+        contest_id=1,
     )
 
 
@@ -22,20 +23,19 @@ STRICT = True  # Alias
 
 
 @pytest.mark.parametrize(
-    "check_params",
+    ("expected_answer", "actual_answer", "is_case_sensitive", "is_strict"),
     [
         ("Apple", "Apple", CASE_SENSITIVE, STRICT),
         ("Apple", "aPPlE", not CASE_SENSITIVE, STRICT),
         ("Apple", "Aple", ..., not STRICT)
     ]
 )
-def test_right_answers(check_params):
-    (
-        expected_answer,
-        actual_answer,
-        is_case_sensitive,
+def test_right_answers(
+        expected_answer, 
+        actual_answer, 
+        is_case_sensitive, 
         is_strict
-    ) = check_params
+):
     check = CheckQuizSolution(
         quiz_checker=QuizTextChecker(
             max_score=100,

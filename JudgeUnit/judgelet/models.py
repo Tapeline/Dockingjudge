@@ -86,5 +86,5 @@ class RunAnswer(BaseModel):
     score: int
     verdict: str
     group_scores: dict[str, int]
-    protocol: list[list[TestCaseResult]]
+    protocol: dict[str, list[TestCaseResult]]
     compilation_error: str | None = None

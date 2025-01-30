@@ -107,7 +107,7 @@ class TestSuite:  # noqa: WPS230 (too many attrs)
         """Run all groups and calculate result"""
         score = 0
         fully_passed = set()
-        full_protocol = []
+        full_protocol = {}
         group_scores = {}
         verdict = None
         for group in self.groups:
@@ -122,7 +122,7 @@ class TestSuite:  # noqa: WPS230 (too many attrs)
                 file_name,
                 solution_dir
             )
-            full_protocol.append(group_protocol)
+            full_protocol[group.name] = group_protocol
             if self._all_dependencies_passed(fully_passed, group):
                 if has_passed:
                     fully_passed.add(group.name)
