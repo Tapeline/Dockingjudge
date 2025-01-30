@@ -11,6 +11,7 @@ import {Save} from "@material-ui/icons";
 import {lightGreen} from "@material-ui/core/colors";
 import {toastError, toastSuccess} from "../../ui/toasts.jsx";
 import {Spinner} from "react-bootstrap";
+import VWhitespace from "../../utils/VWhitespace.jsx";
 
 const styles = theme => ({});
 
@@ -60,58 +61,70 @@ function EditQuizTaskPage(props) {
 
     return (
         pageData === null || validatorJSON === null?
-        <CircularProgress className={classes.progress}/>
+        <Preloader/>
         :
         <Grid container spacing={16}>
-            <Grid item md={4} xs={12} style={{marginBottom: 8}}>
-                <Button onClick={applyChanges} mini fullWidth
+            <Grid item md={4} xs={12}>
+                <Paper style={{width: "100%", height: "100%", padding: "1rem"}}>
+                    <Typography variant="headline">
+                        Edit quiz task
+                    </Typography>
+                    <VWhitespace/>
+                    <Button onClick={applyChanges} mini fullWidth
                         style={{marginBottom: 8}}
                         variant="raised">
-                    <Save/>&nbsp;Save
-                </Button>
-                <TextField
-                    id="title"
-                    label="Title"
-                    value={pageTitle}
-                    onChange={e => setPageTitle(e.target.value)}
-                    margin="normal"
-                    fullWidth
-                    required
-                />
-                <br/>
-                <TextField
-                    id="desc"
-                    label="Description"
-                    multiline
-                    value={pageDescription}
-                    onChange={e => setPageDescription(e.target.value)}
-                    margin="normal"
-                    fullWidth
-                    required
-                />
-                <br/>
-                <TextField
-                    margin="dense"
-                    id="score"
-                    label="Question points"
-                    type="text"
-                    fullWidth
-                    required
-                    onChange={e => setQuizScore(e.target.value)}
-                />
+                        <Save/>&nbsp;Save
+                    </Button>
+                    <TextField
+                        id="title"
+                        label="Title"
+                        value={pageTitle}
+                        onChange={e => setPageTitle(e.target.value)}
+                        margin="normal"
+                        fullWidth
+                        required
+                    />
+                    <br/>
+                    <TextField
+                        id="desc"
+                        label="Description"
+                        multiline
+                        value={pageDescription}
+                        onChange={e => setPageDescription(e.target.value)}
+                        margin="normal"
+                        fullWidth
+                        required
+                    />
+                    <br/>
+                    <TextField
+                        margin="dense"
+                        id="score"
+                        label="Question points"
+                        type="number"
+                        fullWidth
+                        required
+                        value={quizScore}
+                        onChange={e => setQuizScore(e.target.value)}
+                    />
+                </Paper>
+
             </Grid>
             <Grid item md={8} xs={12}>
                 <Paper style={{padding: 16}}>
-                    <Typography variant="title">
+                    <Typography variant="headline">
                         Validator declaration
                     </Typography>
+                    <VWhitespace/>
                     <Editor
                         value={validatorJSON}
                         onChange={setValidatorJSON}
                         language="json"
                         width="100%"
                         height="40vh"
-                        className="dj-code-editor"
+                        options={{
+                            tabSize: 2,
+                            fontFamily: "JetBrains Mono"
+                        }}
                     />
                 </Paper>
             </Grid>

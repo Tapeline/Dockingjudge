@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Link, useNavigate, useParams} from "react-router-dom";
 import VWhitespace from "../../utils/VWhitespace.jsx";
 import {getContest, getContestPage, tryToEnterContest} from "../../api/endpoints-contests.jsx";
@@ -7,6 +7,10 @@ import QuizDetailPage from "./QuizDetailPage.jsx";
 import {CircularProgress, Typography, withStyles, Button} from "@material-ui/core";
 import CodeDetailPage from "./CodeDetailPage.jsx";
 import {Edit} from "@material-ui/icons";
+import MarkdownRenderer from "../../components/Markdown/MarkdownRenderer.jsx";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import {Fade} from "react-bootstrap";
+import Preloader from "../../components/Preloader/Preloader.jsx";
 
 const styles = theme => ({});
 
@@ -62,15 +66,16 @@ function ContestDetailPage(props) {
         return <h1>Contest not found</h1>;
 
     if (!isFullyLoaded())
-        return <CircularProgress className={classes.progress}/>;
+        return <Preloader/>;
 
     if (receivedPageType === "text") {
+        console.log(pageData);
         return (
-            <div>
+            <div style={{maxWidth: "1200px"}}>
                 <Typography variant="display2">
                     {pageData.name}
                     {
-                        contestData.author === localStorage.getItem("accountId")
+                        contestData.author == localStorage.getItem("accountId")
                             ? <Button mini style={{marginLeft: 16}}
                                 href={`/contests/${contestId}/${receivedPageType}/${receivedPageId}/edit`}
                             ><Edit/></Button>
@@ -78,7 +83,8 @@ function ContestDetailPage(props) {
                     }
                 </Typography>
                 <VWhitespace/>
-                <Typography variant="body1">{pageData.text}</Typography>
+                <MarkdownRenderer text={pageData.text}/>
+                {/*<Typography variant="body1">{pageData.text}</Typography>*/}
                 <VWhitespace/>
                 {pageData?.is_enter_page
                     ? <Button variant="outlined" onClick={onEnterClick}>Enter contest</Button>
@@ -86,9 +92,13 @@ function ContestDetailPage(props) {
             </div>
         );
     } else if (receivedPageType === "quiz") {
-        return <QuizDetailPage contestData={contestData} pageData={pageData}/>;
+        return <div>
+            <QuizDetailPage contestData={contestData} pageData={pageData}/>
+        </div>;
     } else if (receivedPageType === "code") {
-        return <CodeDetailPage contestData={contestData} pageData={pageData}/>;
+        return <div>
+            <CodeDetailPage contestData={contestData} pageData={pageData}/>
+        </div>;
     }
 
 }

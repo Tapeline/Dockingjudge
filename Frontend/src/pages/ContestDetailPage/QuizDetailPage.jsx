@@ -18,6 +18,8 @@ import {
 import {lightGreen} from "@material-ui/core/colors";
 import MarkdownRenderer from "../../components/Markdown/MarkdownRenderer.jsx";
 import {Edit} from "@material-ui/icons";
+import HWhitespace from "../../utils/HWhitespace.jsx";
+import Preloader from "../../components/Preloader/Preloader.jsx";
 
 const styles = theme => ({});
 
@@ -51,7 +53,7 @@ function QuizDetailPage(props) {
     };
 
     if (!isFullyLoaded())
-        return <CircularProgress className={classes.progress}/>;
+        return <Preloader/>;
 
     return (
         <div>
@@ -65,32 +67,42 @@ function QuizDetailPage(props) {
                         : ""
                 }
             </Typography>
-            <MarkdownRenderer text={pageData.description}/>
+            <VWhitespace/>
+            <Paper style={{width: "100%", padding: "1rem"}}>
+                <div style={{maxWidth: 1200}}>
+                    <MarkdownRenderer text={pageData.description}/>
+                </div>
+            </Paper>
+            <VWhitespace/>
             <Grid container spacing={24}>
                 <Grid item md={8} xs={12} style={{display: "flex"}}>
-                    <TextField
-                        autoFocus
-                        margin="dense"
-                        id="name"
-                        label="Answer"
-                        type="text"
-                        fullWidth
-                        multiline
-                        onChange={e => setSolutionText(e.target.value)}
-                    />
-                    <Button variant="fab" mini
-                            onClick={onSubmitSolution}
-                            disabled={isSubmissionLoading}
-                            style={{margin: 8}}>
-                        <Icon>send</Icon>
-                    </Button>
+                    <Paper style={{width: "100%", padding: "1rem"}}>
+                        <Typography variant="headline">Submit answer</Typography>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="name"
+                            label="Answer"
+                            type="text"
+                            fullWidth
+                            multiline
+                            onChange={e => setSolutionText(e.target.value)}
+                        />
+                        <div>
+                            <Button onClick={onSubmitSolution}
+                                disabled={isSubmissionLoading}
+                                    variant="raised"
+                                style={{margin: 8}}>
+                            <Icon>send</Icon><HWhitespace width={0.5}/>Submit
+                        </Button>
+                        </div>
+                    </Paper>
                 </Grid>
                 <Grid item md={4} xs={12}>
-                    <Typography variant="title">
-                        Your solutions
-                    </Typography>
-                    <VWhitespace/>
-                    <Paper className={classes.root}>
+                    <Paper style={{height: "100%", width: "100%", padding: "1rem"}}>
+                        <Typography variant="headline">
+                            Your solutions
+                        </Typography>
                         <Table className={classes.table}>
                             <TableHead>
                                 <TableRow>

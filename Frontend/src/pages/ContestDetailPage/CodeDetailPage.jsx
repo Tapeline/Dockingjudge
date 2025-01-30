@@ -24,9 +24,12 @@ import {Editor} from "@monaco-editor/react";
 import MarkdownRenderer from "../../components/Markdown/MarkdownRenderer.jsx";
 import {lightGreen, teal} from "@material-ui/core/colors";
 import {Edit} from "@material-ui/icons";
+import HWhitespace from "../../utils/HWhitespace.jsx";
+import {dateConverter} from "../../utils/time.jsx";
+import Preloader from "../../components/Preloader/Preloader.jsx";
 
 const styles = theme => ({
-    paper: {
+    table: {
         overflowX: "scroll"
     }
 });
@@ -79,134 +82,147 @@ function CodeDetailPage(props) {
     };
 
     if (!isFullyLoaded())
-        return <CircularProgress className={classes.progress}/>;
+        return <Preloader/>;
 
     return (
         <div>
             <Grid container spacing={24}>
                 <Grid item lg={6} xs={12}>
-                    <Typography variant="display2">
-                        {pageData.title}
-                        {
-                            contestData.author == localStorage.getItem("accountId")
-                                ? <Button mini style={{marginLeft: 16}}
-                                    href={`/contests/${contestId}/${pageType}/${pageId}/edit`}
-                                ><Edit/></Button>
-                                : ""
-                        }
-                    </Typography>
-                    <MarkdownRenderer text={pageData.description}/>
-                    {/*<Typography variant="body1">*/}
-                    {/*    {pageData.description}*/}
-                    {/*</Typography>*/}
+                    <div style={{
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "stretch"
+                    }}>
+                        <Typography variant="display2">
+                            {pageData.title}
+                            {
+                                contestData.author == localStorage.getItem("accountId")
+                                    ? <Button mini style={{marginLeft: 16}}
+                                        href={`/contests/${contestId}/${pageType}/${pageId}/edit`}
+                                    ><Edit/></Button>
+                                    : ""
+                            }
+                        </Typography>
+                        <VWhitespace/>
+                        <Paper style={{width: "100%", padding: "1rem", flex: "1 1 auto"}}>
+                            <MarkdownRenderer text={pageData.description}/>
+                        </Paper>
+                    </div>
                 </Grid>
                 <Grid item lg={6} xs={12}>
-                    <Typography variant="title">
-                        Constraints
-                    </Typography>
-                    <Typography variant="subheading">
-                        Time limit: <b>{pageData.test_suite?.time_limit}s</b>
-                    </Typography>
-                    <Typography variant="subheading">
-                        Memory limit: <b>{pageData.test_suite?.mem_limit_mb}MB</b>
-                    </Typography>
+                    <Paper style={{width: "100%", padding: "1rem"}}>
+                        <Typography variant="headline">
+                            Constraints
+                        </Typography>
+                        <Typography variant="subheading">
+                            Time limit: <b>{pageData.test_suite?.time_limit}s</b>
+                        </Typography>
+                        <Typography variant="subheading">
+                            Memory limit: <b>{pageData.test_suite?.mem_limit_mb}MB</b>
+                        </Typography>
+                    </Paper>
                     <VWhitespace/>
-                    <Typography variant="title">
-                        Example test cases
-                    </Typography>
-                    {
-                        pageData.test_suite?.public_cases?.map((data, index) => {
-                            return <Paper key={index} style={{marginTop: 8}}>
-                                <Table className={classes.table}>
-                                    <TableHead>
-                                        <TableRow>
-                                            <TableCell>Input</TableCell>
-                                            <TableCell>Output</TableCell>
-                                        </TableRow>
-                                    </TableHead>
-                                    <TableBody>
-                                        <TableRow>
-                                            <TableCell><pre>{data.in}</pre></TableCell>
-                                            <TableCell><pre>{data.out}</pre></TableCell>
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </Paper>;
-                        })
-                    }
+                    <Paper style={{width: "100%", padding: "1rem"}}>
+                        <Typography variant="headline">
+                            Example test cases
+                        </Typography>
+                        <Table className={classes.table}>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Input</TableCell>
+                                    <TableCell>Output</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>{
+                                pageData.test_suite?.public_cases?.map((data, index) => {
+                                    return <TableRow>
+                                        <TableCell><pre>{data.in}</pre></TableCell>
+                                        <TableCell><pre>{data.out}</pre></TableCell>
+                                    </TableRow>
+                                })
+                            }</TableBody>
+                        </Table>
+                    </Paper>
                 </Grid>
             </Grid>
             <Grid container spacing={24}>
                 <Grid item lg={6} xs={12}>
-                    <div style={{display: "flex", justifyContent: "space-between"}}>
-                        <FormControl className={classes.formControl} style={{minWidth: "50%", marginBottom: 8}}>
-                            <InputLabel htmlFor="compiler-name">Compiler</InputLabel>
-                            <Select
-                                value={currentSubmissionLang}
-                                onChange={e => {
-                                    setCurrentSubmissionLang(e.target.value);
-                                    setCurrentHighlightLang(availableCompilers[e.target.value]);
-                                    console.log(e.target.value, availableCompilers[e.target.value])
-                                }}
-                                inputProps={{
-                                    name: 'compiler',
-                                    id: 'compiler-name',
-                                }}
-                            >{Object.entries(availableCompilers).map((data, index) => {
-                                return <MenuItem key={index} value={data[0]}>{data[0]}</MenuItem>;
-                            })}</Select>
-                        </FormControl>
-                        <Button variant="fab" mini
-                                onClick={onSubmitSolution}
+                    <Paper style={{width: "100%", padding: "1rem"}}>
+                        <Typography variant="headline">Submit code</Typography>
+                        <div style={{display: "flex", justifyContent: "space-between", marginTop: 8}}>
+                            <FormControl className={classes.formControl}
+                                         style={{minWidth: "50%", marginBottom: 8}}>
+                                <InputLabel htmlFor="compiler-name">Compiler</InputLabel>
+                                <Select
+                                    value={currentSubmissionLang}
+                                    onChange={e => {
+                                        setCurrentSubmissionLang(e.target.value);
+                                        setCurrentHighlightLang(availableCompilers[e.target.value]);
+                                        console.log(e.target.value, availableCompilers[e.target.value])
+                                    }}
+                                    inputProps={{
+                                        name: 'compiler',
+                                        id: 'compiler-name',
+                                    }}
+                                >{Object.entries(availableCompilers).map((data, index) => {
+                                    return <MenuItem key={index} value={data[0]}>{data[0]}</MenuItem>;
+                                })}</Select>
+                            </FormControl>
+                            <Button onClick={onSubmitSolution}
                                 disabled={isSubmissionLoading}
+                                    variant="raised"
                                 style={{margin: 8}}>
-                            <Icon>send</Icon>
-                        </Button>
-                    </div>
+                                <Icon>send</Icon><HWhitespace width={0.5}/>Submit
+                            </Button>
+                        </div>
 
-                    <Editor
-                        height="400px" width="100%"
-                        language={currentHighlightLang}
-                        className="dj-code-editor"
-                        onChange={s => setSolutionText(s)}
-                        options={{
-                            tabSize: 2,
-                            fontFamily: "JetBrains Mono"
-                        }}
-                    />
-
+                        <Editor
+                            height="400px" width="100%"
+                            language={currentHighlightLang}
+                            className="dj-code-editor"
+                            onChange={s => setSolutionText(s)}
+                            options={{
+                                tabSize: 2,
+                                fontFamily: "JetBrains Mono"
+                            }}
+                        />
+                    </Paper>
                 </Grid>
                 <Grid item lg={6} xs={12}>
-                    <Typography variant="title">
-                        Your solutions
-                    </Typography>
-                    <VWhitespace/>
-                    <Paper className={classes.paper}>
-                        <Table className={classes.table} style={{width: "100%"}} padding="dense">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>#</TableCell>
-                                    <TableCell>Date</TableCell>
-                                    <TableCell>Compiler</TableCell>
-                                    <TableCell>Verdict</TableCell>
-                                    <TableCell>Score</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>{previousSolutions.map((data, index) => {
-                                const style = data.is_solved? {background: lightGreen[300]} : {};
-                                return <TableRow key={index}
-                                                 className="table-success"
-                                                 style={style} >
-                                    <TableCell padding="none" style={{paddingLeft: 8}}>
-                                        <Button href={`/solutions/code/${data.id}`}>{data.id}</Button>
-                                    </TableCell>
-                                    <TableCell>{data.submitted_at}</TableCell>
-                                    <TableCell>{data.compiler}</TableCell>
-                                    <TableCell>{data.verdict}</TableCell>
-                                    <TableCell>{data.points}</TableCell>
-                                </TableRow>;
-                            })}</TableBody>
-                        </Table>
+                    <Paper style={{width: "100%", padding: "1rem"}}>
+                        <Typography variant="headline">
+                            Your solutions
+                        </Typography>
+                        <VWhitespace/>
+                        <div style={{width: "100%", overflowX: "scroll"}}>
+                            <Table className={classes.table} style={{width: "100%"}} padding="dense">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>#</TableCell>
+                                        <TableCell>Date</TableCell>
+                                        <TableCell>Compiler</TableCell>
+                                        <TableCell>Verdict</TableCell>
+                                        <TableCell>Score</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>{previousSolutions.map((data, index) => {
+                                    const style = data.is_solved? {background: lightGreen[300]} : {};
+                                    return <TableRow key={index}
+                                                     className="table-success"
+                                                     style={style} >
+                                        <TableCell padding="none" style={{paddingLeft: 8}}>
+                                            <Button href={`/solutions/code/${data.id}`}>{data.id}</Button>
+                                        </TableCell>
+                                        <TableCell>{dateConverter(data.submitted_at)}</TableCell>
+                                        <TableCell>{data.compiler}</TableCell>
+                                        <TableCell>{data.verdict}</TableCell>
+                                        <TableCell>{data.points}</TableCell>
+                                    </TableRow>;
+                                })}</TableBody>
+                            </Table>
+                        </div>
                     </Paper>
                 </Grid>
             </Grid>

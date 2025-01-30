@@ -10,6 +10,7 @@ import {Editor} from "@monaco-editor/react";
 import {Save} from "@material-ui/icons";
 import {lightGreen} from "@material-ui/core/colors";
 import {toastError, toastSuccess} from "../../ui/toasts.jsx";
+import VWhitespace from "../../utils/VWhitespace.jsx";
 
 const styles = theme => ({});
 
@@ -56,10 +57,13 @@ function EditCodeTaskPage(props) {
 
     return (
         pageData === null || testSuiteJSON === null?
-        <CircularProgress className={classes.progress}/>
+        <Preloader/>
         :
         <Grid container spacing={16} style={{height: "100%"}}>
-            <Grid item md={4} xs={12} style={{marginBottom: 8}}>
+            <Grid item md={4} xs={12}>
+                <Paper style={{width: "100%", height: "100%", padding: "1rem"}}>
+                    <Typography variant="headline">Edit code task</Typography>
+                    <VWhitespace/>
                 <Button onClick={applyChanges} mini fullWidth
                         style={{marginBottom: 8}}
                         variant="raised">
@@ -83,10 +87,11 @@ function EditCodeTaskPage(props) {
                     margin="normal"
                     fullWidth
                 />
+                </Paper>
             </Grid>
             <Grid item md={8} xs={12}>
                 <Paper style={{padding: 16, height: "100%"}}>
-                    <Typography variant="title">
+                    <Typography variant="headline">
                         Test suite declaration
                     </Typography>
                     <Editor

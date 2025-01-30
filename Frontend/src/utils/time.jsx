@@ -21,12 +21,11 @@ export function dateConverter(isoDate) {
         return ""
     }
     const dateObj = new Date(isoDate);
-    const hours = String(dateObj.getHours()).padStart(2, '0');
+    const hours = String(dateObj.getHours());
     const minutes = String(dateObj.getMinutes()).padStart(2, '0');
-    const day = String(dateObj.getDate()).padStart(2, '0');
-    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate());
+    const month = String(dateObj.getMonth() + 1);
     const year = String(dateObj.getFullYear());
-    const dayOfWeek = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'][dateObj.getDay()];
-    const formattedDate = `${hours}:${minutes} ${day}.${month}.${year} (${dayOfWeek})`;
+    const formattedDate = `${hours}:${minutes} ${day}/${month}/${year}`;
     return formattedDate;
 }

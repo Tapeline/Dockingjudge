@@ -63,7 +63,7 @@ function ProfilePage(props) {
     };
 
     return (<div className="dj-container">
-        <Typography variant="display2" style={{marginBottom: 16}}>
+        <Typography variant="display3" style={{marginBottom: 16}}>
             Your profile
         </Typography>
         <VWhitespace size={1}/>

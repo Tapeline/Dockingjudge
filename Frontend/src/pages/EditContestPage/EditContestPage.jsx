@@ -18,7 +18,7 @@ import {
     Paper, Switch,
     TextField, Toolbar,
     Typography, Tab, Tabs,
-    withStyles, AppBar
+    withStyles, AppBar, ExpansionPanelSummary, ExpansionPanel, ExpansionPanelDetails
 } from "@material-ui/core";
 import HWhitespace from "../../utils/HWhitespace.jsx";
 import {Editor} from "@monaco-editor/react";
@@ -30,8 +30,21 @@ import PageListItem from "./PageListIem.jsx";
 import CreateTextPageDialog from "../../components/Dialogs/CreatePageDialog/CreateTextPageDialog.jsx";
 import CreateCodePageDialog from "../../components/Dialogs/CreatePageDialog/CreateCodePageDialog.jsx";
 import CreateQuizPageDialog from "../../components/Dialogs/CreatePageDialog/CreateQuizPageDialog.jsx";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
-const styles = theme => ({});
+const styles = theme => ({root: {
+        width: '100%',
+      },
+      heading: {
+        fontSize: theme.typography.pxToRem(15),
+        flexBasis: '33.33%',
+        flexShrink: 0,
+        marginRight: "1rem"
+      },
+      secondaryHeading: {
+        fontSize: theme.typography.pxToRem(15),
+        color: theme.palette.text.secondary,
+      },});
 
 function EditContestPage(props) {
     const navigate = useNavigate();
@@ -39,6 +52,7 @@ function EditContestPage(props) {
     const accessToken = localStorage.getItem("accessToken");
     const [contestData, setContestData] = useState(null);
     const {classes, theme} = props;
+    const [key, setKey] = useState("general");
 
     const [contestTitle, setContestTitle] = useState(null);
     const [contestDescription, setContestDescription] = useState(null);
@@ -89,7 +103,7 @@ function EditContestPage(props) {
     return (
         contestData === null || contestTitle === null || contestDescription === null ||
             timeLimit === null || isEnded === null || isStarted === null?
-        <CircularProgress className={classes.progress}/>
+        <Preloader/>
         :
             <div>
                 <Typography variant="display2">
@@ -102,118 +116,124 @@ function EditContestPage(props) {
                     <Save/>&nbsp;Save
                 </Button>
                 <VWhitespace/>
-                <Typography variant="title">
-                    General
-                </Typography>
-                <TextField
-                    id="title"
-                    label="Title"
-                    value={contestTitle}
-                    onChange={e => setContestTitle(e.target.value)}
-                    margin="normal"
-                    fullWidth
-                />
-                <br/>
-                <TextField
-                    id="desc"
-                    label="Description"
-                    multiline
-                    value={contestDescription}
-                    onChange={e => setContestDescription(e.target.value)}
-                    margin="normal"
-                    fullWidth
-                />
-                <br/>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={isStarted}
-                            onChange={e => setIsStarted(e.target.checked)}
+                <ExpansionPanel expanded={key === 'general'} onChange={() => setKey("general")}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                        <Typography className={classes.heading}>General</Typography>
+                        <Typography className={classes.secondaryHeading}>Main contest settings</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails style={{display: "block"}}>
+                        <TextField
+                            id="title"
+                            label="Title"
+                            value={contestTitle}
+                            onChange={e => setContestTitle(e.target.value)}
+                            margin="normal"
+                            fullWidth
                         />
-                    }
-                    label="Is started?"
-                />
-                <HWhitespace/>
-                <FormControlLabel
-                    control={
-                        <Switch
-                            checked={isEnded}
-                            onChange={e => setIsEnded(e.target.checked)}
+                        <br/>
+                        <TextField
+                            id="desc"
+                            label="Description"
+                            multiline
+                            value={contestDescription}
+                            onChange={e => setContestDescription(e.target.value)}
+                            margin="normal"
+                            fullWidth
                         />
-                    }
-                    label="Is ended?"
-                />
-                <HWhitespace/>
-                <FormControl aria-describedby="time-limit-helper-text">
-                    <Input
-                        id="time-limit"
-                        value={timeLimit}
-                        onChange={e => {
-                            if (e.target.value < 0)
-                                setTimeLimit(-1)
-                            else
-                                setTimeLimit(e.target.value)
-                        }}
-                        endAdornment={<InputAdornment position="end">seconds</InputAdornment>}
-                        inputProps={{
-                            'aria-label': 'Time limit',
-                        }}
-                        type="number"
-                    />
-                    <FormHelperText id="time-limit-helper-text">Time limit</FormHelperText>
-                </FormControl>
-                <VWhitespace/>
-                <Typography variant="title">
-                    Pages
-                </Typography>
-                <VWhitespace/>
-                <div>
-                    <AppBar position="static">
-                        <Tabs value={tabValue} onChange={(event, value) => {
-                            setTabValue(value);
-                        }}>
-                            <Tab label="Page list"/>
-                            <Tab label="JSON"/>
-                        </Tabs>
-                    </AppBar>
-                    {tabValue === 0 && <>
-                        <VWhitespace/>
-                        <Toolbar variant="dense"
-                                 indicatorColor="primary"
-                                 textColor="primary"
-                        >
-                            <Grid container spacing={24}>
-                                <Grid item xs={4} sm={2}>
-                                    <CreateTextPageDialog contestId={contestId}/>
-                                </Grid>
-                                <Grid item xs={4} sm={2}>
-                                    <CreateQuizPageDialog contestId={contestId}/>
-                                </Grid>
-                                <Grid item xs={4} sm={2}>
-                                    <CreateCodePageDialog contestId={contestId}/>
-                                </Grid>
-                            </Grid>
-                        </Toolbar>
-                        <List>{
-                            contestData.pages.map((data, index) => {
-                                return <PageListItem contestId={contestId} data={data}/>;
-                            })
-                        }</List>
-                    </>}
-                    {tabValue === 1 && <>
-                        <Editor
-                            value={pagesJSON}
-                            onChange={setPagesJSON}
-                            language="json"
-                            width="100%"
-                            height="80vh"
-                            options={{
-                                tabSize: 2,
-                                fontFamily: "JetBrains Mono"
-                            }}
+                        <br/>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={isStarted}
+                                    onChange={e => setIsStarted(e.target.checked)}
+                                />
+                            }
+                            label="Is started?"
                         />
-                    </>}
-                </div>
+                        <HWhitespace/>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    checked={isEnded}
+                                    onChange={e => setIsEnded(e.target.checked)}
+                                />
+                            }
+                            label="Is ended?"
+                        />
+                        <HWhitespace/>
+                        <FormControl aria-describedby="time-limit-helper-text">
+                            <Input
+                                id="time-limit"
+                                value={timeLimit}
+                                onChange={e => {
+                                    if (e.target.value < 0)
+                                        setTimeLimit(-1)
+                                    else
+                                        setTimeLimit(e.target.value)
+                                }}
+                                endAdornment={<InputAdornment position="end">seconds</InputAdornment>}
+                                inputProps={{
+                                    'aria-label': 'Time limit',
+                                }}
+                                type="number"
+                            />
+                            <FormHelperText id="time-limit-helper-text">Time limit</FormHelperText>
+                        </FormControl>
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+                <ExpansionPanel expanded={key === 'pages'} onChange={() => setKey("pages")}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                        <Typography className={classes.heading}>Pages</Typography>
+                        <Typography className={classes.secondaryHeading}>Configure contest pages and tasks</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails style={{display: "block"}}>
+                        <AppBar position="static">
+                            <Tabs value={tabValue} onChange={(event, value) => {
+                                setTabValue(value);
+                            }}>
+                                <Tab label="Page list"/>
+                                <Tab label="JSON"/>
+                            </Tabs>
+                        </AppBar>
+                        {tabValue === 0 && <>
+                            <VWhitespace/>
+                            <Toolbar variant="dense"
+                                     indicatorColor="primary"
+                                     textColor="primary"
+                            >
+                                <Grid container spacing={24}>
+                                    <Grid item xs={4} sm={2}>
+                                        <CreateTextPageDialog contestId={contestId}/>
+                                    </Grid>
+                                    <Grid item xs={4} sm={2}>
+                                        <CreateQuizPageDialog contestId={contestId}/>
+                                    </Grid>
+                                    <Grid item xs={4} sm={2}>
+                                        <CreateCodePageDialog contestId={contestId}/>
+                                    </Grid>
+                                </Grid>
+                            </Toolbar>
+                            <List>{
+                                contestData.pages.map((data, index) => {
+                                    return <PageListItem contestId={contestId} data={data}/>;
+                                })
+                            }</List>
+                        </>}
+                        {tabValue === 1 && <>
+                            <Editor
+                                value={pagesJSON}
+                                onChange={setPagesJSON}
+                                language="json"
+                                width="100%"
+                                height="80vh"
+                                options={{
+                                    tabSize: 2,
+                                    fontFamily: "JetBrains Mono"
+                                }}
+                            />
+                        </>}
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
             </div>
     );
 }
