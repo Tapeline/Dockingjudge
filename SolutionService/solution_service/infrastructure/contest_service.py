@@ -31,7 +31,7 @@ class ContestServiceImpl(contest.AbstractContestService):
                 raise BadServiceResponseException("contest", response)
             return await response.json()
 
-    async def get_contest_tasks(self, contest_id: int) -> Sequence[tuple[TaskType, int]]:
+    async def get_contest_tasks(self, contest_id: int) -> Sequence[tuple[TaskType, int, str]]:
         async with (
             aiohttp.ClientSession() as session,
             session.get(
@@ -45,7 +45,7 @@ class ContestServiceImpl(contest.AbstractContestService):
             data = await response.json()
             print(data)
             return [
-                (TaskType(str(task["type"])), int(task["id"]))
+                (TaskType(str(task["type"])), int(task["id"]), task["title"])
                 for task in data
             ]
 
@@ -95,17 +95,7 @@ class ContestServiceImpl(contest.AbstractContestService):
                 raise BadServiceResponseException("contest", response)
             data = await response.json()
             print(data)
-            return contest.QuizTaskDTO(
-                id=data["id"],
-                contest_id=data["contest"],
-                title=data["title"],
-                description=data["description"],
-                points=data["points"],
-                validator=contest.ValidatorDTO(
-                    type=data["validator"]["type"],
-                    args=data["validator"]["args"],
-                ),
-            )
+            return contest.QuizTaskDTO(**data)
 
     async def get_code_task(self, task_id: int) -> CodeTaskDTO | None:
         async with (
@@ -119,10 +109,4 @@ class ContestServiceImpl(contest.AbstractContestService):
             if response.status != 200:
                 raise BadServiceResponseException("contest", response)
             data = await response.json()
-            return contest.CodeTaskDTO(
-                id=data["id"],
-                contest_id=data["contest"],
-                title=data["title"],
-                description=data["description"],
-                test_suite=data["test_suite"],
-            )
+            return contest.CodeTaskDTO(**data)

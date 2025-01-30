@@ -24,6 +24,7 @@ def _transform_solution_model_to_entity(
         "user_id": model.user_id,
         "score": model.score,
         "short_verdict": model.short_verdict,
+        "submitted_at": model.submitted_at
     }
     if model.task_type == TaskType.CODE:
         return CodeSolution(

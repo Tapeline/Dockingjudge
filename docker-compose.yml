@@ -202,6 +202,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${MINIO_USER}
       MINIO_ROOT_PASSWORD: ${MINIO_PASS}
+      MINIO_BROWSER_REFERRER_POLICY: "unsafe-url"
     volumes:
       - minio_data:/data
     healthcheck:

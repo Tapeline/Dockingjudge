@@ -1,6 +1,7 @@
+import datetime
 from typing import Optional
 
-from sqlalchemy import Integer, Enum, String, JSON, UUID
+from sqlalchemy import Integer, Enum, String, JSON, UUID, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 import uuid
 
@@ -23,6 +24,10 @@ class SolutionModel(Base):
     score: Mapped[int] = mapped_column(Integer)
     short_verdict: Mapped[str] = mapped_column(String)
     answer: Mapped[str] = mapped_column(String)
+    submitted_at: Mapped[datetime.datetime] = mapped_column(
+        DateTime,
+        default=datetime.datetime.now,
+    )
 
     code_solution_type: Mapped[str] = mapped_column(
         Enum(SubmissionType),

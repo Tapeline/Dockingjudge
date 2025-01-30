@@ -17,7 +17,7 @@ import {
 } from "@material-ui/core";
 import {lightGreen} from "@material-ui/core/colors";
 import MarkdownRenderer from "../../components/Markdown/MarkdownRenderer.jsx";
-import {Edit} from "@material-ui/icons";
+import {Edit, Visibility} from "@material-ui/icons";
 import HWhitespace from "../../utils/HWhitespace.jsx";
 import Preloader from "../../components/Preloader/Preloader.jsx";
 
@@ -45,6 +45,10 @@ function QuizDetailPage(props) {
     }
 
     const onSubmitSolution = () => {
+        if (solutionText === null) {
+            toastError("No answer provided!")
+            return;
+        }
         setIsSubmissionLoading(true);
         submitQuizSolution(accessToken, pageId, solutionText).then(response => {
             window.location.href = `/contests/${contestId}/${pageType}/${pageId}`;
@@ -75,7 +79,7 @@ function QuizDetailPage(props) {
             </Paper>
             <VWhitespace/>
             <Grid container spacing={24}>
-                <Grid item md={8} xs={12} style={{display: "flex"}}>
+                <Grid item lg={8} xs={12} style={{display: "flex"}}>
                     <Paper style={{width: "100%", padding: "1rem"}}>
                         <Typography variant="headline">Submit answer</Typography>
                         <TextField
@@ -86,6 +90,7 @@ function QuizDetailPage(props) {
                             type="text"
                             fullWidth
                             multiline
+                            required={true}
                             onChange={e => setSolutionText(e.target.value)}
                         />
                         <div>
@@ -98,7 +103,7 @@ function QuizDetailPage(props) {
                         </div>
                     </Paper>
                 </Grid>
-                <Grid item md={4} xs={12}>
+                <Grid item lg={4} xs={12}>
                     <Paper style={{height: "100%", width: "100%", padding: "1rem"}}>
                         <Typography variant="headline">
                             Your solutions
@@ -107,16 +112,21 @@ function QuizDetailPage(props) {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>#</TableCell>
+                                    <TableCell>Verdict</TableCell>
                                     <TableCell>Score</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>{previousSolutions.map((data, index) => {
-                                const style = data.is_solved? {background: lightGreen[300]} : {};
+                                const style = data.short_verdict === "OK"?
+                                    {background: lightGreen[300]} : {};
                                 return <TableRow key={index} className="table-success" style={style}>
-                                    <TableCell>
-                                        <Button href={`/solutions/quiz/${data.id}`}>{data.id}</Button>
+                                    <TableCell padding="none" style={{paddingLeft: 8}}>
+                                        <Button href={`/solutions/quiz/${data.id}`} variant="mini">
+                                            <Visibility/>
+                                        </Button>
                                     </TableCell>
-                                    <TableCell>{data.points}</TableCell>
+                                    <TableCell>{data.short_verdict}</TableCell>
+                                    <TableCell>{data.score}</TableCell>
                                 </TableRow>;
                             })}</TableBody>
                         </Table>

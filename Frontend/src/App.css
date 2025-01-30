@@ -40,6 +40,12 @@ code {
     border-radius: 0;
 }
 
+.rendered-md code {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+}
+
 /*.rendered-md pre {*/
 /*    padding: 8px;*/
 /*    border: 1px solid #AAA;*/

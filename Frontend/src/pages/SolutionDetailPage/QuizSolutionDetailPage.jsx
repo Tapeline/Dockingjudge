@@ -55,7 +55,7 @@ function QuizSolutionDetailPage(props) {
 
     return (<>
         <div style={{width: "100%", display: "flex", flexDirection: "column", alignItems: "center"}}>
-            <div className="dj-under-card-bg" style={{background: getScoreColor(solutionData.points)}}></div>
+            <div className="dj-under-card-bg" style={{background: getScoreColor(solutionData.score)}}></div>
             <Paper className="dj-solution-paper">
                 <Typography variant="headline">
                     Quiz solution {solutionId}
@@ -65,9 +65,9 @@ function QuizSolutionDetailPage(props) {
                     <Stars/>
                     <HWhitespace width={1}/>
                     Score: <HWhitespace width={0.5}/>
-                    <code>{solutionData.points}</code>
+                    <code>{solutionData.score}</code>
                     <HWhitespace width={1}/>
-                    {solutionData.is_solved? <Check/> : <Close/>}
+                    {solutionData.short_verdict === "OK"? <Check/> : <Close/>}
                 </Typography>
                 <Typography variant="caption" style={{display: "flex", alignItems: "center"}}>
                     <Timer/>
@@ -79,7 +79,7 @@ function QuizSolutionDetailPage(props) {
                 <Typography variant="headline">
                     Your answer
                 </Typography>
-                <pre>{solutionData.text}</pre>
+                <pre>{solutionData.data.submitted_answer}</pre>
             </Paper>
         </div>
     </>);

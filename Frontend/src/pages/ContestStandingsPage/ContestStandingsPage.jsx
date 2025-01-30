@@ -67,11 +67,7 @@ function ContestStandingsPage(props) {
 
     return (
         <div>
-            <Typography variant="display2">
-                {contestData.name}
-            </Typography>
-            <VWhitespace/>
-            <Typography variant="subheading">
+            <Typography variant="display3">
                 Standings
             </Typography>
             <VWhitespace/>
@@ -80,21 +76,24 @@ function ContestStandingsPage(props) {
                     <TableHead>
                         <TableRow>
                             <TableCell>Username</TableCell>
+                            <TableCell>Total</TableCell>
                         {standingsData.tasks.map((data, index) => {
-                            return <TableCell key={index}>{data.title}</TableCell>;
+                            return <TableCell key={index}>{data[2]}</TableCell>;
                         })}</TableRow>
                     </TableHead>
                     <TableBody>{standingsData.table.map((data, index) => {
-                        return <TableRow key={index}>{data.map((cell, index2) => {
-                            if (index2 === 0)
-                                return <TableCell key={index2}>{cell.username}</TableCell>;
-                            if (cell[0] === null || cell[0] === undefined)
-                                return <TableCell key={index2}></TableCell>;
-                            const style = {
-                                background: cell[2]? lightGreen[300] : amber[300]
-                            }
-                            return <TableCell key={index2} style={style}>{cell[1]}</TableCell>;
-                        })}</TableRow>;
+                        return <TableRow key={index}>
+                            <TableCell>{data.user.username}</TableCell>
+                            <TableCell>{data.total_score}</TableCell>
+                            {data.solutions.map((cell, index2) => {
+                                if (cell === null) return <TableCell></TableCell>
+                                const style = {
+                                    background: cell.short_verdict === "OK"?
+                                        lightGreen[300] : amber[300]
+                                }
+                                return <TableCell key={index2} style={style}>{cell.score}</TableCell>;
+                            })}
+                        </TableRow>;
                     })}</TableBody>
                 </Table>
             </Paper>

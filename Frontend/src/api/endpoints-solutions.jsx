@@ -1,4 +1,5 @@
-import {apiUrl, sendRequest} from "./common.jsx";
+import {apiUrl, s3Url, sendRequest} from "./common.jsx";
+import axios from "axios";
 
 export function submitQuizSolution(token, taskId, text) {
     return sendRequest(
@@ -12,7 +13,7 @@ export function submitQuizSolution(token, taskId, text) {
 export function getQuizSolutions(token, taskId) {
     return sendRequest(
         "GET",
-        apiUrl(`solutions/my/code/${taskId}/`),
+        apiUrl(`solutions/my/quiz/${taskId}/`),
         {},
         "Authorization: Bearer " + token
     )
@@ -21,7 +22,7 @@ export function getQuizSolutions(token, taskId) {
 export function getQuizSolution(token, solutionId) {
     return sendRequest(
         "GET",
-        apiUrl(`solutions/get/quiz/${solutionId}/`),
+        apiUrl(`solutions/${solutionId}/`),
         {},
         "Authorization: Bearer " + token
     )
@@ -52,6 +53,10 @@ export function getCodeSolution(token, solutionId) {
         {},
         "Authorization: Bearer " + token
     )
+}
+
+export function getCodeFile(url) {
+    return axios.get(s3Url(url),{responseType: 'text'})
 }
 
 export function getStandings(token, contestId) {

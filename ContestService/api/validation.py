@@ -50,14 +50,9 @@ class TestSuite(BaseModel):
     mem_limit_mb: int
 
 
-class QuizValidationType(str, Enum):
-    regex = 'regex'
-    contains = 'contains'
-
-
 class QuizValidator(BaseModel):
-    type: QuizValidationType
-    pattern: str
+    type: str
+    args: dict
 
 
 def validate_pages_list(pages: list):

@@ -1,16 +1,28 @@
+export function getHost() {
+    if (import.meta.env.DEV)
+        return "http://localhost:8888";
+    return "https://dockingjudge.tapeline.dev";
+}
+
 export function getBaseUrl() {
-    //const envUrl = import.meta.env.API_BASE_URL;
+    ///const envUrl = import.meta.env.API_BASE_URL;
     // console.log(import.meta.env.API_BASE_URL, import.meta.env.API_WS_URL);
     // console.log(import.meta.env);
-    console.log(JSON.stringify(import.meta.env));
-    //if (envUrl === null || envUrl === undefined)
-    if (import.meta.env.DEV)
-        return "http://localhost:8888/api/v1/";
-    return "https://dockingjudge.tapeline.dev/api/v1/";
+    // console.log(JSON.stringify(import.meta.env));
+    // //if (envUrl === null || envUrl === undefined)
+    // if (import.meta.env.DEV)
+    //     return "http://localhost:8888/api/v1/";
+    // return "https://dockingjudge.tapeline.dev/api/v1/";
+    return `${getHost()}/api/v1/`;
 }
 
 export function apiUrl(url) {
     return getBaseUrl() + url;
+}
+
+
+export function s3Url(url) {
+    return getHost() + url;
 }
 
 

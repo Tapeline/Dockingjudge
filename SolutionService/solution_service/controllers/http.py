@@ -27,6 +27,7 @@ def _serialize_solution(
         )
     if not is_safe and solution.task_type == TaskType.CODE:
         data = schemas.CodeSolutionExtraSchema(
+            compiler=solution.compiler_name,
             submission_url=solution.submission_url,
             group_scores=solution.group_scores,
             detailed_verdict=solution.detailed_verdict,
@@ -38,6 +39,7 @@ def _serialize_solution(
         user_id=solution.user_id,
         score=solution.score,
         short_verdict=solution.short_verdict,
+        submitted_at=solution.submitted_at,
         data=data,
     )
 
@@ -178,26 +180,29 @@ class SolutionsController(Controller):
             self,
             contest_id: int,
             interactor: Depends[interactors.GetStandings],
-    ) -> list[schemas.UserContestStatusSchema]:
-        standings = await interactor(contest_id)
-        return [
-            schemas.UserContestStatusSchema(
-                user=schemas.UserSchema(
-                    id=status.user.id,
-                    username=status.user.username,
-                    profile_pic=status.user.profile_pic,
-                    roles=status.user.roles,
-                ),
-                tasks_attempted=status.tasks_attempted,
-                tasks_solved=status.tasks_solved,
-                solutions=[
-                    _serialize_solution(solution, is_safe=True)
-                    for solution in status.solutions
-                ],
-                total_score=status.total_score,
-            )
-            for status in standings
-        ]
+    ) -> schemas.StandingsSchema:
+        standings, tasks = await interactor(contest_id)
+        return schemas.StandingsSchema(
+            tasks=tasks,
+            table=[
+                schemas.UserContestStatusSchema(
+                    user=schemas.UserSchema(
+                        id=status.user.id,
+                        username=status.user.username,
+                        profile_pic=status.user.profile_pic,
+                        roles=status.user.roles,
+                    ),
+                    tasks_attempted=status.tasks_attempted,
+                    tasks_solved=status.tasks_solved,
+                    solutions=[
+                        _serialize_solution(solution, is_safe=True)
+                        for solution in status.solutions
+                    ],
+                    total_score=status.total_score,
+                )
+                for status in standings
+            ]
+        )
 
 
 @get("/api/v1/solutions/ping/", exclude_from_auth=True)

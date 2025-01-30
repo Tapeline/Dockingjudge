@@ -3,18 +3,18 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
+from pydantic import BaseModel, Field
+
 from solution_service.domain.entities.abstract import TaskType
 
 
-@dataclass
-class ValidatorDTO:
+class ValidatorDTO(BaseModel):
     type: str
     args: dict[str, Any]
 
 
-@dataclass
-class QuizTaskDTO:
-    contest_id: int
+class QuizTaskDTO(BaseModel):
+    contest_id: int = Field(alias="contest")
     id: int
     title: str
     description: str
@@ -22,9 +22,8 @@ class QuizTaskDTO:
     points: int
 
 
-@dataclass
-class CodeTaskDTO:
-    contest_id: int
+class CodeTaskDTO(BaseModel):
+    contest_id: int = Field(alias="contest")
     id: int
     title: str
     description: str
@@ -40,7 +39,7 @@ class AbstractContestService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_contest_tasks(self, contest_id: int) -> Sequence[tuple[TaskType, int]]:
+    async def get_contest_tasks(self, contest_id: int) -> Sequence[tuple[TaskType, int, str]]:
         raise NotImplementedError
 
     @abstractmethod

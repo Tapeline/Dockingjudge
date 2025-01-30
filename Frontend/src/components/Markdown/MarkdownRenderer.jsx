@@ -3,7 +3,7 @@ import remarkGfm from "remark-gfm";
 import rehypeMathjax from 'rehype-mathjax';
 import SyntaxHighlighter from "react-syntax-highlighter";
 import {atomDark, materialLight} from 'react-syntax-highlighter/dist/esm/styles/prism';
-import {Paper, Table, Typography} from "@material-ui/core";
+import {Paper, Table, TableCell, TableHead, TableRow, Typography} from "@material-ui/core";
 import remarkMath from "remark-math";
 import remarkRehype from "remark-rehype";
 
@@ -14,7 +14,19 @@ export default function MarkdownRenderer(props) {
         <Markdown remarkPlugins={[remarkGfm, remarkMath, remarkRehype, rehypeMathjax]} components={{
             table(props) {
                 const {node, ...rest} = props;
-                return <Table {...rest}></Table>
+                return <Paper><Table {...rest}></Table></Paper>
+            },
+            thead(props) {
+                const {node, ...rest} = props;
+                return <TableHead {...rest}></TableHead>
+            },
+            tr(props) {
+                const {node, ...rest} = props;
+                return <TableRow {...rest}></TableRow>
+            },
+            td(props) {
+                const {node, ...rest} = props;
+                return <TableCell {...rest}></TableCell>
             },
             code: (props) => {
                 const {children, className, inline, node, ...rest} = props

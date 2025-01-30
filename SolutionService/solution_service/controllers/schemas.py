@@ -1,3 +1,4 @@
+import datetime
 from enum import Enum
 from typing import Annotated
 
@@ -15,6 +16,7 @@ class CodeSolutionExtraSchema(BaseModel):
     submission_url: str
     group_scores: dict[str, int] = {}
     detailed_verdict: str
+    compiler: str
 
 
 class SolutionSchema(BaseModel):
@@ -24,6 +26,7 @@ class SolutionSchema(BaseModel):
     user_id: int
     score: int
     short_verdict: str
+    submitted_at: datetime.datetime
     data: QuizSolutionExtraSchema | CodeSolutionExtraSchema | None
 
 
@@ -51,6 +54,11 @@ class UserContestStatusSchema(BaseModel):
     tasks_solved: int
     solutions: list[SolutionSchema]
     total_score: int
+
+
+class StandingsSchema(BaseModel):
+    tasks: list[tuple[TaskType, int, str]]
+    table: list[UserContestStatusSchema]
 
 
 class TestCaseResult(BaseModel):

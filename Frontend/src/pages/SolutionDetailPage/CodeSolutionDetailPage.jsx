@@ -10,13 +10,14 @@ import {
     TableRow,
     TableCell, TableBody, Table, Grid
 } from "@material-ui/core";
-import {getCodeSolution} from "../../api/endpoints-solutions.jsx";
+import {getCodeFile, getCodeSolution} from "../../api/endpoints-solutions.jsx";
 import {dateConverter} from "../../utils/time.jsx";
-import {Check, Close, Code, Stars, Timer} from "@material-ui/icons";
+import {Check, Close, Code, Info, Stars, Timer} from "@material-ui/icons";
 import HWhitespace from "../../utils/HWhitespace.jsx";
 import Preloader from "../../components/Preloader/Preloader.jsx";
 import {getScoreColor} from "../../utils/scoreColors.jsx";
 import VWhitespace from "../../utils/VWhitespace.jsx";
+import SyntaxHighlighter from "react-syntax-highlighter";
 
 const styles = theme => ({
     paper: {
@@ -33,17 +34,21 @@ function CodeSolutionDetailPage(props) {
     const {theme, classes} = props;
     const [isNotFound, setNotFound] = useState(false);
     const [solutionData, setSolutionData] = useState(null);
+    const [solutionText, setSolutionText] = useState(null);
 
     useEffect(() => {
         getCodeSolution(accessToken, solutionId).then(response => {
             if (response.success) {
                 setSolutionData(response.data);
+                getCodeFile(response.data.data.submission_url).then(r => {
+                    setSolutionText(r.data);
+                })
             } else setNotFound(true);
         });
     }, []);
 
     const isFullyLoaded = () => {
-        return !(solutionData === null);
+        return !(solutionData === null || solutionText === null);
     }
 
     if (isNotFound)
@@ -54,7 +59,7 @@ function CodeSolutionDetailPage(props) {
 
     return (<>
         <div style={{width: "100%", display: "flex", flexDirection: "column", alignItems: "center"}}>
-            <div className="dj-under-card-bg" style={{background: getScoreColor(solutionData.points)}}></div>
+            <div className="dj-under-card-bg" style={{background: getScoreColor(solutionData.score)}}></div>
             <Paper className="dj-solution-paper">
                 <Typography variant="headline">
                     Code solution {solutionId}
@@ -64,9 +69,9 @@ function CodeSolutionDetailPage(props) {
                     <Stars/>
                     <HWhitespace width={1}/>
                     Score: <HWhitespace width={0.5}/>
-                    <code>{solutionData.points}</code>
+                    <code>{solutionData.score}</code>
                     <HWhitespace width={1}/>
-                    {solutionData.is_solved? <Check/> : <Close/>}
+                    {solutionData.short_verdict === "OK" ? <Check/> : <Close/>}
                 </Typography>
                 <Typography variant="caption" style={{display: "flex", alignItems: "center"}}>
                     <Timer/>
@@ -78,7 +83,13 @@ function CodeSolutionDetailPage(props) {
                     <Code/>
                     <HWhitespace width={1}/>
                     Compiler: <HWhitespace width={0.5}/>
-                    {solutionData.compiler}
+                    {solutionData.data.compiler}
+                </Typography>
+                <VWhitespace/>
+                <Typography variant="body1" style={{display: "flex", alignItems: "start"}}>
+                    <Info/>
+                    <HWhitespace width={1}/>
+                    <pre style={{margin: 0}}>{solutionData.data.detailed_verdict}</pre>
                 </Typography>
                 <VWhitespace/>
                 <Typography variant="headline">
@@ -92,23 +103,29 @@ function CodeSolutionDetailPage(props) {
                         </TableRow>
                     </TableHead>
                     <TableBody>{
-                        Object.entries(solutionData.group_points).map(
+                        Object.entries(solutionData.data.group_scores).map(
                             (data, index) => {
-                            return <TableRow key={index}>
-                                <TableCell>{data[0]}</TableCell>
-                                <TableCell>{data[1]}</TableCell>
-                            </TableRow>;
-                        })
+                                return <TableRow key={index}>
+                                    <TableCell>{data[0]}</TableCell>
+                                    <TableCell>{data[1]}</TableCell>
+                                </TableRow>;
+                            })
                     }</TableBody>
                 </Table>
                 <VWhitespace/>
                 <Typography variant="headline">
                     Your answer
                 </Typography>
-                <pre>{solutionData.submission_data}</pre>
+                <div className="rendered-md">
+                    <SyntaxHighlighter
+                        customStyle={{padding: "1rem", background: null}}
+                        language={solutionData.compiler}
+                    >{solutionText}</SyntaxHighlighter>
+                </div>
             </Paper>
         </div>
-    </>);
+    </>
+);
 }
 
 export default withStyles(styles, { withTheme: true })(CodeSolutionDetailPage);

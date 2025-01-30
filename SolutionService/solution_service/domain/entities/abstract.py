@@ -1,5 +1,5 @@
 """Domain entities"""
-
+import datetime
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
@@ -51,11 +51,12 @@ class GenericSolution:
     user_id: int
     score: int
     short_verdict: str
+    submitted_at: datetime.datetime = field(default_factory=datetime.datetime.now)
 
 
 @dataclass
 class QuizSolution(GenericSolution):
-    submitted_answer: str
+    submitted_answer: str = ""
     task_type = TaskType.QUIZ
 
 
@@ -69,9 +70,9 @@ class CodeSolution(GenericSolution):
     type GroupName = str
 
     task_type = TaskType.CODE
-    submission_url: str
-    submission_type: SubmissionType
-    compiler_name: str
+    submission_url: str = ""
+    submission_type: SubmissionType = SubmissionType.STR
+    compiler_name: str = ""
     main_file: str | None = None
     group_scores: dict[GroupName, int] = field(default_factory=dict)
     detailed_verdict: str = ""

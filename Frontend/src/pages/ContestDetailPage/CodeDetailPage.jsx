@@ -23,7 +23,7 @@ import {
 import {Editor} from "@monaco-editor/react";
 import MarkdownRenderer from "../../components/Markdown/MarkdownRenderer.jsx";
 import {lightGreen, teal} from "@material-ui/core/colors";
-import {Edit} from "@material-ui/icons";
+import {Edit, Visibility} from "@material-ui/icons";
 import HWhitespace from "../../utils/HWhitespace.jsx";
 import {dateConverter} from "../../utils/time.jsx";
 import Preloader from "../../components/Preloader/Preloader.jsx";
@@ -200,25 +200,28 @@ function CodeDetailPage(props) {
                             <Table className={classes.table} style={{width: "100%"}} padding="dense">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>#</TableCell>
-                                        <TableCell>Date</TableCell>
-                                        <TableCell>Compiler</TableCell>
+                                        <TableCell></TableCell>
                                         <TableCell>Verdict</TableCell>
                                         <TableCell>Score</TableCell>
+                                        <TableCell>Date</TableCell>
+                                        <TableCell>Compiler</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>{previousSolutions.map((data, index) => {
-                                    const style = data.is_solved? {background: lightGreen[300]} : {};
+                                    const style = data.short_verdict === "OK"?
+                                        {background: lightGreen[300]} : {};
                                     return <TableRow key={index}
                                                      className="table-success"
                                                      style={style} >
                                         <TableCell padding="none" style={{paddingLeft: 8}}>
-                                            <Button href={`/solutions/code/${data.id}`}>{data.id}</Button>
+                                            <Button href={`/solutions/code/${data.id}`} variant="mini">
+                                                <Visibility/>
+                                            </Button>
                                         </TableCell>
+                                        <TableCell>{data.short_verdict}</TableCell>
+                                        <TableCell>{data.score}</TableCell>
                                         <TableCell>{dateConverter(data.submitted_at)}</TableCell>
-                                        <TableCell>{data.compiler}</TableCell>
-                                        <TableCell>{data.verdict}</TableCell>
-                                        <TableCell>{data.points}</TableCell>
+                                        <TableCell>{data.data.compiler}</TableCell>
                                     </TableRow>;
                                 })}</TableBody>
                             </Table>

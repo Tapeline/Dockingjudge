@@ -1,6 +1,7 @@
 import base64
 import uuid
 from collections.abc import Collection, Sequence
+from operator import itemgetter
 
 from solution_service.application import dto
 from solution_service.application.checker_loader import load_checker
@@ -54,7 +55,7 @@ class ListSolutionForUserOnContest:
         tasks = await self._contest_service.get_contest_tasks(contest_id)
         return await self._solution_repo.get_all_solutions_of_user_for_contest(
             user_id,
-            tasks,
+            list(map(itemgetter(slice(0, 2)), tasks)),
         )
 
 
@@ -95,12 +96,16 @@ class GetStandings:
     async def __call__(
         self,
         contest_id: int
-    ) -> Sequence[dto.EnrichedUserContestStatus]:
+    ) -> tuple[
+        Sequence[dto.EnrichedUserContestStatus],
+        Sequence[tuple[TaskType, int, str]]
+    ]:
         participants = await self._contest_service.get_contest_participants(contest_id)
         participant_objects = await self._account_service.get_users_by_ids(participants)
         contest_tasks = await self._contest_service.get_contest_tasks(contest_id)
+        contest_tasks_ids = list(map(itemgetter(slice(0, 2)), contest_tasks))
         standings = await self._solution_repo.get_contest_standings(
-            contest_tasks,
+            contest_tasks_ids,
             participants
         )
         return [
@@ -112,7 +117,7 @@ class GetStandings:
                 total_score=standings[i].total_score,
             )
             for i, row in enumerate(standings)
-        ]
+        ], contest_tasks
 
 
 class GetBestSolutionForUserOnTask:
