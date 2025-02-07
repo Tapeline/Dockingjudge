@@ -151,3 +151,12 @@ export function createTextPage(token, contestId, data) {
         "Authorization: Bearer " + token
     )
 }
+
+export function getContestTimeLeft(token, contestId) {
+    return sendRequest(
+        "GET",
+        apiUrl(`contests/${contestId}/time-left/`),
+        {},
+        "Authorization: Bearer " + token
+    )
+}

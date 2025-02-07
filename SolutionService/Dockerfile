@@ -5,8 +5,7 @@ WORKDIR /app
 COPY . .
 RUN chmod +x ./start.sh
 
-RUN pip install poetry
-ENV PYTHONPATH /app
+RUN pip3 install poetry
 RUN poetry install
 
-CMD ./start.sh
+CMD chmod +x ./start.sh ; ./start.sh

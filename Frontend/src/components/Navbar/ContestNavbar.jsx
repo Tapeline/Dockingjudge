@@ -1,7 +1,7 @@
 import dockingjudgeWhite from "../../assets/dockingjudgeWhite.png";
 import React, {useEffect, useState} from "react";
 import {NavLink, useNavigate, useParams} from "react-router-dom";
-import {getContest} from "../../api/endpoints-contests.jsx";
+import {getContest, getContestTimeLeft} from "../../api/endpoints-contests.jsx";
 import ContestPageLink from "./ContestPageLink.jsx";
 import {
     AppBar,
@@ -49,6 +49,7 @@ function ContestNavbar(props) {
     const {classes, theme} = props;
     const {contestId} = useParams();
     const [contestData, setContestData] = useState(null);
+    const [timeLeft, setTimeLeft] = useState(null)
     const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
     const navigate = useNavigate();
@@ -57,7 +58,18 @@ function ContestNavbar(props) {
         getContest(localStorage.getItem("accessToken"), contestId).then(response => {
             if (response.success) setContestData(response.data);
         });
+        getContestTimeLeft(localStorage.getItem("accessToken"), contestId).then(response => {
+            if (response.success) setTimeLeft(response.data);
+        })
     }, []);
+
+    const shouldDisplayPage = (page) => {
+        if (page.content.is_enter_page)
+            return true;
+        if (contestData.time_limit_seconds < 0)
+            return true
+        return timeLeft.time_left > 0;
+    }
 
     const drawer = (
         <div>
@@ -73,9 +85,12 @@ function ContestNavbar(props) {
             <Divider />
             <List>{
                     contestData?.pages?.map(data => {
-                        return <ContestPageLink contestId={contestId}
-                                                closeCallback={() => setIsMobileDrawerOpen(false)}
-                                                data={data}/>;
+                        if (!shouldDisplayPage(data)) return;
+                        return <ContestPageLink
+                            contestId={contestId}
+                            closeCallback={() => setIsMobileDrawerOpen(false)}
+                            data={data}
+                        />;
                     })
             }</List>
             <Divider/>

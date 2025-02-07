@@ -50,7 +50,7 @@ class QuizTask(models.Model):
     contest = models.ForeignKey(to=Contest, on_delete=models.CASCADE)
     title = models.CharField(max_length=255)
     description = models.TextField()
-    validator = models.JSONField(default={})
+    validator = models.JSONField(default=dict)
     points = models.IntegerField()
 
     def save(self, **kwargs):

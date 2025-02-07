@@ -34,7 +34,6 @@ class S3Storage(AbstractStorage):
             password=config.s3.password,
             is_secure=config.s3.host.startswith("https")
         )
-        self.outer_url = config.s3.outer_url
         self.connect()
         self.create_bucket_if_not_present()
 

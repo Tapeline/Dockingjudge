@@ -62,11 +62,10 @@ services:
     hostname: judge_service
     build: JudgeService
     environment:
-      IO_ENCODING: ${GLOBAL_ENCODING}
-      RMQ_ADDRESS: rabbitmq
+      RMQ_HOST: rabbitmq
       RMQ_USER: ${RMQ_USER}
-      RMQ_PASSWORD: ${RMQ_PASSWORD}
-      CONFIG_PATH: /app/config.yml
+      RMQ_PASS: ${RMQ_PASSWORD}
+      S3_BASE_URL: http://minio:9000
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -218,20 +217,24 @@ services:
     build: SolutionService
     hostname: solution.service
     environment:
-      SECRET_KEY: ${SECRET_KEY}
-      PG_USER: ${DB_USER}
-      PG_PASS: ${DB_PASS}
-      PG_HOST: solution_db_legacy
-      PG_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASS: ${DB_PASS}
+      DB_HOST: solution_db
+      DB_PORT: 5432
+      DB_NAME: solution_db
       MODE: production
-      RMQ_ADDRESS: rabbitmq
+      DEBUG: True
+      RMQ_HOST: rabbitmq
       RMQ_USER: ${RMQ_USER}
       RMQ_PASS: ${RMQ_PASSWORD}
       ENCODING: ${GLOBAL_ENCODING}
       ACCOUNT_SERVICE: "http://account.service:8000/api/v1/accounts"
       CONTEST_SERVICE: "http://contest.service:8000/api/v1"
       CONTEST_SERVICE_INTERNAL: "http://contest.service:8000/internal"
-      MINIO_SERVICE: "http://minio"
+      S3_HOST: "http://minio"
+      S3_PORT: 9000
+      S3_USER: ${MINIO_USER}
+      S3_PASS: ${MINIO_PASS}
       ALLOWED_HOSTS: "*"
     ports:
       - "8003:8000"
@@ -248,29 +251,6 @@ services:
         condition: service_started
       contest_service:
         condition: service_started
-
-  solution_db_legacy:
-    image: postgres:13.3
-    hostname: solution_db_legacy
-    environment:
-      POSTGRES_DB: solution_db
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-    expose:
-      - "5432"
-    ports:
-      - "5530:5432"
-    networks:
-      - main_network
-    volumes:
-      - solution_legacy_pgdata:/var/lib/postgresql/
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d account_db" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
-    restart: unless-stopped
 
   solution_db:
     image: postgres:13.3
@@ -343,6 +323,5 @@ volumes:
   account_pgdata:
   contest_pgdata:
   solution_pgdata:
-  solution_legacy_pgdata:
   rabbitmq_data:
   minio_data:

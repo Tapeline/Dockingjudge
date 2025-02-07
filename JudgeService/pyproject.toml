@@ -3,10 +3,9 @@ name = "judgeservice"
 version = "0.1.0"
 description = "Dockingjudge Judge Service"
 authors = [
-    {name = "Tapeline",email = "yt.redstone.mail@gmail.com"}
+    {name = "Tapeline", email = "yt.redstone.mail@gmail.com"}
 ]
 license = {text = "GNU GPL v3.0"}
-readme = "README.md"
 requires-python = ">=3.12,<4.0"
 dependencies = [
     "faststream[cli] (>=0.5.34,<0.6.0)",

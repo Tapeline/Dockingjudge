@@ -252,7 +252,8 @@ class GetTimeLeft(APIView):
     def get(self, request, *args, **kwargs):
         contest = get_object_or_404(models.Contest, kwargs["contest_id"])
         return Response({
-            "time_left": accessor.user_get_time_left(request.user.id, contest)
+            "time_left": accessor.user_get_time_left(request.user.id, contest),
+            "is_unlimited": contest.time_limit_seconds < 0
         })
 
 

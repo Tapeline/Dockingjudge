@@ -14,7 +14,7 @@ class PostgresConfig(BaseModel):
     host: str = Field(alias="DB_HOST", default="localhost")
     port: int = Field(alias="DB_PORT", default=5503)
     username: str = Field(alias="DB_USER", default="pguser")
-    password: str = Field(alias="DB_PASSWORD", default="pgpass")
+    password: str = Field(alias="DB_PASS", default="pgpass")
     database: str = Field(alias="DB_NAME", default="solution_db")
 
 
@@ -24,10 +24,6 @@ class MinioConfig(BaseModel):
     username: str = Field(alias="S3_USER", default="minio_user")
     password: str = Field(alias="S3_PASS", default="minio_pass")
     bucket_name: str = "solutions"
-    outer_url: str = Field(
-        alias="S3_OUTER_URL",
-        default="http://localhost/files"
-    )
 
 
 class ModeConfig(BaseModel):

@@ -2,7 +2,7 @@ groups:
   - name: General
     selector: .*
     nodes:
-      - http://localhost:9000 #http://judgelet_0:8000
-      - http://localhost:9001 #http://judgelet_1:8000
+      - http://judgelet_0:8000
+      - http://judgelet_1:8000
 
 load_balancing: round-robin
