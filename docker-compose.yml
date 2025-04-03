@@ -1,4 +1,50 @@
 version: "3.7"
+
+#
+# --- common sections declaration ---
+#
+
+x-log-to-loki: &log-to-loki
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://loki:3100/loki/api/v1/push"
+      #loki-retries: 2
+      #loki-max-backoff: 800ms
+      #loki-timeout: 1s
+      #keep-file: "true"
+      #mode: "non-blocking"
+
+x-judgelet: &judgelet
+  image: dockingjudge-unit
+  #<<: *log-to-loki
+  logging:
+    driver: loki
+    options:
+      loki-url: "http://loki:3100/loki/api/v1/push"
+      loki-retries: 5
+      loki-max-backoff: 800ms
+      loki-timeout: 3s
+      keep-file: "true"
+      mode: "non-blocking"
+  expose: [ 8000 ]
+  environment:
+    IO_ENCODING: ${GLOBAL_ENCODING}
+  healthcheck:
+    test: curl --fail http://localhost:8000/ping || exit 1
+    interval: 10s
+    retries: 5
+    start_period: 10s
+    timeout: 10s
+  networks:
+    - judgelet_network
+
+
+#
+# --- services declaration ---
+#
+
+
 services:
   rabbitmq:
     image: rabbitmq:3.10.7-management
@@ -26,36 +72,13 @@ services:
 
 
   judgelet_0:
-    image: dockingjudge-unit
-    expose: [8000]
+    <<: *judgelet
     ports:
       - "9000:8000"
-    environment:
-      IO_ENCODING: ${GLOBAL_ENCODING}
-    healthcheck:
-      test: curl --fail http://localhost:8000/ping || exit 1
-      interval: 10s
-      retries: 5
-      start_period: 10s
-      timeout: 10s
-    networks:
-      - judgelet_network
-
   judgelet_1:
-    image: dockingjudge-unit
-    expose: [8000]
+    <<: *judgelet
     ports:
       - "9001:8000"
-    environment:
-      IO_ENCODING: ${GLOBAL_ENCODING}
-    healthcheck:
-      test: curl --fail http://localhost:8000/ping || exit 1
-      interval: 10s
-      retries: 5
-      start_period: 10s
-      timeout: 10s
-    networks:
-      - judgelet_network
 
 
   judge_service:
@@ -312,6 +335,58 @@ services:
       #  condition: service_started
 
 
+  grafana:
+    build: grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - main_network
+    healthcheck:
+      test: [ "CMD", "grafana-cli", "plugins", "ls" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+
+  loki:
+    hostname: loki
+    image: grafana/loki:3.2.1
+    command: "-config.file=/etc/loki/config.yaml"
+    expose:
+      - 3100
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./Loki/config.yml:/etc/loki/config.yaml
+      - loki_data:/loki
+    networks:
+      - main_network
+      - judgelet_network
+
+
+  prometheus:
+    build: prometheus
+    volumes:
+      - prometheus_data:/etc/prometheus/
+    hostname: prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+    ports:
+      - "3090:9090"
+    expose:
+      - 9090
+    restart: unless-stopped
+    environment:
+      TZ: "Europe/Moscow"
+    networks:
+      - main_network
+
+
 networks:
   main_network:
     driver: bridge
@@ -325,3 +400,6 @@ volumes:
   solution_pgdata:
   rabbitmq_data:
   minio_data:
+  prometheus_data:
+  grafana_data:
+  loki_data:

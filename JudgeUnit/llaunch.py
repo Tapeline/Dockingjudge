@@ -10,9 +10,8 @@ import psutil
 MEMORY_LIMIT_EXIT_CODE: Final[int] = 170
 TIMEOUT_EXIT_CODE: Final[int] = 171
 
-
 process: subprocess.Popen | None = None
-_return_code = None
+_return_code: int | None = None
 
 
 def _will_terminate_by_timeout(time_limit_s: float) -> bool:
@@ -37,13 +36,15 @@ def _will_terminate_by_memory_limit(mem_limit_bytes: int) -> bool:
         return False
 
 
-def _kill_process():
+def _kill_process() -> None:
     process.kill()
 
 
-def _checker(target,
-             time_limit_s: float,
-             mem_limit_mb: float):
+def _checker(
+        target,
+        time_limit_s: float,
+        mem_limit_mb: float
+) -> None:
     global _return_code, process
     mem_limit_bytes = int(mem_limit_mb * 1024 * 1024)
     process = subprocess.Popen(
@@ -51,7 +52,7 @@ def _checker(target,
         stdin=sys.stdin,
         stdout=sys.stdout,
         stderr=sys.stderr,
-        shell=True  # to make it work on linux
+        shell=sys.platform != "win32"  # to make it work on linux
     )
     while process.poll() is None:
         if _will_terminate_by_timeout(time_limit_s):
@@ -74,14 +75,16 @@ def _get_args() -> tuple[float, float, str]:
     return float(time_limit), float(mem_limit), target
 
 
-def main():
+def main() -> int:
     time_limit, mem_limit, target = _get_args()
-    watch_thread = Thread(name="Watcher thread",
-                          target=_checker,
-                          args=(target, time_limit, mem_limit))
+    watch_thread = Thread(
+        name="Watcher thread",
+        target=_checker,
+        args=(target, time_limit, mem_limit)
+    )
     watch_thread.start()
     watch_thread.join()
-    return _return_code
+    return int(_return_code)
 
 
 if __name__ == '__main__':

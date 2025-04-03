@@ -6,6 +6,7 @@ import re
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from operator import attrgetter
+from typing import Any
 
 import aiohttp
 
@@ -102,7 +103,7 @@ class JudgeletImpl(Judgelet):
                 return False
 
     def _form_request(self, solution: Solution) -> dict:
-        request = {
+        request: dict[str, str | dict[str, str]] = {
             "id": solution.id,
             "compiler": solution.compiler,
             "suite": solution.suite,
