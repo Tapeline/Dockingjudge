@@ -100,3 +100,13 @@ class AbstractSolutionRepository(ABC):
             protocol: dict,
     ) -> None:
         raise NotImplementedError
+
+    @abstractmethod
+    async def purge_user_solutions(self, user_id: int) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def purge_task_solutions(
+            self, task_type: TaskType, task_id: int
+    ) -> None:
+        raise NotImplementedError

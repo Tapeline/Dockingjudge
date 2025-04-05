@@ -61,12 +61,17 @@ class StandingsSchema(BaseModel):
     table: list[UserContestStatusSchema]
 
 
-class TestCaseResult(BaseModel):
-    return_code: int
-    stdout: str
-    stderr: str
-    verdict: str
+class VerdictSchema(BaseModel):
+    codename: str
     is_successful: bool
+    details: str
+
+
+class GroupProtocolSchema(BaseModel):
+    score: int
+    verdicts: list[VerdictSchema]
+    is_successful: bool
+    verdict: VerdictSchema
 
 
 class MQSolutionAnswer(BaseModel):
@@ -75,5 +80,38 @@ class MQSolutionAnswer(BaseModel):
     detailed_verdict: str
     short_verdict: str
     group_scores: dict[str, int]
-    protocol: dict[str, list[TestCaseResult]]
+    protocol: dict[str, GroupProtocolSchema]
     compilation_error: str | None = None
+
+
+class MQUserEventTarget(BaseModel):
+    id: int
+
+
+class MQUserEvent(BaseModel):
+    event: str
+    object: MQUserEventTarget
+
+
+class MQContestEventTargetPage(BaseModel):
+    id: int
+    type: TaskType
+
+
+class MQContestEventTarget(BaseModel):
+    id: int
+    pages: list[MQContestEventTargetPage]
+
+
+class MQContestEvent(BaseModel):
+    event: str
+    object: MQContestEventTarget
+
+
+class MQTaskEventTarget(BaseModel):
+    id: int
+
+
+class MQTaskEvent(BaseModel):
+    event: str
+    object: MQUserEventTarget

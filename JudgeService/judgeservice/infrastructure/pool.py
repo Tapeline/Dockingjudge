@@ -129,7 +129,7 @@ class JudgeletImpl(Judgelet):
                     json=data
             ) as response:
                 logging.info("Got response %s", response.status)
-                if response.status != 200:
+                if response.status not in (200, 201):
                     logging.error(
                         "Judgelet %s returned %i code. Data: %s",
                         self.address,

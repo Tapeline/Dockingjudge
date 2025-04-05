@@ -2,12 +2,22 @@ import sys
 from typing import Sequence, Iterable
 
 import sqlalchemy
-from sqlalchemy import select, text, and_, literal, or_, update
+from sqlalchemy import delete, select, text, and_, literal, or_, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from solution_service.application.interfaces import solutions
-from solution_service.application.interfaces.solutions import PaginationParameters, UserContestStatus
-from solution_service.domain.entities.abstract import AnySolution, TaskType, CodeSolution, QuizSolution, SubmissionType
+from solution_service.application.interfaces.solutions import \
+    (
+    PaginationParameters,
+    UserContestStatus,
+)
+from solution_service.domain.entities.abstract import (
+    AnySolution,
+    TaskType,
+    CodeSolution,
+    QuizSolution,
+    SubmissionType,
+)
 from solution_service.infrastructure.persistence.models import SolutionModel
 
 
@@ -98,10 +108,12 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
         )
         query = _apply_pagination(query, pagination_params)
         models = await self._session.execute(query)
-        return list(map(
-            _transform_solution_model_to_entity,
-            models.scalars().all()
-        ))
+        return list(
+            map(
+                _transform_solution_model_to_entity,
+                models.scalars().all()
+            )
+        )
 
     async def get_all_solutions_of_user_for_contest(
             self,
@@ -115,10 +127,12 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
         )
         query = _apply_pagination(query, pagination_params)
         models = await self._session.execute(query)
-        return list(map(
-            _transform_solution_model_to_entity,
-            models.scalars().all()
-        ))
+        return list(
+            map(
+                _transform_solution_model_to_entity,
+                models.scalars().all()
+            )
+        )
 
     async def get_all_solutions_of_task(
             self,
@@ -137,10 +151,12 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
         )
         query = _apply_pagination(query, pagination_params)
         models = await self._session.execute(query)
-        return list(map(
-            _transform_solution_model_to_entity,
-            models.scalars().all()
-        ))
+        return list(
+            map(
+                _transform_solution_model_to_entity,
+                models.scalars().all()
+            )
+        )
 
     async def get_contest_standings(
             self,
@@ -250,14 +266,18 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
         total_score = 0
         tasks_solved = 0
         tasks_attempted = 0
-        best_solutions: list[SolutionModel | None] = [None] * len(contest_tasks)
+        best_solutions: list[SolutionModel | None] = [None] * len(
+            contest_tasks
+        )
         reverse_map: dict[str, int] = {
             f"{task_type.value.lower()}{task_id}": i
             for i, (task_type, task_id) in enumerate(contest_tasks)
         }
         for model in models:
-            i = reverse_map[f"{str(model.task_type.value).lower()}{model.task_id}"]
-            if best_solutions[i] is None or best_solutions[i].score < model.score:
+            i = reverse_map[
+                f"{str(model.task_type.value).lower()}{model.task_id}"]
+            if best_solutions[i] is None or best_solutions[
+                i].score < model.score:
                 best_solutions[i] = model
         for i, solution in enumerate(best_solutions):
             if solution is None:
@@ -270,10 +290,12 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
             tasks_solved=tasks_solved,
             tasks_attempted=tasks_attempted,
             total_score=total_score,
-            solutions=list(map(
-                _transform_solution_model_to_entity,
-                best_solutions,
-            )),
+            solutions=list(
+                map(
+                    _transform_solution_model_to_entity,
+                    best_solutions,
+                )
+            ),
         )
 
     async def store_solution_check_result(
@@ -293,4 +315,23 @@ class SolutionRepoImpl(solutions.AbstractSolutionRepository):
             group_scores=group_scores,
         )
         await self._session.execute(query)
+        await self._session.commit()
+
+    async def purge_user_solutions(self, user_id: int) -> None:
+        await self._session.execute(
+            delete(SolutionModel).where(SolutionModel.user_id == user_id)
+        )
+        await self._session.commit()
+
+    async def purge_task_solutions(
+            self,
+            task_type: TaskType,
+            task_id: int
+    ) -> None:
+        await self._session.execute(
+            delete(SolutionModel).where(
+                SolutionModel.task_id == task_id,
+                SolutionModel.task_type == task_type
+            )
+        )
         await self._session.commit()

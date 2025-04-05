@@ -1,22 +1,56 @@
 import logging
-from logging import Logger
 
 from dishka import FromDishka
-from faststream.rabbit import RabbitRouter, RabbitExchange, RabbitQueue, RabbitBroker
+from faststream.rabbit import (
+    RabbitRouter,
+    RabbitExchange,
+    RabbitQueue,
+    RabbitBroker,
+)
 
 from solution_service.application.dto import SolutionCheckResult
-from solution_service.application.interactors import StoreCheckedSolution
-from solution_service.application.interfaces.publisher import AbstractSolutionPublisher
+from solution_service.application.interactors import (
+    PurgeTaskSolutions, PurgeUserSolutions,
+    StoreCheckedSolution,
+)
+from solution_service.application.interfaces.publisher import \
+    AbstractSolutionPublisher
 from solution_service.application.interfaces.storage import AbstractStorage
-from solution_service.controllers.schemas import MQSolutionAnswer
-from solution_service.domain.entities.abstract import CodeSolution
+from solution_service.controllers.schemas import (
+    MQContestEvent,
+    MQSolutionAnswer,
+    MQTaskEvent, MQUserEvent,
+)
+from solution_service.domain.entities.abstract import CodeSolution, TaskType
 
 mq_controller = RabbitRouter()
 
 solutions_exchange = RabbitExchange("solutions_exchange", durable=True)
 answers_exchange = RabbitExchange("judge_answers_exchange", durable=True)
+user_object_events = RabbitExchange("user_object_events", durable=True)
+contest_object_events = RabbitExchange("contest_object_events", durable=True)
 
 answers_inbox = RabbitQueue("_solution_service_inbox", durable=True)
+user_event_inbox = RabbitQueue(
+    "_solution_service_user_inbox",
+    durable=True,
+    routing_key="user_event"
+)
+contest_event_inbox = RabbitQueue(
+    "_solution_service_contest_inbox",
+    durable=True,
+    routing_key="contest_event"
+)
+quiz_task_event_inbox = RabbitQueue(
+    "_solution_service_quiz_task_inbox",
+    durable=True,
+    routing_key="quiz_task_event"
+)
+code_task_event_inbox = RabbitQueue(
+    "_solution_service_code_task_inbox",
+    durable=True,
+    routing_key="code_task_event"
+)
 
 
 @mq_controller.subscriber(answers_inbox, solutions_exchange)
@@ -62,3 +96,52 @@ class RMQSolutionPublisher(AbstractSolutionPublisher):
             routing_key="solution_to_check"
         )
         self.logger.info(f"Published solution #{solution.uid}")
+
+
+@mq_controller.subscriber(user_event_inbox, user_object_events)
+async def handle_user_deleted(
+        data: MQUserEvent,
+        interactor: FromDishka[PurgeUserSolutions]
+):
+    if data.event != "DELETED":
+        return
+    logging.info("Received purge request for user %s", data.object.id)
+    await interactor(data.object.id)
+    logging.info("Purged user %s", data.object.id)
+
+
+@mq_controller.subscriber(contest_event_inbox, contest_object_events)
+async def handle_contest_deleted(
+        data: MQContestEvent,
+        interactor: FromDishka[PurgeTaskSolutions]
+):
+    if data.event != "DELETED":
+        return
+    logging.info("Received purge request for contest %s", data.object.id)
+    for page in data.object.pages:  # TODO: that's inefficient
+        await interactor(page.type, page.id)
+    logging.info("Purged contest %s", data.object.id)
+
+
+@mq_controller.subscriber(quiz_task_event_inbox, contest_object_events)
+async def handle_quiz_task_deleted(
+        data: MQTaskEvent,
+        interactor: FromDishka[PurgeTaskSolutions]
+):
+    if data.event != "DELETED":
+        return
+    logging.info("Received purge request for task quiz:%s", data.object.id)
+    await interactor(TaskType.QUIZ, data.object.id)
+    logging.info("Purged task quiz:%s", data.object.id)
+
+
+@mq_controller.subscriber(code_task_event_inbox, contest_object_events)
+async def handle_code_task_deleted(
+        data: MQTaskEvent,
+        interactor: FromDishka[PurgeTaskSolutions]
+):
+    if data.event != "DELETED":
+        return
+    logging.info("Received purge request for task code:%s", data.object.id)
+    await interactor(TaskType.CODE, data.object.id)
+    logging.info("Purged task code:%s", data.object.id)

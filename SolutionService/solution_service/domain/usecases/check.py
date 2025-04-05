@@ -20,6 +20,8 @@ class CheckQuizSolution:
             submitted_solution: MutatedArgument[QuizSolution]
     ) -> QuizCheckerVerdict:
         verdict = self._checker.check(submitted_solution.submitted_answer)
-        submitted_solution.short_verdict = _verdict_by_success(verdict.is_successful)
+        submitted_solution.short_verdict = _verdict_by_success(
+            verdict.is_successful
+        )
         submitted_solution.score = verdict.score
         return verdict

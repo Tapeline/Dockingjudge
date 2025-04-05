@@ -1,4 +1,5 @@
 import base64
+import logging
 import uuid
 from collections.abc import Collection, Sequence
 from operator import itemgetter
@@ -74,7 +75,6 @@ class ListSolutionForUserOnTask:
         task_type: TaskType,
         task_id: int,
     ) -> Sequence[solutions.AnySolution]:
-        print("REQUEST")
         return await self._solution_repo.get_all_solutions_of_task(
             user_id,
             task_type,
@@ -92,6 +92,7 @@ class GetStandings:
         self._solution_repo = solution_repository
         self._contest_service = contest_service
         self._account_service = account_service
+        self.logger = logging.getLogger("get_standings")
 
     async def __call__(
         self,
@@ -100,14 +101,19 @@ class GetStandings:
         Sequence[dto.EnrichedUserContestStatus],
         Sequence[tuple[TaskType, int, str]]
     ]:
+        self.logger.info("Getting participants")
         participants = await self._contest_service.get_contest_participants(contest_id)
+        self.logger.info("Getting user objects")
         participant_objects = await self._account_service.get_users_by_ids(participants)
+        self.logger.info("Getting contest tasks")
         contest_tasks = await self._contest_service.get_contest_tasks(contest_id)
         contest_tasks_ids = list(map(itemgetter(slice(0, 2)), contest_tasks))
+        self.logger.info("Requesting standings")
         standings = await self._solution_repo.get_contest_standings(
             contest_tasks_ids,
             participants
         )
+        self.logger.info("Serializing standings")
         return [
             dto.EnrichedUserContestStatus(
                 user=participant_objects[i],
@@ -148,7 +154,6 @@ class GetSolution:
         self._solution_repo = solution_repository
 
     async def __call__(self, solution_id: str) -> AnySolution:
-        print("Getting", solution_id)
         return await self._solution_repo.get_solution(solution_id)
 
 
@@ -168,6 +173,7 @@ class PostCodeSolution:
         self._encoding = config.encoding
         self._storage = object_storage
         self._publisher = solution_publisher
+        self.logger = logging.getLogger("post_code")
 
     def _prepare_file(self, solution: dto.NewCodeSolution) -> storage.File:
         match solution.submission_type.value:
@@ -200,9 +206,11 @@ class PostCodeSolution:
             user_id: int,
             solution: dto.NewCodeSolution
     ) -> CodeSolution:
+        self.logger.info("Getting code task %s", solution.task_id)
         task = await self._contest_service.get_code_task(solution.task_id)
         if task is None:
             raise NotFoundException
+        self.logger.info("Saving file")
         solution_file = self._prepare_file(solution)
         solution_url = await self._storage.save_file(solution_file)
         solution_entity = CodeSolution(
@@ -218,8 +226,10 @@ class PostCodeSolution:
             main_file=solution.main_file,
             submission_type=solution.submission_type,
         )
+        self.logger.info("Creating solution")
         solution_id = await self._solution_repo.create_solution(solution_entity)
         solution_entity.uid = solution_id
+        self.logger.info("Publishing solution")
         await self._publisher.publish(solution_entity, task.test_suite)
         return solution_entity
 
@@ -245,13 +255,18 @@ class PostQuizSolution:
         self._account_service = account_service
         self._encoding = config.encoding
         self._publisher = solution_publisher
+        self.logger = logging.getLogger("post_code")
 
     async def __call__(
         self,
         user_id: int,
         solution: dto.NewQuizSolution
     ) -> QuizSolution:
+        self.logger.info("Getting quiz task %s", solution.task_id)
         task = await self._contest_service.get_quiz_task(solution.task_id)
+        self.logger.info(
+            "Loading checker %s %s", task.validator.type, task.validator.args
+        )
         checker = load_checker(
             task.validator.type,
             task.validator.args,
@@ -270,7 +285,9 @@ class PostQuizSolution:
             short_verdict="NC",
             submitted_answer=solution.text
         )
+        self.logger.info("Checking quiz solution for task %s", task.id)
         use_case(solution_entity)
+        self.logger.info("Saving solution")
         solution_id = await self._solution_repo.create_solution(solution_entity)
         solution_entity.uid = solution_id
         return solution_entity
@@ -296,3 +313,25 @@ class StoreCheckedSolution:
             check_result.group_scores,
             check_result.protocol,
         )
+
+
+class PurgeUserSolutions:
+    def __init__(
+            self,
+            solution_repository: solutions.AbstractSolutionRepository,
+    ) -> None:
+        self.solution_repo = solution_repository
+
+    async def __call__(self, user_id: int) -> None:
+        await self.solution_repo.purge_user_solutions(user_id)
+        
+
+class PurgeTaskSolutions:
+    def __init__(
+            self,
+            solution_repository: solutions.AbstractSolutionRepository,
+    ) -> None:
+        self.solution_repo = solution_repository
+
+    async def __call__(self, task_type: TaskType, task_id: int) -> None:
+        await self.solution_repo.purge_task_solutions(task_type, task_id)

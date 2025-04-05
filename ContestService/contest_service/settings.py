@@ -27,9 +27,9 @@ SECRET_KEY = 'django-insecure-3&uwud=s#&0(uz**lf5$fi+m#)gf40l+s!v84l&afvi5bxqjr!
 MODE = os.getenv("MODE") or "local"
 DEBUG = MODE == "local"
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["dockingjudge.tapeline.dev", "localhost", "127.0.0.1"]
 if "ALLOWED_HOSTS" in os.environ:
-    ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split()
+    ALLOWED_HOSTS += os.getenv("ALLOWED_HOSTS").split()
 
 
 # Application definition

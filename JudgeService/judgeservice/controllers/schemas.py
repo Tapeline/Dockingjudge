@@ -1,6 +1,9 @@
 from pydantic import BaseModel
 
-from judgeservice.domain.entities import SubmissionType, TestCaseResult
+from judgeservice.domain.entities import (
+    GroupProtocolSchema,
+    SubmissionType,
+)
 
 
 class MQSolutionCheckRequest(BaseModel):
@@ -18,4 +21,4 @@ class MQSolutionAnswer(BaseModel):
     short_verdict: str
     group_scores: dict[str, int]
     detailed_verdict: str
-    protocol: dict[str, list[TestCaseResult]]
+    protocol: dict[str, GroupProtocolSchema]

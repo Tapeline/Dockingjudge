@@ -1,5 +1,8 @@
 import asyncio
 import sys
+
+from litestar.plugins.prometheus import PrometheusConfig, PrometheusController
+
 if sys.platform == "win32":
     from asyncio import WindowsSelectorEventLoopPolicy
 
@@ -42,6 +45,11 @@ def get_faststream_app() -> FastStream:
 
 
 def get_litestar_app() -> Litestar:
+    prometheus_config = PrometheusConfig(
+        app_name="solution_service",
+        group_path=True,
+        exclude=["/metrics"]
+    )
     logging_config = LoggingConfig(
         root={"level": "INFO", "handlers": ["queue_listener"]},
         formatters={
@@ -52,27 +60,35 @@ def get_litestar_app() -> Litestar:
     auth_mw = DefineMiddleware(
         ServiceAuthenticationMiddleware,
         other_services=config.services,
-        exclude=["/api/v1/solutions/docs"]
+        exclude=[
+            "/api/v1/solutions/docs",
+            "/metrics",
+        ]
     )
     litestar_app = Litestar(
         debug=config.mode.debug_mode,
         route_handlers=[
             http.SolutionsController,
             http.ping,
+            PrometheusController,
         ],
         openapi_config=OpenAPIConfig(
-            title="Litestar Example",
-            description="Example of Litestar with Scalar OpenAPI docs",
+            title="Solution service",
+            description="Solution service docs",
             version="0.0.1",
             render_plugins=[SwaggerRenderPlugin()],
             path="/api/v1/solutions/docs",
             components=Components(
-                security_schemes={**account_service.provided_security_definitions}
+                security_schemes={
+                    **account_service.provided_security_definitions
+                }
             )
         ),
         logging_config=logging_config,
-        middleware=[auth_mw],
-
+        middleware=[
+            prometheus_config.middleware,
+            auth_mw
+        ],
     )
     litestar_integration.setup_dishka(container, litestar_app)
     return litestar_app

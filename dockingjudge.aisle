@@ -128,18 +128,38 @@ service Judgelet [scalable]:
     tech = Python, FastAPI
 
 
+service Promtail:
+    "Logs collector from docker."
+    system = Monitoring System
+    links:
+        --> Loki
+        --> PCMS
+
+
 service Loki:
-    "Logs collector. Attached to all services"
+    "Logs manager. Receives log pushes."
+    system = Monitoring System
+
+
+service cAdvisor:
+    "Metrics collector for docker system."
     system = Monitoring System
     links:
         --> PCMS
+
+
+service Node Exporter:
+    "Metrics collector of host."
+    system = Monitoring System
 
 
 service Prometheus:
     "Metrics collector. Attached to all services"
     system = Monitoring System
     links:
+        --> cAdvisor
         --> PCMS
+        --> Node Exporter
 
 
 service Grafana:
@@ -148,14 +168,6 @@ service Grafana:
     links:
         --> Loki
         --> Prometheus
-
-
-service Alertmanager:
-    system = Monitoring System
-    links:
-        --> Loki
-        --> Prometheus
-
 
 
 
@@ -174,9 +186,11 @@ deployment VPS Deployment:
         deploy Solution Storage = Docker container
         deploy MQ = Docker container
         deploy Judge Service = Docker container
-        deploy Judgelet = Docker container
+        deploy Judgelet = Docker container (Scalable)
 
         deploy Loki = Docker container
         deploy Grafana = Docker container
-        deploy Alertmanager = Docker container
+        deploy Promtail = Docker container
+        deploy Node Exporter = Docker container
+        deploy cAdvisor = Docker container
         deploy Prometheus = Docker container

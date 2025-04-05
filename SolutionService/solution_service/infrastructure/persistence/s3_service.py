@@ -1,4 +1,5 @@
 import json
+import logging
 from dataclasses import dataclass
 from io import BytesIO
 from urllib.parse import urlsplit
@@ -34,11 +35,13 @@ class S3Storage(AbstractStorage):
             password=config.s3.password,
             is_secure=config.s3.host.startswith("https")
         )
+        self.logger = logging.getLogger("s3")
         self.connect()
         self.create_bucket_if_not_present()
 
     def create_bucket_if_not_present(self):
         if not self.client.bucket_exists(self.params.bucket_name):
+            self.logger.info("Bucket not found, creating")
             self.client.make_bucket(self.params.bucket_name)
             self.client.set_bucket_policy(
                 self.params.bucket_name,
@@ -62,6 +65,7 @@ class S3Storage(AbstractStorage):
             )
 
     def connect(self):
+        self.logger.info("Connecting to S3")
         self.client = minio.Minio(
             self.params.endpoint,
             access_key=self.params.username,
@@ -70,11 +74,13 @@ class S3Storage(AbstractStorage):
         )
 
     async def get_file_url(self, name: str) -> URL:
+        self.logger.info("Getting file url for %s", name)
         signed_url = self.client.get_presigned_url("GET", self.params.bucket_name, name)
         url = urlsplit(signed_url)
         return url.path
 
     async def save_file(self, file: File) -> URL:
+        self.logger.info("Saving file %s", file.name)
         fake_io = BytesIO(file.contents)
         self.client.put_object(
             bucket_name=self.params.bucket_name,
@@ -85,6 +91,7 @@ class S3Storage(AbstractStorage):
         return await self.get_file_url(file.name)
 
     async def get_file(self, url: URL) -> File:
+        self.logger.info("Getting file by url %s", url)
         url = url.removeprefix("/").removesuffix("/")
         bucket_name, object_id = url.split("/")
         response = None

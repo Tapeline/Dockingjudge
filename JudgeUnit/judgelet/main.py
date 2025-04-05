@@ -32,7 +32,7 @@ shared_processors = [
     structlog.processors.add_log_level,
     structlog.dev.set_exc_info,
 ]
-if sys.stderr.isatty() and False:
+if sys.stderr.isatty() and True:
     processors = shared_processors + [
         structlog.processors.TimeStamper(
             fmt="%Y-%m-%d %H:%M:%S", utc=False
@@ -74,9 +74,7 @@ def get_litestar_app() -> Litestar:
                         #standard_lib_logging_config=logging_config,
                         processors=processors,
                         #logger_factory=structlog.get_logger,
-                        logger_factory=structlog.WriteLoggerFactory(
-                            file=open("log.log", "w")
-                        )
+                        logger_factory=structlog.PrintLoggerFactory()
                     )
                 )
             )

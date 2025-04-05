@@ -33,7 +33,7 @@ class Config(BaseModel):
     s3: S3Config = Field(
         default_factory=lambda: S3Config(**os.environ)
     )
-    judgelet_endpoint_format: str = Field(default="{0}/run-suite")
+    judgelet_endpoint_format: str = Field(default="{0}/run")
     config_path: str = Field(default="config.yml")
 
 

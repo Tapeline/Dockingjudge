@@ -4,29 +4,10 @@ version: "3.7"
 # --- common sections declaration ---
 #
 
-x-log-to-loki: &log-to-loki
-  logging:
-    driver: loki
-    options:
-      loki-url: "http://loki:3100/loki/api/v1/push"
-      #loki-retries: 2
-      #loki-max-backoff: 800ms
-      #loki-timeout: 1s
-      #keep-file: "true"
-      #mode: "non-blocking"
+
 
 x-judgelet: &judgelet
   image: dockingjudge-unit
-  #<<: *log-to-loki
-  logging:
-    driver: loki
-    options:
-      loki-url: "http://loki:3100/loki/api/v1/push"
-      loki-retries: 5
-      loki-max-backoff: 800ms
-      loki-timeout: 3s
-      keep-file: "true"
-      mode: "non-blocking"
   expose: [ 8000 ]
   environment:
     IO_ENCODING: ${GLOBAL_ENCODING}
@@ -38,6 +19,7 @@ x-judgelet: &judgelet
     timeout: 10s
   networks:
     - judgelet_network
+
 
 
 #
@@ -188,7 +170,7 @@ services:
         condition: service_started
 
   contest_db:
-    image: postgres:13.3
+    image: postgres:17.4
     hostname: contest_db
     environment:
       POSTGRES_DB: contest_db
@@ -203,7 +185,7 @@ services:
     volumes:
       - contest_pgdata:/var/lib/postgresql/
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d account_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d contest_db" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -291,7 +273,7 @@ services:
     volumes:
       - solution_pgdata:/var/lib/postgresql/
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d account_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d solution_db" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -306,9 +288,6 @@ services:
       - 3000
     networks:
       - main_network
-    depends_on:
-      api_gateway:
-        condition: service_started
 
 
   api_gateway:
@@ -336,15 +315,16 @@ services:
 
 
   grafana:
-    build: grafana
+    build: Grafana
     container_name: grafana
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "3001:3000"
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
       - main_network
+      - monitoring_network
     healthcheck:
       test: [ "CMD", "grafana-cli", "plugins", "ls" ]
       interval: 30s
@@ -352,45 +332,133 @@ services:
       retries: 3
       start_period: 20s
 
+  prometheus:
+    build: Prometheus
+    container_name: prometheus
+    hostname: prometheus
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: always
+    expose:
+      - 9090
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring_network
+      - main_network
+      - judgelet_network
+    labels:
+      org.label-schema.group: "monitoring"
+
+#  alertmanager:
+#    build: Alertmanager
+#    container_name: alertmanager
+#    command:
+#      - '--config.file=/etc/alertmanager/config.yml'
+#      - '--storage.path=/alertmanager'
+#    restart: always
+#    expose:
+#      - 9093
+#    networks:
+#      - monitoring_network
+#    labels:
+#      org.label-schema.group: "monitoring"
+
+  nodeexporter:
+    image: prom/node-exporter:v1.3.1
+    hostname: nodeexporter
+    container_name: nodeexporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: always
+    expose:
+      - 9100
+    networks:
+      - monitoring_network
+    labels:
+      org.label-schema.group: "monitoring"
 
   loki:
     hostname: loki
-    image: grafana/loki:3.2.1
-    command: "-config.file=/etc/loki/config.yaml"
+    container_name: loki
+    build: Loki
+    command: -config.file=/etc/loki/loki-config.yaml
     expose:
       - 3100
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./Loki/config.yml:/etc/loki/config.yaml
-      - loki_data:/loki
+    restart: always
     networks:
+      - monitoring_network
+
+  promtail:
+    build: Promtail
+    container_name: promtail
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/log:/var/log:ro
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    restart: always
+    networks:
+      - monitoring_network
       - main_network
       - judgelet_network
 
-
-  prometheus:
-    build: prometheus
-    volumes:
-      - prometheus_data:/etc/prometheus/
-    hostname: prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
+    container_name: cadvisor
+    hostname: cadvisor
+    privileged: true
     ports:
-      - "3090:9090"
+      - "3200:8080"
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    restart: always
     expose:
-      - 9090
-    restart: unless-stopped
-    environment:
-      TZ: "Europe/Moscow"
+      - 8080
+    networks:
+      - monitoring_network
+    labels:
+      org.label-schema.group: "monitoring"
+
+  nginx-prometheus-exporter:
+    image: nginx/nginx-prometheus-exporter:1.0
+    container_name: prometheus-nginx-exporter
+    hostname: promexporter.service
+    restart: always
+    command:
+      - -nginx.scrape-uri=http://api.service:4000/nginx_status
+    expose:
+      - 9113
     networks:
       - main_network
+
 
 
 networks:
   main_network:
     driver: bridge
   judgelet_network:
+    driver: bridge
+  monitoring_network:
     driver: bridge
 
 

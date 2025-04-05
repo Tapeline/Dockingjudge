@@ -1,3 +1,4 @@
+import logging
 from typing import Sequence, Final
 
 import aiohttp
@@ -30,13 +31,19 @@ class AccountServiceImpl(account.AbstractAccountService):
             other_services: FromDishka[Config],
     ):
         self.base_url = other_services.services.account_service
+        self.logger = logging.getLogger("account_service")
 
     async def get_users_by_ids(self, ids: Sequence[int]) -> Sequence[account.UserDTO]:
+        self.logger.info("Getting all users")
         async with (
             aiohttp.ClientSession() as session,
             session.get(f"{self.base_url}/all", params={"id": ids}) as response,
         ):
             if response.status != 200:
+                self.logger.error(
+                    "/all responded %s: %s",
+                    response.status, await response.text()
+                )
                 raise BadServiceResponseException("account", response)
             data = await response.json()
             return [

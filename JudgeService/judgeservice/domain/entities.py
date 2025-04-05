@@ -10,15 +10,17 @@ class SubmissionType(Enum):
     ZIP = "zip"
 
 
-@dataclass
-class TestCaseResult:
-    """Result for a test case."""
-
-    return_code: int
-    stdout: str
-    stderr: str
-    verdict: str
+class VerdictSchema(BaseModel):
+    codename: str
     is_successful: bool
+    details: str
+
+
+class GroupProtocolSchema(BaseModel):
+    score: int
+    verdicts: list[VerdictSchema]
+    is_successful: bool
+    verdict: VerdictSchema
 
 
 @dataclass
@@ -36,18 +38,19 @@ class Solution:
     short_verdict: str
     group_scores: dict[GroupName, int]
     detailed_verdict: str
-    protocol: dict[str, list[TestCaseResult]]
+    protocol: dict[str, GroupProtocolSchema]
     score: int
 
 
 class JudgeletAnswer(BaseModel):
-    """Judgelet answer to check call."""
+    """Response model."""
 
     score: int
     verdict: str
     group_scores: dict[str, int]
-    protocol: dict[str, list[TestCaseResult]]
-    compilation_error: str | None
+    protocol: dict[str, GroupProtocolSchema]
+    compilation_error: str | None = None
+
 
 
 class Judgelet(ABC):

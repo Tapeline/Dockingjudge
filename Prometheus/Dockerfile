@@ -1,3 +1,4 @@
-FROM prom/prometheus
+FROM prom/prometheus:v2.38.0
 
-COPY prometheus.yml /etc/prometheus/prometheus.yml
+ADD prometheus.yml /etc/prometheus/prometheus.yml
+ADD alert.rules /etc/prometheus/alert.rules

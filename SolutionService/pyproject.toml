@@ -1,26 +1,29 @@
-[tool.poetry]
+[project]
 name = "solution_service"
 version = "0.1.0"
 description = ""
-authors = ["Tapeline <yt.redstone.mail@gmail.com>"]
-readme = "README.md"
+authors = [
+    {name = "Tapeline",email = "yt.redstone.mail@gmail.com"}
+]
 package-mode = false
-
-[tool.poetry.dependencies]
-python = "^3.12"
-litestar = {extras = ["sqlalchemy"], version = "^2.13.0"}
-fuzzywuzzy = "^0.18.0"
-python-levenshtein = "^0.26.1"
-boto3 = "^1.35.90"
-dishka = "^1.4.2"
-faststream = {extras = ["rabbit"], version = "^0.5.33"}
-alembic = "^1.14.0"
-psycopg = {extras = ["binary", "pool"], version = "^3.2.3"}
-uvicorn = "^0.34.0"
-minio = "^7.2.14"
-aiohttp = "^3.11.11"
+license = {text = "GNU GPL v3.0"}
+readme = "README.md"
+requires-python = ">=3.13,<4.0"
+dependencies = [
+    "litestar[prometheus,sqlalchemy] (>=2.15.1,<3.0.0)",
+    "sqlalchemy (>=2.0.40,<3.0.0)",
+    "fuzzywuzzy (>=0.18.0,<0.19.0)",
+    "python-levenshtein (>=0.27.1,<0.28.0)",
+    "dishka (>=1.5.2,<2.0.0)",
+    "minio (>=7.2.15,<8.0.0)",
+    "faststream[rabbit] (>=0.5.37,<0.6.0)",
+    "alembic (>=1.15.2,<2.0.0)",
+    "uvicorn (>=0.34.0,<0.35.0)",
+    "aiohttp (>=3.11.16,<4.0.0)",
+    "psycopg[binary,pool] (>=3.2.3)",
+]
 
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"

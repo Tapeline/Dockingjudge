@@ -24,8 +24,8 @@ class TestCase(BaseModel):
     stdin: str
     files_in: dict = {}
     files_out: list = []
-    time_limit: Optional[int] = None
-    mem_limit_mb: Optional[int] = None
+    time_limit: Optional[float] = None
+    mem_limit_mb: Optional[float] = None
 
 
 class TestGroup(BaseModel):
@@ -38,16 +38,17 @@ class TestGroup(BaseModel):
 
 class PrecompileCheckerModel(BaseModel):
     type: str
-    parameters: dict = {}
+    parameters: dict
 
 
 class TestSuite(BaseModel):
-    place_files: Optional[str] = None
+    place_files: dict[str, str] = {}
     precompile: list[PrecompileCheckerModel]
     groups: list[TestGroup]
-    public_cases: list[dict]
-    time_limit: int
-    mem_limit_mb: int
+    public_cases: list[dict[str, str]]
+    time_limit: float
+    mem_limit_mb: float
+    compile_timeout: int
 
 
 class QuizValidator(BaseModel):
@@ -87,7 +88,7 @@ def validate_test_suite(test_suite: dict):
     try:
         TestSuite(**test_suite)
     except PydanticValidationError as e:
-        raise ValidationError from e
+        raise ValidationError(detail=e.json()) from e
 
 
 def validate_quiz_validator(validator: dict):

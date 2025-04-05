@@ -1,0 +1,30 @@
+global:
+  resolve_timeout: 1m
+  slack_api_url: 'https://hooks.slack.com/services/<webhook-id>'
+
+route:
+  # continue: false
+  # group_by:
+  # - job
+  group_wait: 30s
+  group_interval: 1m
+  repeat_interval: 4h
+  receiver: default-telegram
+  routes:
+  - receiver: default-telegram
+
+  
+receivers:
+- name: default-telegram
+  telegram_configs:
+  - api_url: https://api.telegram.org
+    bot_token: "7549999257:AAFXbTPurXok6hrC_QvFXLpvSKjkFdsQ2LM"
+    chat_id: 1446612308
+    disable_notifications: false
+    http_config:
+      follow_redirects: true
+    send_resolved: true
+    parse_mode: ""
+
+templates:
+- /etc/alertmanager/config/*.tmpl

@@ -1,7 +1,11 @@
 from dishka import FromDishka
 
 from judgeservice.application.interfaces import JudgeletPool, SolutionGateway
-from judgeservice.domain.entities import Solution, JudgeletAnswer, TestCaseResult
+from judgeservice.domain.entities import (
+    GroupProtocolSchema,
+    Solution,
+    JudgeletAnswer,
+)
 
 
 class ProcessSolutionInteractor:
@@ -42,9 +46,9 @@ def _form_detailed_verdict(judgelet_response: JudgeletAnswer) -> str:
     return verdict
 
 
-def _get_first_failed(group_protocol: list[TestCaseResult]) -> str:
-    for test_no, test in enumerate(group_protocol):
-        if test.is_successful:
+def _get_first_failed(group_protocol: GroupProtocolSchema) -> str:
+    for test_no, verdict in enumerate(group_protocol.verdicts):
+        if verdict.is_successful:
             continue
-        return f"Test #{test_no}: {test.verdict}"
+        return f"Test #{test_no}: {verdict.codename}"
     return "OK"

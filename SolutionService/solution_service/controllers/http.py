@@ -65,7 +65,6 @@ class SolutionsController(Controller):
             request: Request[UserDTO, ..., State],
     ) -> schemas.SolutionSchema:
         solution = await interactor(solution_id=str(solution_uid))
-        print(solution_uid)
         if solution is None:
             raise NotFoundException
         contest_managers = await contest_service.get_contest_managers(solution.contest_id)
@@ -100,7 +99,6 @@ class SolutionsController(Controller):
             task_type: str,
             task_id: int,
     ) -> list[schemas.SolutionSchema]:
-        print("REQ")
         solutions = await interactor(request.user.id, TaskType(task_type), task_id)
         return list(map(_serialize_solution, solutions))
 
