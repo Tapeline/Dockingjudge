@@ -1,0 +1,22 @@
+@startuml
+!include <C4/C4_Deployment>
+Boundary(VPS_Deployment,"VPS Deployment",$descr=""){
+    Boundary(Docker_compose,"Docker compose",$descr=""){
+        Node(Web_UI,"Web UI",$descr="Docker container")
+        Node(Account_Service,"Account Service",$descr="Docker container")
+        Node(Contest_Service,"Contest Service",$descr="Docker container")
+        Node(Solution_Service,"Solution Service",$descr="Docker container")
+        Node(Account_DB,"Account DB",$descr="Docker container")
+        Node(Contest_DB,"Contest DB",$descr="Docker container")
+        Node(Solution_DB,"Solution DB",$descr="Docker container")
+        Node(Solution_Storage,"Solution Storage",$descr="Docker container")
+        Node(MQ,"MQ",$descr="Docker container")
+        Node(Judge_Service,"Judge Service",$descr="Docker container")
+        Node(Judgelet,"Judgelet",$descr="Docker container")
+        Node(Loki,"Loki",$descr="Docker container")
+        Node(Grafana,"Grafana",$descr="Docker container")
+        Node(Alertmanager,"Alertmanager",$descr="Docker container")
+        Node(Prometheus,"Prometheus",$descr="Docker container")
+    }
+}
+@enduml

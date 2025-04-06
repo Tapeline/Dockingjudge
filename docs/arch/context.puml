@@ -1,0 +1,18 @@
+@startuml
+!include <C4/C4_Context>
+Person(Participant, "Participant", "Contest participant",$tags="")
+
+Person(Administrator, "Administrator", "PCMS Admin",$tags="")
+
+System(PCMS, "PCMS", "Programming Contest Management System",$tags="")
+
+System(Monitoring_System, "Monitoring System", "",$tags="")
+
+Rel(Participant, PCMS, "Reads statements and submits solutions","Web UI")
+
+Rel(Administrator, PCMS, "Creates and manages contests","Web UI")
+
+Rel(Administrator, Monitoring_System, "Checks logs and metrics","Web UI")
+
+BiRel(Monitoring_System, PCMS, "","")
+@enduml

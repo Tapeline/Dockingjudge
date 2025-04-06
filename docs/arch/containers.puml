@@ -1,0 +1,71 @@
+@startuml
+!include <C4/C4_Container>
+System_Boundary(PCMS,"PCMS"){
+    Container(Web_UI, "Web UI", "",$tags="")
+    Container(Account_Service, "Account Service", "Manages accounts and performs auth",$tags="")
+    Container(Account_DB, "Account DB", "Stores account info",$tags="database")
+    Container(Contest_Service, "Contest Service", "CRUD for contests and tasks",$tags="")
+    Container(Contest_DB, "Contest DB", "Stores contest and task info",$tags="database")
+    Container(Solution_Service, "Solution Service", "CRUD for solutions & quiz solution checker",$tags="")
+    Container(Solution_DB, "Solution DB", "Stores solutions",$tags="database")
+    Container(Solution_Storage, "Solution Storage", "S3 object storage for code solutions",$tags="database")
+    Container(MQ, "MQ", "Message queue",$tags="")
+    Container(Judge_Service, "Judge Service", "Performs routing of solution check requests",$tags="")
+    Container(Judgelet, "Judgelet", "Performs code solution checks",$tags="scalable")
+}
+
+System_Boundary(Monitoring_System,"Monitoring System"){
+    Container(Loki, "Loki", "Logs collector. Attached to all services",$tags="")
+    Container(Prometheus, "Prometheus", "Metrics collector. Attached to all services",$tags="")
+    Container(Grafana, "Grafana", "Web metrics UI",$tags="")
+    Container(Alertmanager, "Alertmanager", "",$tags="")
+}
+
+Person(Participant, "Participant", "Contest participant",$tags="")
+
+Person(Administrator, "Administrator", "PCMS Admin",$tags="")
+
+Rel(Participant, Web_UI, "","")
+
+Rel(Administrator, Web_UI, "","")
+
+Rel(Web_UI, Account_Service, "","HTTP REST API")
+
+Rel(Web_UI, Contest_Service, "","HTTP REST API")
+
+Rel(Web_UI, Solution_Service, "","HTTP REST API")
+
+Rel(Web_UI, Solution_Storage, "","HTTP")
+
+Rel(Account_Service, Account_DB, "","")
+
+Rel(Contest_Service, Account_Service, "Auth & get user info","HTTP REST API")
+
+Rel(Contest_Service, Contest_DB, "","")
+
+Rel(Solution_Service, Account_Service, "Auth & get user info","HTTP REST API")
+
+Rel(Solution_Service, Contest_Service, "Get contest & task info","HTTP REST API")
+
+Rel(Solution_Service, Solution_DB, "","")
+
+Rel(Solution_Service, Solution_Storage, "","")
+
+BiRel(MQ, Solution_Service, "","")
+
+BiRel(MQ, Judge_Service, "","")
+
+Rel(Judge_Service, Judgelet, "","HTTP REST API")
+
+Rel(Loki, PCMS, "","")
+
+Rel(Prometheus, PCMS, "","")
+
+Rel(Grafana, Loki, "","")
+
+Rel(Grafana, Prometheus, "","")
+
+Rel(Alertmanager, Loki, "","")
+
+Rel(Alertmanager, Prometheus, "","")
+@enduml
