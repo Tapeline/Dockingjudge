@@ -121,7 +121,7 @@ function QuizDetailPage(props) {
                                     {background: lightGreen[300]} : {};
                                 return <TableRow key={index} className="table-success" style={style}>
                                     <TableCell padding="none" style={{paddingLeft: 8}}>
-                                        <Button href={`/solutions/quiz/${data.id}`} variant="mini">
+                                        <Button href={`/see-solutions/quiz/${data.id}`} variant="mini">
                                             <Visibility/>
                                         </Button>
                                     </TableCell>

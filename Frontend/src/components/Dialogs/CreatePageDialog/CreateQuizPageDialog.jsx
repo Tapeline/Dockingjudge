@@ -19,8 +19,8 @@ function DialogImpl(props) {
     const [quizScore, setQuizScore] = useState("0");
     const [validatorJSON, setValidatorJSON] = useState(
         "{\n" +
-        '  "type": "",\n' +
-        '  "pattern": ""\n' +
+        '  "type": "text",\n' +
+        '  "args": {"pattern": ""}\n' +
         '}'
     );
     const navigate = useNavigate();
@@ -46,6 +46,7 @@ function DialogImpl(props) {
             validator: validatorParsed,
             points: parseInt(quizScore)
         }).then((response) => {
+            setIsLoading(false);
             if (!response.success) toastError(response.reason);
             else {
                 handleClose();

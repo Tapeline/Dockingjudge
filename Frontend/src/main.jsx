@@ -65,11 +65,11 @@ const router = createBrowserRouter([
                 element: <LoginRequiredRoute><EditTextPage/></LoginRequiredRoute>
             },
             {
-                path: "/solutions/quiz/:solutionId",
+                path: "/see-solutions/quiz/:solutionId",
                 element: <LoginRequiredRoute><QuizSolutionDetailPage/></LoginRequiredRoute>
             },
             {
-                path: "/solutions/code/:solutionId",
+                path: "/see-solutions/code/:solutionId",
                 element: <LoginRequiredRoute><CodeSolutionDetailPage/></LoginRequiredRoute>
             },
             {

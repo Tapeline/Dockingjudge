@@ -26,6 +26,7 @@ function DialogImpl(props) {
             name: pageTitle,
             text: pageDescription
         }).then((response) => {
+            setIsLoading(false);
             if (!response.success) toastError(response.reason);
             else {
                 handleClose();

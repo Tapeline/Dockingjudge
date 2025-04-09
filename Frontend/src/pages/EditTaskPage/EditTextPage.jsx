@@ -45,7 +45,7 @@ function EditTextPage(props) {
 
     const applyChanges = () => {
         modifyTextPage(accessToken, contestId, pageId, {
-            title: pageTitle,
+            name: pageTitle,
             text: pageDescription,
             is_enter_page: isEnterPage
         }).then(response => {

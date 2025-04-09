@@ -214,7 +214,7 @@ function CodeDetailPage(props) {
                                                      className="table-success"
                                                      style={style} >
                                         <TableCell padding="none" style={{paddingLeft: 8}}>
-                                            <Button href={`/solutions/code/${data.id}`} variant="mini">
+                                            <Button href={`/see-solutions/code/${data.id}`} variant="mini">
                                                 <Visibility/>
                                             </Button>
                                         </TableCell>

@@ -69,7 +69,7 @@ function LoginPage(props) {
     return (
         <main className={classes.layout}>
             <Paper className={classes.paper}>
-                <img src={dockingjudgeBlue} alt="Logo" style={{width: "320px"}}/>
+                <img src={dockingjudgeBlue} alt="Logo" style={{width: "300px"}}/>
                 <Typography variant="headline">Register</Typography>
                 <form className={classes.form} onSubmit={handleSubmit}>
                     <FormControl margin="normal" required fullWidth>

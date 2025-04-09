@@ -52,7 +52,7 @@ class UserContestStatusSchema(BaseModel):
     user: UserSchema
     tasks_attempted: int
     tasks_solved: int
-    solutions: list[SolutionSchema]
+    solutions: list[SolutionSchema | None]
     total_score: int
 
 
