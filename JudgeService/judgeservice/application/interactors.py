@@ -1,3 +1,5 @@
+import logging
+
 from dishka import FromDishka
 
 from judgeservice.application.interfaces import JudgeletPool, SolutionGateway
@@ -18,13 +20,17 @@ class ProcessSolutionInteractor:
         self.solution_gateway = solution_gateway
 
     async def __call__(self, solution: Solution) -> None:
+        logging.info("Retrieving target judgelet")
         judgelet = await self.judgelet_pool.get_for_compiler(
             solution.compiler
         )
+        logging.info("Retrieving solution file")
         solution.solution_data = await self.solution_gateway.get_solution_file(
             solution.solution_url
         )
+        logging.info("Communicating with judgelet")
         judgelet_response = await judgelet.check_solution(solution)
+        logging.info("Checking successful")
         solution.score = judgelet_response.score
         solution.group_scores = judgelet_response.group_scores
         solution.short_verdict = judgelet_response.verdict

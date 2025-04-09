@@ -28,6 +28,7 @@ class SingleBalancedStrategy(AbstractBalancingStrategy):
     """Dummy balancing strategy."""
 
     async def get_preferred_node(self, nodes: list[Judgelet]) -> Judgelet:
+        logging.info("Using single-node mode")
         return nodes[0]
 
 
@@ -37,6 +38,7 @@ class RoundRobinBalancingStrategy(AbstractBalancingStrategy):
         self._ptr = 0
 
     async def get_preferred_node(self, nodes: list[Judgelet]) -> Judgelet | None:
+        logging.info("Using round-robin strategy")
         beginning = self._ptr
         while True:
             node = nodes[self._ptr]
@@ -52,6 +54,7 @@ class RoundRobinBalancingStrategy(AbstractBalancingStrategy):
 class LeastConnectionsBalancingStrategy(AbstractBalancingStrategy):
     """Prefers node with the least number of connections opened"""
     async def get_preferred_node(self, nodes: list[Judgelet]) -> Judgelet | None:
+        logging.info("Using least connections strategy")
         nodes = [node for node in nodes if await node.is_alive()]
         if len(nodes) == 0:
             return None
@@ -154,6 +157,7 @@ class JudgeletPoolImpl(JudgeletPool):
         group = self._get_group_for_compiler(compiler_name)
         node = await self.balance.get_preferred_node(group.nodes)
         if node is None:
+            logging.error("No judgelet found for compiler %s", compiler_name)
             raise NoSuitableJudgeletFoundException
         return node
 
@@ -161,4 +165,5 @@ class JudgeletPoolImpl(JudgeletPool):
         for group in self.groups:
             if group.selector.is_applicable(compiler_name):
                 return group
+        logging.error("No judgelet group found for compiler %s", compiler_name)
         raise NoSuitableJudgeletFoundException

@@ -1,3 +1,10 @@
+import logging
+
+from judgeservice import log_config
+
+logging.basicConfig(level=logging.INFO)
+log_config.setup_default_handlers(logging.getLogger())
+
 from dishka import make_async_container
 from dishka.integrations import faststream as faststream_integration
 from faststream import FastStream

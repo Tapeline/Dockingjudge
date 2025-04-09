@@ -1,3 +1,4 @@
+import logging
 from logging import Logger
 
 from dishka import FromDishka
@@ -21,7 +22,7 @@ async def handle_incoming_solution(
         data: MQSolutionCheckRequest,
         interactor: FromDishka[ProcessSolutionInteractor],
 ) -> MQSolutionAnswer:
-    print("Received request %s" % data.id)
+    logging.info("Received request %s", data.id)
     solution = Solution(
         id=data.id,
         solution_url=data.solution_url,
@@ -37,7 +38,7 @@ async def handle_incoming_solution(
         protocol={}
     )
     await interactor(solution)
-    print("Handled request %s" % data.id)
+    logging.info("Handled request %s", data.id)
     return MQSolutionAnswer(
         id=data.id,
         score=solution.score,
