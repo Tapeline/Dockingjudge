@@ -20,6 +20,8 @@ def _serialize_solution(
         solution: AnySolution,
         is_safe: bool = False,
 ) -> schemas.SolutionSchema:
+    if not solution:
+        return None
     data = None
     if not is_safe and solution.task_type == TaskType.QUIZ:
         data = schemas.QuizSolutionExtraSchema(
