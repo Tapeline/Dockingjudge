@@ -30,7 +30,11 @@ answers_exchange = RabbitExchange("judge_answers_exchange", durable=True)
 user_object_events = RabbitExchange("user_object_events", durable=True)
 contest_object_events = RabbitExchange("contest_object_events", durable=True)
 
-answers_inbox = RabbitQueue("_solution_service_inbox", durable=True)
+answers_inbox = RabbitQueue(
+    "_solution_service_inbox",
+    durable=True,
+    routing_key="solution_answer"
+)
 user_event_inbox = RabbitQueue(
     "_solution_service_user_inbox",
     durable=True,
