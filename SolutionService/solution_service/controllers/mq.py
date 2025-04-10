@@ -53,7 +53,7 @@ code_task_event_inbox = RabbitQueue(
 )
 
 
-@mq_controller.subscriber(answers_inbox, solutions_exchange)
+@mq_controller.subscriber(answers_inbox, answers_exchange)
 async def handle_checked_solution(
         data: MQSolutionAnswer,
         interactor: FromDishka[StoreCheckedSolution]

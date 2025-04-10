@@ -22,7 +22,7 @@ function DialogImpl(props) {
         '    {\n' +
         '      "name": "A",\n' +
         '      "depends_on": [],\n' +
-        '      "score": 100,\n' +
+        '      "points": 100,\n' +
         '      "scoring_rule": "polar",\n' +
         '      "cases": [\n' +
         '        {"stdin": "", "validators": [{"type": "stdout", "args": {"expected": ""}}]}\n' +
@@ -32,7 +32,7 @@ function DialogImpl(props) {
         '  "precompile": [],\n' +
         '  "time_limit": 1,\n' +
         '  "mem_limit_mb": 256,\n' +
-        '  "public_cases": []\n' +
+        '  "public_cases": [],\n' +
         '  "compile_timeout": 5' +
         '}'
     );
