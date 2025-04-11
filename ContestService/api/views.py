@@ -96,8 +96,7 @@ class ListCreateContestView(ListCreateAPIView):
         return super().create(request, *args, **kwargs)
 
 
-class RetrieveUpdateDestroyContestView(NotifyOnDeleteMixin,
-                                       RetrieveUpdateDestroyAPIView):
+class RetrieveUpdateDestroyContestView(RetrieveUpdateDestroyAPIView):
     serializer_class = serializers.ContestSerializer
     queryset = models.Contest.objects.all()
     permission_classes = (IsAuthenticated,
@@ -118,7 +117,9 @@ class RetrieveUpdateDestroyContestView(NotifyOnDeleteMixin,
         obj = self.get_object()
         response = super().delete(request, *args, **kwargs)
         rmq.notify_contest_deleted(
-            serializers.ContestSerializer(obj, display_sensitive_info=True).data
+            serializers.ContestSerializer(
+                obj, display_sensitive_info=True
+            ).data
         )
         return response
 
