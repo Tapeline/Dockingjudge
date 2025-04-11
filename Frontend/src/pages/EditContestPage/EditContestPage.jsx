@@ -31,6 +31,7 @@ import CreateTextPageDialog from "../../components/Dialogs/CreatePageDialog/Crea
 import CreateCodePageDialog from "../../components/Dialogs/CreatePageDialog/CreateCodePageDialog.jsx";
 import CreateQuizPageDialog from "../../components/Dialogs/CreatePageDialog/CreateQuizPageDialog.jsx";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import SyntaxHighlighter from "react-syntax-highlighter";
 
 const styles = theme => ({root: {
         width: '100%',
@@ -232,6 +233,25 @@ function EditContestPage(props) {
                                 }}
                             />
                         </>}
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+                <ExpansionPanel expanded={key === 'json'} onChange={() => setKey("json")}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                        <Typography className={classes.heading}>JSON Model</Typography>
+                        <Typography className={classes.secondaryHeading}>View contest JSON (read-only)</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails style={{display: "block"}}>
+                        <Editor
+                            value={JSON.stringify(contestData)}
+                            readOnly={true}
+                            language="json"
+                            width="100%"
+                            height="60vh"
+                            options={{
+                                tabSize: 2,
+                                fontFamily: "JetBrains Mono"
+                            }}
+                        />
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
             </div>
