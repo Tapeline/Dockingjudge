@@ -136,7 +136,7 @@ def _get_precompile_checker(
     if checker.type not in CHECKERS:
         raise ValidationException(f"bad precompile checker {checker.type}")
     checker_cls = CHECKERS[checker.type]
-    return checker_cls(checker_cls._args_cls(**checker.parameters))
+    return checker_cls(checker_cls._args_cls(**checker.args))
 
 
 def _transform_protocol(protocol: GroupProtocol) -> GroupProtocolSchema:

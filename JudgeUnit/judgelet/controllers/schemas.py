@@ -45,7 +45,7 @@ class PrecompileCheckerSchema(BaseModel):
     """Checks code before running"""
 
     type: str
-    parameters: dict = {}  # noqa: WPS110 (bad name)
+    args: dict = {}  # noqa: WPS110 (bad name)
 
 
 class TestSuite(BaseModel):
