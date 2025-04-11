@@ -38,7 +38,7 @@ class TestGroup(BaseModel):
 
 class PrecompileCheckerModel(BaseModel):
     type: str
-    parameters: dict
+    args: dict
 
 
 class TestSuite(BaseModel):
