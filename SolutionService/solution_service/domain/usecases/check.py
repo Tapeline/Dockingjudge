@@ -11,6 +11,9 @@ def _verdict_by_success(is_successful: bool) -> str:
         return "WA"
 
 
+# TODO: this is an abomination. It doesn't follow the clean architecture
+#       patterns and thus should be refactored. Move this to application
+#       layer and merge with check quiz interactor
 class CheckQuizSolution:
     def __init__(self, quiz_checker: AbstractQuizChecker):
         self._checker = quiz_checker

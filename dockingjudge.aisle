@@ -50,7 +50,7 @@ service Web UI:
 
 
 service Account Service:
-    Manages accounts and performs auth
+    Manages accounts and performs auth, register, login
     system = PCMS
     tech = DRF
     links:
@@ -82,7 +82,7 @@ service Contest DB [database]:
 
 
 service Solution Service:
-    CRUD for solutions & quiz solution checker
+    CRUD for solutions, check quiz solutions, queue code solutions
     system = PCMS
     tech = Python, Litestar, Faststream
     links:
@@ -92,7 +92,8 @@ service Solution Service:
             Get contest & task info
         --> Solution DB
         --> Solution Storage
-        <-> MQ
+        <-> MQ:
+            Queue code solutions and get judge verdicts
 
 
 service Solution DB [database]:
@@ -108,7 +109,10 @@ service Solution Storage [database]:
 
 
 service MQ:
-    Message queue
+    "Message queue."
+    "Used for asynchronous communication between solution service"
+    "and judge services. Also an event queue for object deletion"
+    "events for synchronising cascade deletion."
     system = PCMS
     tech = RabbitMQ
 
@@ -118,7 +122,8 @@ service Judge Service:
     system = PCMS
     tech = Python, Faststream
     links:
-        <-> MQ
+        <-> MQ:
+            Get queued solutions and queue verdicts
         --> Judgelet over HTTP REST API
 
 
@@ -186,7 +191,7 @@ deployment VPS Deployment:
         deploy Solution Storage = Docker container
         deploy MQ = Docker container
         deploy Judge Service = Docker container
-        deploy Judgelet = Docker container (Scalable)
+        deploy Judgelet = "Docker container (Scalable)"
 
         deploy Loki = Docker container
         deploy Grafana = Docker container

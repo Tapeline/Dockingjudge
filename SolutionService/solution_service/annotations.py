@@ -1,4 +1,3 @@
-from typing import TypeVar, Annotated
+from typing import Annotated
 
-T = TypeVar("T")
 type MutatedArgument[T] = Annotated[T, "MutatedArgument"]

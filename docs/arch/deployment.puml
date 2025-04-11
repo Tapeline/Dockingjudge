@@ -12,10 +12,12 @@ Boundary(VPS_Deployment,"VPS Deployment",$descr=""){
         Node(Solution_Storage,"Solution Storage",$descr="Docker container")
         Node(MQ,"MQ",$descr="Docker container")
         Node(Judge_Service,"Judge Service",$descr="Docker container")
-        Node(Judgelet,"Judgelet",$descr="Docker container")
+        Node(Judgelet,"Judgelet",$descr="Docker container (Scalable)")
         Node(Loki,"Loki",$descr="Docker container")
         Node(Grafana,"Grafana",$descr="Docker container")
-        Node(Alertmanager,"Alertmanager",$descr="Docker container")
+        Node(Promtail,"Promtail",$descr="Docker container")
+        Node(Node_Exporter,"Node Exporter",$descr="Docker container")
+        Node(cAdvisor,"cAdvisor",$descr="Docker container")
         Node(Prometheus,"Prometheus",$descr="Docker container")
     }
 }
