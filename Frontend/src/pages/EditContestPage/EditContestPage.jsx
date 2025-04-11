@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import Preloader from "../../components/Preloader/Preloader.jsx";
 import {
+    deleteContest,
     getAllContests,
     getContest,
     getContestPage, modifyContest,
@@ -32,6 +33,8 @@ import CreateCodePageDialog from "../../components/Dialogs/CreatePageDialog/Crea
 import CreateQuizPageDialog from "../../components/Dialogs/CreatePageDialog/CreateQuizPageDialog.jsx";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SyntaxHighlighter from "react-syntax-highlighter";
+import ConfirmDeletionDialog from "../../components/Dialogs/ConfirmDeletionDialog/ConfirmDeletionDialog.jsx";
+import {deleteProfile} from "../../api/endpoints-accounts.jsx";
 
 const styles = theme => ({root: {
         width: '100%',
@@ -99,6 +102,13 @@ function EditContestPage(props) {
             }
             toastSuccess("Saved");
         })
+    };
+
+    const onContestDelete = () => {
+        deleteContest(accessToken, contestId).then((response) => {
+            if (!response.success) toastError(response.reason);
+            else window.location.href = "/";
+        });
     };
 
     return (
@@ -252,6 +262,24 @@ function EditContestPage(props) {
                                 fontFamily: "JetBrains Mono"
                             }}
                         />
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+                <ExpansionPanel expanded={key === 'danger'} onChange={() => setKey("danger")}>
+                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                        <Typography className={classes.heading}>Danger zone</Typography>
+                        <Typography className={classes.secondaryHeading}>
+                            Dangerous actions that cannot be reverted</Typography>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                        <ConfirmDeletionDialog
+                                buttonText="Delete contest"
+                                header="Delete contest?"
+                                text={<>
+                                    Are you sure you want to delete your contest?<br/>
+                                    <b>This action is not undoable, proceed with caution!</b>
+                                </>}
+                                onOk={onContestDelete}
+                            />
                     </ExpansionPanelDetails>
                 </ExpansionPanel>
             </div>
