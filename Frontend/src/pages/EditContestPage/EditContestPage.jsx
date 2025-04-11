@@ -242,7 +242,7 @@ function EditContestPage(props) {
                     </ExpansionPanelSummary>
                     <ExpansionPanelDetails style={{display: "block"}}>
                         <Editor
-                            value={JSON.stringify(contestData)}
+                            value={JSON.stringify(contestData, null, 2)}
                             readOnly={true}
                             language="json"
                             width="100%"
