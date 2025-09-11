@@ -5,6 +5,8 @@
 ---
 
 <!-- TOC -->
+* [Dockingjudge](#dockingjudge)
+  * [Demo](#demo)
   * [Deployment](#deployment)
     * [Dev env](#dev-env)
   * [Structure](#structure)
@@ -12,6 +14,16 @@
 <!-- TOC -->
 
 ---
+
+## Demo
+
+[View full demo](https://docs.dockingjudge.tapeline.dev/explore/demo)
+
+![](docs/docs/img/ui-code-task.png)
+
+![](docs/docs/img/ui-markdown-page.png)
+
+[View full demo](https://docs.dockingjudge.tapeline.dev/explore/demo)
 
 ## Deployment
 (you may want to replace the domain name in files with you own)
@@ -22,8 +34,9 @@ docker compose up -d rabbitmq    # for some reason rabbitmq sometimes does not s
 docker compose up -d --build
 ```
 
-also replace example sensitive information in .env (like SECRET_KEY)
+also replace example sensitive information in .env (like SECRET_KEY).
 
+You can consult [docs](https://docs.dockingjudge.tapeline.dev/admin/install) for more info.
 
 ### Dev env
 If you want to deploy locally, without a domain, then you
@@ -59,3 +72,4 @@ Dockingjudge consists of several services:
 - [ ] Add more compilers (at least cpp)
 - [ ] Add tests
 - [ ] Lint and test in CI
+- [ ] Move config to config files
