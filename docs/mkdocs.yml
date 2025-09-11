@@ -26,6 +26,8 @@ theme:
 plugins:
   - mermaid2
   - ezglossary
+  - macros:
+      module_name: macros
 
 markdown_extensions:
   - toc:
