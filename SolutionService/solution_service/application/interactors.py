@@ -114,6 +114,7 @@ class GetStandings:
             participants
         )
         self.logger.info("Serializing standings")
+        self.logger.info("%s", str(standings))
         return [
             dto.EnrichedUserContestStatus(
                 user=participant_objects[i],

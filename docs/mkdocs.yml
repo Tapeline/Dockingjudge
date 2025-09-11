@@ -1,0 +1,51 @@
+site_name: Dockingjudge docs
+site_url: https://docs.dockingjudge.tapeline.dev
+repo_url: https://github.com/Tapeline/Dockingjudge
+copyright: "&copy; Copyright Tapeline 2024-2025"
+nav:
+  - Home: index.md
+  - Explore:
+      - Features: explore/features.md
+      - Demo: explore/demo.md
+      - Infrastructure: explore/infrastructure.md
+      - Tech stack: explore/stack.md
+      - C4: explore/c4.md
+  - Getting started for contestants:
+      - Sign up for a contest: get_started/sign_up.md
+      - Solve tasks: get_started/solve.md
+  - Getting started for admins:
+      - Install: admin/install.md
+      - Set up a contest: admin/contest.md
+      - Set up a quiz task: admin/quiz.md
+      - Set up a code task: admin/code.md
+
+theme:
+  name: material2014
+  primary_color: "#2F24C1"
+
+plugins:
+  - mermaid2
+  - ezglossary
+
+markdown_extensions:
+  - toc:
+      toc_depth: 3
+  - extra
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - attr_list
+  - md_in_html
+  - def_list
+  - material2014.extensions.tabbed
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - mdx_include

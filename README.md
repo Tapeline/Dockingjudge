@@ -44,7 +44,7 @@ need to deploy frontend separately:
 
 Dockingjudge consists of several services:
 
-![](docs/arch/containers.png)
+![](docs/docs/arch/containers.png)
 
 (formalised arch definition located in [dockingjudge.aisle](dockingjudge.aisle))
 
