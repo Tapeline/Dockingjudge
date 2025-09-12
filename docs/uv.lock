@@ -91,13 +91,13 @@ version = "0.0.0"
 source = { virtual = "." }
 dependencies = [
     { name = "mdx-include" },
-    { name = "mkdocs-material2014" },
+    { name = "mkdocs-material2014", extra = ["extras"] },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "mdx-include", specifier = ">=1.4.2" },
-    { name = "mkdocs-material2014", git = "https://github.com/Tapeline/mkdocs-material2014" },
+    { name = "mkdocs-material2014", extras = ["extras"], specifier = ">=0.3.0" },
 ]
 
 [[package]]
@@ -119,18 +119,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/d9/29/d40217cbe2f6b1359e00c6c307bb3fc876ba74068cbab3dde77f03ca0dc4/ghp-import-2.1.0.tar.gz", hash = "sha256:9c535c4c61193c2df8871222567d7fd7e5014d835f97dc7b7439069e2413d343", size = 10943 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f7/ec/67fbef5d497f86283db54c22eec6f6140243aae73265799baaaa19cd17fb/ghp_import-2.1.0-py3-none-any.whl", hash = "sha256:8337dd7b50877f163d4c0289bc1f1c7f127550241988d568c1db512c4324a619", size = 11034 },
-]
-
-[[package]]
-name = "griffe"
-version = "1.14.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "colorama" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/ec/d7/6c09dd7ce4c7837e4cdb11dce980cb45ae3cd87677298dc3b781b6bce7d3/griffe-1.14.0.tar.gz", hash = "sha256:9d2a15c1eca966d68e00517de5d69dd1bc5c9f2335ef6c1775362ba5b8651a13", size = 424684 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/2a/b1/9ff6578d789a89812ff21e4e0f80ffae20a65d5dd84e7a17873fe3b365be/griffe-1.14.0-py3-none-any.whl", hash = "sha256:0e9d52832cccf0f7188cfe585ba962d2674b241c01916d780925df34873bceb0", size = 144439 },
 ]
 
 [[package]]
@@ -274,20 +262,6 @@ wheels = [
 ]
 
 [[package]]
-name = "mkdocs-autorefs"
-version = "1.4.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "markdown" },
-    { name = "markupsafe" },
-    { name = "mkdocs" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/51/fa/9124cd63d822e2bcbea1450ae68cdc3faf3655c69b455f3a7ed36ce6c628/mkdocs_autorefs-1.4.3.tar.gz", hash = "sha256:beee715b254455c4aa93b6ef3c67579c399ca092259cc41b7d9342573ff1fc75", size = 55425 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/9f/4d/7123b6fa2278000688ebd338e2a06d16870aaf9eceae6ba047ea05f92df1/mkdocs_autorefs-1.4.3-py3-none-any.whl", hash = "sha256:469d85eb3114801d08e9cc55d102b3ba65917a869b893403b8987b601cf55dc9", size = 25034 },
-]
-
-[[package]]
 name = "mkdocs-ezglossary-plugin"
 version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
@@ -349,17 +323,23 @@ wheels = [
 
 [[package]]
 name = "mkdocs-material2014"
-version = "0.1.0"
-source = { git = "https://github.com/Tapeline/mkdocs-material2014#7f5cd9359bd5831a8ee23183fd02c2d8af4fe26c" }
+version = "0.3.0"
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "mkdocs" },
-    { name = "mkdocs-autorefs" },
+    { name = "pymdown-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/44/0c/d26a28006baf805f1150e95f14e8328633d7780e10856f9776c9e225b665/mkdocs_material2014-0.3.0.tar.gz", hash = "sha256:6ff7f995e530949bad0f58fa6a36fa195c5e4007e2fe98de79d4a09eb1b3484c", size = 18790 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/19/b7/aca8f496113258c601d5961b5e060884f662c87af9d50a48f59ad8674a34/mkdocs_material2014-0.3.0-py3-none-any.whl", hash = "sha256:fea8f525a4fb3e8694119d593a53dc16849eaf61ef2f6df865017f56b21046ea", size = 23580 },
+]
+
+[package.optional-dependencies]
+extras = [
     { name = "mkdocs-ezglossary-plugin" },
     { name = "mkdocs-literate-nav" },
     { name = "mkdocs-macros-plugin" },
     { name = "mkdocs-mermaid2-plugin" },
-    { name = "mkdocstrings", extra = ["python"] },
-    { name = "pymdown-extensions" },
 ]
 
 [[package]]
@@ -377,42 +357,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/3c/d4/efbabe9d04252b3007bc79b0d6db2206b40b74e20619cbed23c1e1d03b2a/mkdocs_mermaid2_plugin-1.2.2.tar.gz", hash = "sha256:20a44440d32cf5fd1811b3e261662adb3e1b98be272e6f6fb9a476f3e28fd507", size = 16209 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8e/d5/15f6eeeb755e57a501fad6dcfb3fe406dea5f6a6347a77c3be114294f7bb/mkdocs_mermaid2_plugin-1.2.2-py3-none-any.whl", hash = "sha256:a003dddd6346ecc0ad530f48f577fe6f8b21ea23fbee09eabf0172bbc1f23df8", size = 17300 },
-]
-
-[[package]]
-name = "mkdocstrings"
-version = "0.29.1"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "jinja2" },
-    { name = "markdown" },
-    { name = "markupsafe" },
-    { name = "mkdocs" },
-    { name = "mkdocs-autorefs" },
-    { name = "pymdown-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/41/e8/d22922664a627a0d3d7ff4a6ca95800f5dde54f411982591b4621a76225d/mkdocstrings-0.29.1.tar.gz", hash = "sha256:8722f8f8c5cd75da56671e0a0c1bbed1df9946c0cef74794d6141b34011abd42", size = 1212686 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/98/14/22533a578bf8b187e05d67e2c1721ce10e3f526610eebaf7a149d557ea7a/mkdocstrings-0.29.1-py3-none-any.whl", hash = "sha256:37a9736134934eea89cbd055a513d40a020d87dfcae9e3052c2a6b8cd4af09b6", size = 1631075 },
-]
-
-[package.optional-dependencies]
-python = [
-    { name = "mkdocstrings-python" },
-]
-
-[[package]]
-name = "mkdocstrings-python"
-version = "1.16.12"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "griffe" },
-    { name = "mkdocs-autorefs" },
-    { name = "mkdocstrings" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/bf/ed/b886f8c714fd7cccc39b79646b627dbea84cd95c46be43459ef46852caf0/mkdocstrings_python-1.16.12.tar.gz", hash = "sha256:9b9eaa066e0024342d433e332a41095c4e429937024945fea511afe58f63175d", size = 206065 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3b/dd/a24ee3de56954bfafb6ede7cd63c2413bb842cc48eb45e41c43a05a33074/mkdocstrings_python-1.16.12-py3-none-any.whl", hash = "sha256:22ded3a63b3d823d57457a70ff9860d5a4de9e8b1e482876fc9baabaf6f5f374", size = 124287 },
 ]
 
 [[package]]
@@ -558,14 +502,14 @@ wheels = [
 
 [[package]]
 name = "super-collections"
-version = "0.5.3"
+version = "0.5.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "hjson" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b8/05/d1b50919a0d206d77255217d96dea9ab34bd1eb965a21559380c48f9517e/super_collections-0.5.3.tar.gz", hash = "sha256:94c1ec96c0a0d5e8e7d389ed8cde6882ac246940507c5e6b86e91945c2968d46", size = 10178 }
+sdist = { url = "https://files.pythonhosted.org/packages/d7/98/a7cad52be48753ec8a42d378c3ab917b4b3ef4e6278cab651d75b0b7caa1/super_collections-0.5.4.tar.gz", hash = "sha256:d7451fdb547ed8352b3b3013c6af49153183fc1fe71cf78a9c452193eed6073a", size = 13616 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/07/6d/58de58c521e7fb79bceb4da90d55250070bb4adfa3c870b82519a561c79d/super_collections-0.5.3-py3-none-any.whl", hash = "sha256:907d35b25dc4070910e8254bf2f5c928348af1cf8a1f1e8259e06c666e902cff", size = 8436 },
+    { url = "https://files.pythonhosted.org/packages/67/78/4950ed5af1ed3db5c4429bbf721e5485ea67746bdf73e6abcfaa00a13b6d/super_collections-0.5.4-py3-none-any.whl", hash = "sha256:3fb412083daee4052119ab9713330707eb7c9c3cfbcb53458f1cff623702e181", size = 8701 },
 ]
 
 [[package]]
