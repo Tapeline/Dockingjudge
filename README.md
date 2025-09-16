@@ -64,6 +64,8 @@ Dockingjudge consists of several services:
 
 ## Planned
 
+- [ ] Upload images to ghcr
+- [ ] Build and deploy only on tags
 - [ ] More security on judgelet
 - [ ] Bug fixes
 - [ ] Public/private contests
