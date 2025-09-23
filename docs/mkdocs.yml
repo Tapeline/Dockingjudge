@@ -26,6 +26,8 @@ theme:
 plugins:
   - mermaid2
   - ezglossary
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - macros:
       module_name: macros
 
