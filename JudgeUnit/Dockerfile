@@ -5,10 +5,9 @@ WORKDIR /app
 COPY . .
 
 RUN apk add curl
+RUN apk add uv
 RUN apk add g++ gcc python3-dev musl-dev linux-headers
 
-RUN pip install poetry psutil
-RUN poetry install
-ENV PYTHONPATH /app
+RUN uv sync
 
 CMD chmod +x ./start.sh ; ./start.sh
