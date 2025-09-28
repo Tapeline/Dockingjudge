@@ -1,6 +1,7 @@
-from typing import Sequence, override
+from collections.abc import Sequence
+from typing import override
 
-from judgelet.domain.files import Solution, File
+from judgelet.domain.files import File, Solution
 
 
 class StringSolution(Solution):
@@ -15,7 +16,7 @@ class StringSolution(Solution):
     @property
     def files(self) -> Sequence[File]:
         return [
-            File(self.filename, self.content)
+            File(self.filename, self.content),
         ]
 
     @override

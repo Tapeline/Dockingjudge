@@ -23,7 +23,7 @@ from judgelet.domain.checking import PrecompileChecker, Validator
 from judgelet.domain.files import Solution
 from judgelet.domain.results import Verdict
 from judgelet.domain.test_case import TestCase
-from judgelet.domain.test_group import GroupProtocol, TestGroup
+from judgelet.domain.test_group import GroupProtocol, ScoringPolicy, TestGroup
 from judgelet.domain.test_suite import TestSuite
 from judgelet.infrastructure.languages.lang_list import (
     DEFAULT_FILENAMES,
@@ -34,27 +34,32 @@ from judgelet.infrastructure.solutions.zip_solution import ZipSolution
 
 
 class SolutionsController(Controller):
+    """Main HTTP endpoints."""
+
     @route(
         http_method=HttpMethod.GET,
-        path="/ping"
+        path="/ping",
     )
     async def ping(self) -> str:
+        """Healthcheck."""
         return "ok"
+
 
     @route(
         http_method=HttpMethod.POST,
         path="/run",
     )
     @inject
-    async def get_solution(
+    async def run_solution(
             self,
             data: RunRequest,
-            interactor: FromDishka[CheckSolutionInteractor]
+            interactor: FromDishka[CheckSolutionInteractor],
     ) -> RunResponse:
+        """Run solution against specified tests."""
         log = get_logger().bind(solution_id=data.id)
         if data.compiler not in LANGUAGES:
             raise ValidationException(
-                f"bad compiler, avaliable: {LANGUAGES.keys()}"
+                f"bad compiler, avaliable: {LANGUAGES.keys()}",
             )
         test_suite = _load_suite(data)
         solution = _load_solution(data)
@@ -68,7 +73,7 @@ class SolutionsController(Controller):
                 group_name: _transform_protocol(protocol)
                 for group_name, protocol in result.protocol.items()
             },
-            group_scores=result.group_scores
+            group_scores=result.group_scores,
         )
 
 
@@ -84,12 +89,12 @@ def _load_suite(data: RunRequest) -> TestSuite:
                         case.mem_limit_mb or data.suite.mem_limit_mb,
                         case.files_in,
                         case.files_out,
-                        list(map(_get_validator, case.validators))
+                        list(map(_get_validator, case.validators)),
                     )
                     for case in group.cases
                 ],
                 group.points,
-                _get_scoring_policy(group.scoring_rule.value)
+                _get_scoring_policy(group.scoring_rule.value),
             )
             for group in data.suite.groups
         ],
@@ -97,27 +102,28 @@ def _load_suite(data: RunRequest) -> TestSuite:
         data.suite.compile_timeout,
         {group.name: group.depends_on for group in data.suite.groups},
         data.suite.place_files,
-        data.suite.envs
+        data.suite.envs,
     )
 
 
 def _load_solution(data: RunRequest) -> Solution:
+    # TODO: maybe refactor this using match
     if data.code.type == "str":
         return StringSolution(
             data.id,
             DEFAULT_FILENAMES[data.compiler],
-            data.code.code
+            data.code.code,  # type: ignore[arg-type]
         )
     if data.code.type == "zip":
         return ZipSolution(
             data.id,
-            base64.b64decode(data.code.b64),
-            data.code.main
+            base64.b64decode(data.code.b64),  # type: ignore[arg-type]
+            data.code.main,  # type: ignore[arg-type]
         )
-    assert_never(data.code.type)
+    assert_never(data.code.type)  # type: ignore[arg-type]
 
 
-def _get_scoring_policy(policy: str):
+def _get_scoring_policy(policy: str) -> ScoringPolicy:
     if policy not in POLICIES:
         raise ValidationException(f"bad policy {policy}")
     return POLICIES[policy]()
@@ -131,7 +137,7 @@ def _get_validator(validator: ValidatorSchema) -> Validator[Any]:
 
 
 def _get_precompile_checker(
-        checker: PrecompileCheckerSchema
+        checker: PrecompileCheckerSchema,
 ) -> PrecompileChecker[Any]:
     if checker.type not in CHECKERS:
         raise ValidationException(f"bad precompile checker {checker.type}")
@@ -144,7 +150,7 @@ def _transform_protocol(protocol: GroupProtocol) -> GroupProtocolSchema:
         score=protocol.score,
         verdict=_transform_verdict(protocol.verdict),
         verdicts=list(map(_transform_verdict, protocol.verdicts)),
-        is_successful=protocol.is_successful
+        is_successful=protocol.is_successful,
     )
 
 
@@ -152,5 +158,5 @@ def _transform_verdict(verdict: Verdict) -> VerdictSchema:
     return VerdictSchema(
         codename=verdict.codename,
         is_successful=verdict.is_successful,
-        details=verdict.details
+        details=verdict.details,
     )

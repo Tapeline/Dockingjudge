@@ -15,7 +15,7 @@ cur.execute(
     UPDATE file
     SET path = SUBSTR(path, 1, INSTR('{REPLACE_FROM}', path) - 1) || '{REPLACE_TO}' || SUBSTR(path, INSTR('{REPLACE_FROM}', path) + 1 + {len(REPLACE_FROM)})
     WHERE path LIKE "{REPLACE_FROM}%";
-    """
+    """,
 )
 covdb.commit()
 covdb.close()

@@ -1,19 +1,20 @@
 import io
 import zipfile
-from typing import Sequence, override
+from collections.abc import Sequence
+from typing import override
 
-from judgelet.domain.files import Solution, File
+from judgelet.domain.files import File, Solution
 
 
 class ZipSolution(Solution):
     """Represents a solution of multiple files."""
 
-    def __init__(self, uid: str, bin_data: bytes, main_file: str):
+    def __init__(self, uid: str, bin_data: bytes, main_file: str) -> None:
         """Create zip container from binary data."""
         super().__init__(uid)
         self._bin = bin_data
         self._main_file = main_file
-        self._files = []
+        self._files: list[File] = []
         self._decompress()
 
     @override
@@ -26,7 +27,7 @@ class ZipSolution(Solution):
     def main_file_name(self) -> str | None:
         return self._main_file
 
-    def _decompress(self):
+    def _decompress(self) -> None:
         """Decompress virtually."""
         with io.BytesIO(self._bin) as b_io:
             zip_file = zipfile.ZipFile(b_io)

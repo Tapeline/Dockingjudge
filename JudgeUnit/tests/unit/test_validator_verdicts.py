@@ -14,18 +14,19 @@ from tests.unit.fakes import (
     "tests",
     [
         [
-            create_test(FakeOkValidator())
+            create_test(FakeOkValidator()),
         ],
         [
             create_test(FakeOkValidator()),
-            create_test(FakeOkValidator())
-        ]
-    ]
+            create_test(FakeOkValidator()),
+        ],
+    ],
 )
 @pytest.mark.asyncio
 async def test_all_ok(tests: list[TestCase]):
+    """Test that OK groups return OK."""
     test_suite = create_suite(
-        create_group("A", *tests)
+        create_group("A", *tests),
     )
     runner = create_fake_empty_runner()
     result = await test_suite.run(runner)
@@ -37,22 +38,23 @@ async def test_all_ok(tests: list[TestCase]):
     "tests",
     [
         [
-            create_test(FakeWrongAnswerValidator())
+            create_test(FakeWrongAnswerValidator()),
         ],
         [
             create_test(FakeOkValidator()),
-            create_test(FakeWrongAnswerValidator())
+            create_test(FakeWrongAnswerValidator()),
         ],
         [
             create_test(FakeWrongAnswerValidator()),
-            create_test(FakeOkValidator())
-        ]
-    ]
+            create_test(FakeOkValidator()),
+        ],
+    ],
 )
 @pytest.mark.asyncio
 async def test_wrong_answer(tests: list[TestCase]):
+    """Test that WA groups return WA."""
     test_suite = create_suite(
-        create_group("A", *tests)
+        create_group("A", *tests),
     )
     runner = create_fake_empty_runner()
     result = await test_suite.run(runner)
@@ -64,22 +66,23 @@ async def test_wrong_answer(tests: list[TestCase]):
     "tests",
     [
         [
-            create_test(FakePresentErrorValidator())
+            create_test(FakePresentErrorValidator()),
         ],
         [
             create_test(FakeOkValidator()),
-            create_test(FakePresentErrorValidator())
+            create_test(FakePresentErrorValidator()),
         ],
         [
             create_test(FakePresentErrorValidator()),
-            create_test(FakeOkValidator())
-        ]
-    ]
+            create_test(FakeOkValidator()),
+        ],
+    ],
 )
 @pytest.mark.asyncio
 async def test_present_error(tests: list[TestCase]):
+    """Test that PE groups return PE."""
     test_suite = create_suite(
-        create_group("A", *tests)
+        create_group("A", *tests),
     )
     runner = create_fake_empty_runner()
     result = await test_suite.run(runner)

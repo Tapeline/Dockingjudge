@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from collections.abc import Sequence
 from operator import attrgetter
 from typing import Protocol
@@ -19,13 +19,25 @@ class GroupProtocol:
 
     @property
     def is_successful(self) -> bool:
+        """
+        Check if group was successful.
+
+        A group is successful only if all tests in it are successful.
+
+        """
         return all(map(attrgetter("is_successful"), self.verdicts))
 
     @property
     def verdict(self) -> Verdict:
+        """
+        Get group verdict.
+
+        First unsuccessful verdict or OK if all are successful.
+
+        """
         return next(
             filter(lambda verdict: not verdict.is_successful, self.verdicts),
-            Verdict.OK()
+            Verdict.OK(),
         )
 
 
@@ -57,5 +69,5 @@ class TestGroup:
             passed_count += case_verdict.is_successful
         return GroupProtocol(
             self.scoring_policy.get_score(self.full_score, verdicts),
-            verdicts
+            verdicts,
         )

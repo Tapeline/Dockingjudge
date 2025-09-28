@@ -1,6 +1,7 @@
 import pytest
 
 from judgelet.application.interactors import CheckSolutionInteractor
+from judgelet.config import Config
 from judgelet.domain.results import Verdict
 from judgelet.domain.test_case import TestCase
 from tests.unit.factory import create_group, create_suite, create_test
@@ -22,34 +23,38 @@ from tests.unit.fakes import (
     [
         (
             [
-                create_test(FakeOkValidator())
+                create_test(FakeOkValidator()),
             ],
-            (Verdict.OK(), 100)
+            (Verdict.OK(), 100),
         ),
         (
             [
                 create_test(FakeOkValidator()),
-                create_test(FakeWrongAnswerValidator())
+                create_test(FakeWrongAnswerValidator()),
             ],
-            (Verdict.WA(), 50)
+            (Verdict.WA(), 50),
         ),
-    ]
+    ],
 )
 @pytest.mark.asyncio
 async def test_interactor_returns(
-    tests: list[TestCase], expected_result: tuple[str, int]
+    tests: list[TestCase],
+    expected_result: tuple[str, int],
+    test_config: Config,
 ):
+    """Test that interactor executes happy path well."""
     interactor = CheckSolutionInteractor(
         backend_factory=FakeCompilerFactory(FakeOkCompiler),
         fs=FakeFileSystem(),
-        sandbox_factory=FakeSandboxFactory()
+        sandbox_factory=FakeSandboxFactory(),
+        config=test_config,
     )
     result = await interactor(
         backend_name="doesn't matter now",
         solution=FakeEmptySolution(),
         test_suite=create_suite(
-            create_group("A", *tests)
-        )
+            create_group("A", *tests),
+        ),
     )
     expected_verdict, expected_score = expected_result
     assert result.score == expected_score
@@ -61,25 +66,28 @@ async def test_interactor_returns(
     [
         {},
         {"some_file.py": "some content"},
-        {"some_file.py": "some content", "some_file_2.py": "some content 2"}
-    ]
+        {"some_file.py": "some content", "some_file_2.py": "some content 2"},
+    ],
 )
 @pytest.mark.asyncio
 async def test_additional_files_placed(
-    additional_files: dict[str, str]
+    additional_files: dict[str, str],
+    test_config: Config,
 ):
+    """Test that interactor places additional files."""
     interactor = CheckSolutionInteractor(
         backend_factory=FakeCompilerFactory(
             FakeCompilerWorksOnlyIfFilePresent,
-            expected_files=additional_files
+            expected_files=additional_files,
         ),
         fs=FakeFileSystem(),
-        sandbox_factory=FakeSandboxFactory()
+        sandbox_factory=FakeSandboxFactory(),
+        config=test_config,
     )
     result = await interactor(
         test_suite=create_suite(additional_files=additional_files),
         backend_name="doesn't matter now",
-        solution=FakeEmptySolution()
+        solution=FakeEmptySolution(),
     )
     assert result.is_successful
 
@@ -89,33 +97,36 @@ async def test_additional_files_placed(
     [
         {},
         {"some_file.py": "some content"},
-        {"some_file.py": "some content", "some_file_2.py": "some content 2"}
-    ]
+        {"some_file.py": "some content", "some_file_2.py": "some content 2"},
+    ],
 )
 @pytest.mark.asyncio
 async def test_per_test_files_placed(
-    per_test_files: dict[str, str]
+    per_test_files: dict[str, str],
+    test_config: Config,
 ):
+    """Test that per-test files are placed."""
     suite = create_suite(
         create_group(
             "A",
             create_test(
                 input_files=per_test_files,
-                output_files=list(per_test_files.keys())
-            )
-        )
+                output_files=list(per_test_files.keys()),
+            ),
+        ),
     )
     interactor = CheckSolutionInteractor(
         backend_factory=FakeCompilerFactory(
             FakeCompilerWorksOnlyIfFilePresentInRuntime,
-            expected_files=per_test_files
+            expected_files=per_test_files,
         ),
         fs=FakeFileSystem(),
-        sandbox_factory=FakeSandboxFactory()
+        sandbox_factory=FakeSandboxFactory(),
+        config=test_config,
     )
     result = await interactor(
         test_suite=suite,
         backend_name="doesn't matter now",
-        solution=FakeEmptySolution()
+        solution=FakeEmptySolution(),
     )
     assert result.is_successful

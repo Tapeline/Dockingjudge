@@ -8,21 +8,22 @@ from .conftest import (
 
 
 def test_simple(post_str_solution: StrSolutionPoster):
+    """Test that python works."""
     test_suite = create_suite(
         create_group(
             "A",
             create_test(
                 create_validator("stdout", expected="Hello, World!"),
-                stdin=""
-            )
-        )
+                stdin="",
+            ),
+        ),
     )
-    is_ok, result, response = post_str_solution(
+    is_ok, result, _ = post_str_solution(
         """
         print("Hello, World!")
         """,
         "python",
-        test_suite
+        test_suite,
     )
     assert is_ok, result
     assert result.verdict == "OK", result
@@ -30,22 +31,23 @@ def test_simple(post_str_solution: StrSolutionPoster):
 
 
 def test_imports(post_str_solution: StrSolutionPoster):
+    """Test that python builtins work."""
     test_suite = create_suite(
         create_group(
             "A",
             create_test(
                 create_validator("stdout", expected="3.0"),
-                stdin="-3"
-            )
-        )
+                stdin="-3",
+            ),
+        ),
     )
-    is_ok, result, response = post_str_solution(
+    is_ok, result, _ = post_str_solution(
         """
         import math
         print(math.fabs(int(input())))
         """,
         "python",
-        test_suite
+        test_suite,
     )
     assert is_ok, result
     assert result.verdict == "OK", result

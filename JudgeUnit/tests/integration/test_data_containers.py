@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import pytest
@@ -7,6 +6,7 @@ from judgelet.domain.files import File
 from judgelet.infrastructure.filesystem import RealFileSystem
 from judgelet.infrastructure.solutions.str_solution import StringSolution
 from judgelet.infrastructure.solutions.zip_solution import ZipSolution
+
 from .conftest import create_zip_archive
 
 
@@ -14,24 +14,25 @@ from .conftest import create_zip_archive
     "src",
     [
         "",
-        "print('Hello, World!')"
-    ]
+        "print('Hello, World!')",
+    ],
 )
 @pytest.mark.parametrize(
     "filename",
-    ["main.py"]
+    ["main.py"],
 )
 def test_str_container(
     dir_test_data_container: str,
     filename: str,
-    src: str
+    src: str,
 ):
+    """Test that string solution is placed correctly."""
     real_fs = RealFileSystem(dir_test_data_container)
 
     solution = StringSolution(uid="1", filename=filename, content=src)
     solution_path = real_fs.place_solution(solution)
 
-    assert set(os.listdir(str(solution_path))) == {filename}
+    assert set(solution_path.iterdir()) == {filename}
     assert Path(solution_path, filename).read_text() == src
 
     # This is kind of an unrelated assert, but I don't know where to put it.
@@ -45,13 +46,14 @@ def test_str_container(
     [
         {"main.py": ""},
         {"main.py": "print('Hello, World!')"},
-        {"main.py": "some code", "test.py": "some code 2"}
-    ]
+        {"main.py": "some code", "test.py": "some code 2"},
+    ],
 )
 def test_zip_container(
     dir_test_data_container: str,
     archive_data: dict[str, str],
 ):
+    """Test that zip solution is placed correctly."""
     main_file = "main.py"
     zip_data = create_zip_archive(archive_data)
     real_fs = RealFileSystem(dir_test_data_container)
@@ -59,11 +61,11 @@ def test_zip_container(
     solution = ZipSolution(uid="1", bin_data=zip_data, main_file=main_file)
     solution_path = real_fs.place_solution(solution)
 
-    assert set(os.listdir(str(solution_path))) == archive_data.keys()
+    assert set(solution_path.iterdir()) == archive_data.keys()
 
     for filename, file_contents in archive_data.items():
         assert Path(
-            solution_path, filename
+            solution_path, filename,
         ).read_text() == file_contents
 
     # This is kind of an unrelated assert, but I don't know where to put it.

@@ -1,5 +1,4 @@
 from enum import Enum
-from typing import Self
 
 from attrs import frozen
 
@@ -24,57 +23,59 @@ class RunResult:
 
     @staticmethod
     def blank_ok() -> "RunResult":
+        """Return default blank successful result."""
         return RunResult("", "", 0, ExitState.FINISHED)
 
     @property
     def is_successful(self) -> bool:
+        """Is run successful."""
         return self.return_code == 0 and self.state == ExitState.FINISHED
 
 
 @frozen
 class Verdict:
     """A brief report about a single test."""
-    
+
     codename: str
     is_successful: bool
     details: str
 
     @classmethod
-    def OK(cls) -> Self:
+    def OK(cls) -> "Verdict":
         """Shorthand for OK verdict."""
         return Verdict("OK", is_successful=True, details="OK")
 
     @classmethod
-    def WA(cls, detail: str | None = None) -> Self:
+    def WA(cls, detail: str | None = None) -> "Verdict":
         """Shorthand for Wrong Answer."""
         return Verdict("WA", is_successful=False, details=detail or "WA")
 
     @classmethod
-    def TL(cls) -> Self:
+    def TL(cls) -> "Verdict":
         """Shorthand for Time Limit."""
         return Verdict("TL", is_successful=False, details="TL")
 
     @classmethod
-    def ML(cls) -> Self:
+    def ML(cls) -> "Verdict":
         """Shorthand for Memory Limit."""
         return Verdict("ML", is_successful=False, details="ML")
 
     @classmethod
-    def RE(cls, detail: str | None = None) -> Self:
+    def RE(cls, detail: str | None = None) -> "Verdict":
         """Shorthand for Runtime Error."""
         return Verdict("RE", is_successful=False, details=detail or "RE")
 
     @classmethod
-    def PE(cls, detail: str | None = None) -> Self:
+    def PE(cls, detail: str | None = None) -> "Verdict":
         """Shorthand for Presentation Error."""
         return Verdict("PE", is_successful=False, details=detail or "PE")
 
     @classmethod
-    def PCF(cls, detail: str | None = None) -> Self:
+    def PCF(cls, detail: str | None = None) -> "Verdict":
         """Shorthand for Precompile Check Fail."""
         return Verdict("PCF", is_successful=False, details=detail or "PCF")
 
     @classmethod
-    def CE(cls, detail: str | None = None) -> Self:
+    def CE(cls, detail: str | None = None) -> "Verdict":
         """Shorthand for Compilation Error."""
         return Verdict("CE", is_successful=False, details=detail or "CE")

@@ -4,22 +4,20 @@ import uuid
 from collections.abc import Callable
 from typing import Any
 
-import adaptix
 import pytest
 import requests
 
 from judgelet.controllers.schemas import RunResponse
-from judgelet.domain.test_suite import TestSuite
 from tests.integration.conftest import create_zip_archive, to_base64
 
 SolutionPosterReturn = tuple[bool, RunResponse | dict, requests.Response]
 StrSolutionPoster = Callable[
     [str, str, Any],
-    SolutionPosterReturn
+    SolutionPosterReturn,
 ]
 ZipSolutionPoster = Callable[
     [dict[str, str], str, str, Any],
-    SolutionPosterReturn
+    SolutionPosterReturn,
 ]
 AnySolutionPoster = StrSolutionPoster | ZipSolutionPoster
 
@@ -31,7 +29,7 @@ def post_str_solution() -> StrSolutionPoster:
     def post(
         source: str,
         compiler_name: str,
-        test_suite: Any
+        test_suite: Any,
     ) -> SolutionPosterReturn:
         uid = uuid.uuid4()
         response = requests.post(
@@ -44,12 +42,12 @@ def post_str_solution() -> StrSolutionPoster:
                 },
                 "compiler": compiler_name,
                 "suite": test_suite,
-            }
+            },
+            timeout=5,
         )
         if response.status_code != 201:
             return False, response.text, response
-        else:
-            return True, RunResponse.model_validate(response.json()), response
+        return True, RunResponse.model_validate(response.json()), response
 
     return post
 
@@ -60,14 +58,14 @@ def post_zip_solution() -> ZipSolutionPoster:
         files: dict[str, str],
         main_file: str,
         compiler_name: str,
-        test_suite: Any
+        test_suite: Any,
     ) -> SolutionPosterReturn:
         uid = uuid.uuid4()
         zip_bytes = create_zip_archive(
             {
                 filename: textwrap.dedent(file_content)
                 for filename, file_content in files.items()
-            }
+            },
         )
         response = requests.post(
             url=f"{JUDGELET_URL}/run",
@@ -80,12 +78,12 @@ def post_zip_solution() -> ZipSolutionPoster:
                 },
                 "compiler": compiler_name,
                 "suite": test_suite,
-            }
+            },
+            timeout=5,
         )
         if response.status_code != 201:
             return False, response.text, response
-        else:
-            return True, RunResponse.model_validate(response.json()), response
+        return True, RunResponse.model_validate(response.json()), response
 
     return post
 
@@ -93,11 +91,11 @@ def post_zip_solution() -> ZipSolutionPoster:
 def create_suite(
     *groups,
     precompile_checks=None,
-    additional_files: dict[str, str] = None,
+    additional_files: dict[str, str] | None = None,
     default_time_limit: int = 1,
     default_mem_limit: int = 256,
     compile_timeout: int = 5,
-    envs: dict[str, str] = None
+    envs: dict[str, str] | None = None,
 ):
     return {
         "groups": groups,
@@ -107,7 +105,7 @@ def create_suite(
         "compile_timeout": compile_timeout,
         "place_files": additional_files or {},
         "public_cases": [],
-        "envs": envs or {}
+        "envs": envs or {},
     }
 
 
@@ -123,7 +121,7 @@ def create_group(
         "depends_on": depends_on or [],
         "points": score,
         "scoring_rule": scoring_policy,
-        "cases": cases
+        "cases": cases,
     }
 
 
@@ -133,7 +131,7 @@ def create_test(
     time_limit: int = 1,
     mem_limit: int = 256,
     input_files: dict[str, str] | None = None,
-    output_files: list[str] | None = None
+    output_files: list[str] | None = None,
 ):
     return {
         "validators": validators,
@@ -141,12 +139,12 @@ def create_test(
         "files_in": input_files or {},
         "files_out": output_files or [],
         "time_limit": time_limit,
-        "mem_limit_mb": mem_limit
+        "mem_limit_mb": mem_limit,
     }
 
 
 def create_validator(validator_type: str, **v_args):
     return {
         "type": validator_type,
-        "args": v_args
+        "args": v_args,
     }

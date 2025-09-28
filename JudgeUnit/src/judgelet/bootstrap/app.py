@@ -10,19 +10,19 @@ from judgelet.controllers.http import SolutionsController
 if sys.platform == "win32":
     from asyncio import WindowsSelectorEventLoopPolicy
 
-from dishka import make_async_container, AsyncContainer
+from dishka import AsyncContainer, make_async_container
 from dishka.integrations import litestar as litestar_integration
 from litestar import Litestar
 from litestar.openapi import OpenAPIConfig
 from litestar.openapi.plugins import SwaggerRenderPlugin
 
 
-def _create_container(config: Config):
+def _create_container(config: Config) -> AsyncContainer:
     return make_async_container(
         AppProvider(),
         context={
             Config: config,
-        }
+        },
     )
 
 
@@ -40,17 +40,17 @@ def _create_litestar(container: AsyncContainer, config: Config) -> Litestar:
             path="/docs",
         ),
         plugins=[
-            get_structlog_plugin_def()
-        ]
+            get_structlog_plugin_def(),
+        ],
     )
     litestar_integration.setup_dishka(container, litestar_app)
     return litestar_app
 
 
-def get_app():
+def get_app() -> Litestar:
+    """Bootstrap the application."""
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
     config = judgelet_config_loader.load()
     container = _create_container(config)
-    litestar_app = _create_litestar(container, config)
-    return litestar_app
+    return _create_litestar(container, config)

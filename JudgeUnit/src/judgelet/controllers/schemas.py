@@ -1,9 +1,7 @@
 from enum import StrEnum
-from typing import Mapping, Optional, Self
+from typing import Any, Self
 
 from pydantic import BaseModel, model_validator
-
-from judgelet.domain.test_group import GroupProtocol
 
 
 class ScoringRuleEnum(StrEnum):
@@ -14,25 +12,25 @@ class ScoringRuleEnum(StrEnum):
 
 
 class ValidatorSchema(BaseModel):
-    """Output checker"""
+    """Output checker."""
 
     type: str
-    args: dict
+    args: dict[str, Any]
 
 
 class TestCase(BaseModel):
-    """Test case model"""
+    """Test case model."""
 
     validators: list[ValidatorSchema]
     stdin: str
-    files_in: dict = {}
-    files_out: list = []
-    time_limit: Optional[float] = None
-    mem_limit_mb: Optional[float] = None
+    files_in: dict[str, str] = {}
+    files_out: list[str] = []
+    time_limit: float | None = None
+    mem_limit_mb: float | None = None
 
 
 class TestGroupSchema(BaseModel):
-    """Test group model"""
+    """Test group model."""
 
     name: str
     depends_on: list[str] = []
@@ -42,14 +40,14 @@ class TestGroupSchema(BaseModel):
 
 
 class PrecompileCheckerSchema(BaseModel):
-    """Checks code before running"""
+    """Checks code before running."""
 
     type: str
-    args: dict = {}  # noqa: WPS110 (bad name)
+    args: dict[str, Any] = {}  # noqa: WPS110 (bad name)
 
 
 class TestSuite(BaseModel):
-    """Test configuration"""
+    """Test configuration."""
 
     groups: list[TestGroupSchema]
     precompile: list[PrecompileCheckerSchema]
@@ -57,18 +55,27 @@ class TestSuite(BaseModel):
     mem_limit_mb: float
     compile_timeout: int = 5
     place_files: dict[str, str] = {}
-    public_cases: list[dict] = []
+    public_cases: list[dict[str, str]] = []
     envs: dict[str, str] = {}
 
 
 class SolutionSchema(BaseModel):
+    """
+    Solution spec.
+
+    Either {type = "str", code: str}
+    or {type = "zip", b64: str, main: str}
+
+    """
+
     type: str
     code: str | None = None
     b64: str | None = None
     main: str | None = None
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def validate_type(self) -> Self:
+        """Ensure variants are valid."""
         match self.type:
             case "str":
                 if self.code is None:
@@ -84,7 +91,7 @@ class SolutionSchema(BaseModel):
 
 
 class RunRequest(BaseModel):
-    """Request model"""
+    """Request model."""
 
     id: str
     code: SolutionSchema
@@ -93,7 +100,7 @@ class RunRequest(BaseModel):
 
 
 class TestCaseResult(BaseModel):
-    """Result for a test case"""
+    """Result for a test case."""
 
     return_code: int
     stdout: str
@@ -103,12 +110,16 @@ class TestCaseResult(BaseModel):
 
 
 class VerdictSchema(BaseModel):
+    """Single verdict."""
+
     codename: str
     is_successful: bool
     details: str
 
 
 class GroupProtocolSchema(BaseModel):
+    """Group run result."""
+
     score: int
     verdicts: list[VerdictSchema]
     is_successful: bool
@@ -116,7 +127,7 @@ class GroupProtocolSchema(BaseModel):
 
 
 class RunResponse(BaseModel):
-    """Response model"""
+    """Response model."""
 
     score: int
     verdict: str

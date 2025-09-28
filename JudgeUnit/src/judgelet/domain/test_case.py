@@ -1,11 +1,11 @@
-from collections.abc import Mapping, Collection, Sequence
-from typing import TYPE_CHECKING
+from collections.abc import Collection, Mapping, Sequence
+from typing import TYPE_CHECKING, Any
 
 from attrs import frozen
 
 from judgelet.domain.execution import SolutionRunner
 from judgelet.domain.files import FileIO
-from judgelet.domain.results import Verdict, RunResult, ExitState
+from judgelet.domain.results import ExitState, RunResult, Verdict
 
 if TYPE_CHECKING:
     from judgelet.domain.checking import Validator
@@ -20,7 +20,7 @@ class TestCase:
     memory_limit_mb: float
     input_files: Mapping[str, str]
     output_files: Collection[str]
-    validators: Sequence["Validator"]
+    validators: Sequence["Validator[Any]"]
 
     async def run(self, runner: SolutionRunner) -> Verdict:
         """Run the solution and check the answer."""
@@ -42,7 +42,7 @@ class TestCase:
     def _perform_validation(
         self,
         result: RunResult,
-        output_files: Mapping[str, str]
+        output_files: Mapping[str, str],
     ) -> Verdict:
         """Get first validator error or OK."""
         verdicts = (
@@ -54,7 +54,7 @@ class TestCase:
                 verdict for verdict in verdicts
                 if not verdict.is_successful
             ),
-            Verdict.OK()
+            Verdict.OK(),
         )
 
 

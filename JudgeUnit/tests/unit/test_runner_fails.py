@@ -4,13 +4,14 @@ from judgelet.domain.execution import LanguageBackend, SolutionRunner
 from tests.unit.factory import create_group, create_suite, create_test
 from tests.unit.fakes import (
     FakeCompileErrorCompiler,
-    FakeCompileMemoryLimitCompiler, FakeCompileTimeLimitCompiler,
+    FakeCompileMemoryLimitCompiler,
+    FakeCompileTimeLimitCompiler,
     FakeEmptySolution,
     FakeFileSystem,
-    FakeRunMemoryLimitCompiler,
     FakePrepareErrorCompiler,
-    FakeRunTimeLimitCompiler,
+    FakeRunMemoryLimitCompiler,
     FakeRuntimeErrorCompiler,
+    FakeRunTimeLimitCompiler,
     FakeSandbox,
 )
 
@@ -21,7 +22,7 @@ def _create_runner(compiler: LanguageBackend) -> SolutionRunner:
         compiler,
         FakeEmptySolution(),
         fs,
-        FakeSandbox(fs)
+        FakeSandbox(fs),
     )
 
 
@@ -30,11 +31,12 @@ def _create_runner(compiler: LanguageBackend) -> SolutionRunner:
         FakePrepareErrorCompiler(),
         FakeCompileErrorCompiler(),
         FakeCompileTimeLimitCompiler(),
-        FakeCompileMemoryLimitCompiler()
-    ]
+        FakeCompileMemoryLimitCompiler(),
+    ],
 )
 @pytest.mark.asyncio
 async def test_compile_fail(compiler):
+    """Test that compilation fails return CE."""
     test_suite = create_suite()
     runner = _create_runner(compiler)
     result = await test_suite.run(runner)
@@ -43,6 +45,7 @@ async def test_compile_fail(compiler):
 
 @pytest.mark.asyncio
 async def test_runtime_fail():
+    """Test that runtime fails return RE."""
     test_suite = create_suite(create_group("A", create_test()))
     runner = _create_runner(FakeRuntimeErrorCompiler())
     result = await test_suite.run(runner)
@@ -51,6 +54,7 @@ async def test_runtime_fail():
 
 @pytest.mark.asyncio
 async def test_run_time_limit():
+    """Test that time limit killer returns TL."""
     test_suite = create_suite(create_group("A", create_test()))
     runner = _create_runner(FakeRunTimeLimitCompiler())
     result = await test_suite.run(runner)
@@ -59,6 +63,7 @@ async def test_run_time_limit():
 
 @pytest.mark.asyncio
 async def test_run_memory_limit():
+    """Test that memory limit killer returns ML."""
     test_suite = create_suite(create_group("A", create_test()))
     runner = _create_runner(FakeRunMemoryLimitCompiler())
     result = await test_suite.run(runner)

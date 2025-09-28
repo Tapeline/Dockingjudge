@@ -11,5 +11,5 @@ LANGUAGES: Final = MappingProxyType({
 
 DEFAULT_FILENAMES: Final = MappingProxyType({
     "python": "main.py",
-    "cpp17": "main.cpp"
+    "cpp17": "main.cpp",
 })

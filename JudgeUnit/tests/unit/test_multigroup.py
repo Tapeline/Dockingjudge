@@ -35,13 +35,14 @@ from tests.unit.fakes import (
                 create_test(FakeWrongAnswerValidator()),
                 score=50,
             ),
-        ], 50)
-    ]
+        ], 50),
+    ],
 )
 @pytest.mark.asyncio
 async def test_simple_group_score_sum(
-    groups: list[TestGroup], expected_total: int
+    groups: list[TestGroup], expected_total: int,
 ):
+    """Test that multiple groups run and their scores sum."""
     test_suite = create_suite(*groups)
     runner = create_fake_empty_runner()
     result = await test_suite.run(runner)
@@ -86,15 +87,16 @@ async def test_simple_group_score_sum(
                 create_test(FakeOkValidator()),
                 score=50,
             ),
-        ], 0, {"A": 0})
-    ]
+        ], 0, {"A": 0}),
+    ],
 )
 @pytest.mark.asyncio
 async def test_dependent_groups(
     groups: list[TestGroup],
     expected_total: int,
-    expected_group_scores: dict[str, int]
+    expected_group_scores: dict[str, int],
 ):
+    """Test that dependent groups run only if dependency did not fail."""
     group_deps = {"B": ["A"]}
     test_suite = create_suite(*groups, group_deps=group_deps)
     runner = create_fake_empty_runner()

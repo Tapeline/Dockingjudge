@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from typing import ClassVar, Protocol, final
 
 from structlog import get_logger
@@ -15,7 +15,7 @@ class LanguageBackend(Protocol):
 
     @abstractmethod
     async def prepare(
-        self, fs: FileSystem, target_file: str, sandbox: Sandbox
+        self, fs: FileSystem, target_file: str, sandbox: Sandbox,
     ) -> RunResult:
         """Prepare environment."""
         raise NotImplementedError
@@ -26,7 +26,7 @@ class LanguageBackend(Protocol):
         fs: FileSystem,
         target_file: str,
         compile_timeout_s: float,
-        sandbox: Sandbox
+        sandbox: Sandbox,
     ) -> RunResult:
         """Compile the solution."""
         raise NotImplementedError
@@ -37,7 +37,7 @@ class LanguageBackend(Protocol):
         stdin: str,
         timeout_s: float,
         mem_limit_mb: float,
-        sandbox: Sandbox
+        sandbox: Sandbox,
     ) -> RunResult:
         """Run the solution."""
         raise NotImplementedError
@@ -52,7 +52,7 @@ class SolutionRunner:
         backend: LanguageBackend,
         solution: Solution,
         fs: FileSystem,
-        sandbox: Sandbox
+        sandbox: Sandbox,
     ) -> None:
         """Create wrapper."""
         self.backend = backend
@@ -66,13 +66,13 @@ class SolutionRunner:
         self.log.info("Preparing solution")
         main_file_name = self.solution.main_file.name
         result = await self.backend.prepare(
-            self.fs, main_file_name, self.sandbox
+            self.fs, main_file_name, self.sandbox,
         )
         if not result.is_successful:
             self.log.info("Preparing failed")
             return result
         compile_result = await self.backend.compile(
-            self.fs, main_file_name, compilation_timeout_s, self.sandbox
+            self.fs, main_file_name, compilation_timeout_s, self.sandbox,
         )
         if not compile_result.is_successful:
             self.log.info("Compilation failed")
@@ -82,10 +82,10 @@ class SolutionRunner:
         self,
         stdin: str,
         timeout_s: float,
-        mem_limit_mb: float
+        mem_limit_mb: float,
     ) -> RunResult:
         """Run the solution."""
         self.log.info("Running for %s", stdin[:32])
         return await self.backend.run(
-            stdin, timeout_s, mem_limit_mb, self.sandbox
+            stdin, timeout_s, mem_limit_mb, self.sandbox,
         )

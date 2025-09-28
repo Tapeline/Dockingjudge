@@ -1,16 +1,18 @@
-from collections.abc import Sequence, Mapping
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 from attrs import frozen
 
 from judgelet.domain.checking import PrecompileChecker
 from judgelet.domain.execution import SolutionRunner
-from judgelet.domain.results import RunResult, ExitState, Verdict
-from judgelet.domain.test_group import TestGroup, GroupProtocol
+from judgelet.domain.results import ExitState, RunResult, Verdict
+from judgelet.domain.test_group import GroupProtocol, TestGroup
 
 
 @frozen
 class SuiteResult:
+    """Result of a single suite run."""
+
     is_successful: bool
     score: int
     protocol: Mapping[str, GroupProtocol]
@@ -19,6 +21,7 @@ class SuiteResult:
 
     @property
     def group_scores(self) -> dict[str, int]:
+        """Scores per group."""
         return {
             group_name: protocol.score
             for group_name, protocol in self.protocol.items()
@@ -37,6 +40,7 @@ class TestSuite:
     envs: Mapping[str, str]
 
     async def run(self, runner: SolutionRunner) -> SuiteResult:
+        """Run groups sequentially."""
         result = await runner.compile(self.compilation_timeout_s)
         if not result.is_successful:
             return _get_suite_result_on_compilation_error(result)
@@ -58,11 +62,11 @@ class TestSuite:
             is_successful=is_successful,
             score=total_score,
             protocol=protocol,
-            verdict=verdict
+            verdict=verdict,
         )
 
     def _have_dependencies_passed(
-        self, group_name: str, protocol: dict[str, GroupProtocol]
+        self, group_name: str, protocol: dict[str, GroupProtocol],
     ) -> bool:
         if group_name not in self.test_group_dependencies:
             return True
@@ -74,18 +78,21 @@ class TestSuite:
 
 
 def _get_suite_result_on_compilation_error(error: RunResult) -> SuiteResult:
-    factory = lambda err: SuiteResult(
+    if error.state == ExitState.MEM_LIMIT:
+        return _get_err_result("compiler memory limit")
+    if error.state == ExitState.TIME_LIMIT:
+        return _get_err_result("compiler time limit")
+    return _get_err_result(
+        f"-- compilation error --\n\n"
+        f"{error.stderr}",
+    )
+
+
+def _get_err_result(err: str) -> SuiteResult:
+    return SuiteResult(
         is_successful=False,
         score=0,
         protocol={},
         verdict=Verdict.CE(err),
-        compilation_error=err
-    )
-    if error.state == ExitState.MEM_LIMIT:
-        return factory("compiler memory limit")
-    if error.state == ExitState.TIME_LIMIT:
-        return factory("compiler time limit")
-    return factory(
-        f"-- compilation error --\n\n"
-        f"{error.stderr}"
+        compilation_error=err,
     )

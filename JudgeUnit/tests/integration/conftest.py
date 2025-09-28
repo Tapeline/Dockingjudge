@@ -1,7 +1,6 @@
 import base64
 import io
 import shutil
-import tempfile
 import uuid
 import zipfile
 from pathlib import Path
@@ -25,7 +24,7 @@ def from_base64(b64_data: str) -> bytes:
     return base64.b64decode(b64_data)
 
 
-@pytest.fixture()
+@pytest.fixture
 def dir_test_data_container():
     unique_postfix = hex(hash(uuid.uuid4()))[2:]
     dirname = f"_test_data_container_{unique_postfix}"

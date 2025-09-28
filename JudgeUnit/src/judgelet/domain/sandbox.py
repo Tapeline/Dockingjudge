@@ -1,6 +1,6 @@
 import enum
 from abc import ABC, abstractmethod
-from typing import Final, Mapping
+from collections.abc import Mapping
 
 from attrs import frozen
 
@@ -33,8 +33,8 @@ class Sandbox(ABC):
         fs: FileSystem,
         sandbox_dir: str,
         encoding: str | None = None,
-        environment: Mapping[str, str] | None = None
-    ):
+        environment: Mapping[str, str] | None = None,
+    ) -> None:
         """Create sandbox at directory."""
         self.sandbox_dir = sandbox_dir
         self.encoding = encoding
@@ -47,10 +47,10 @@ class Sandbox(ABC):
         cmd: str,
         proc_input: str,
         timeout_s: float,
-        memory_limit_mb: float
+        memory_limit_mb: float,
     ) -> SandboxResult:
         """
-        Run command in sandbox
+        Run command in sandbox.
 
         Args:
             cmd: target command
@@ -59,15 +59,15 @@ class Sandbox(ABC):
             memory_limit_mb: when to interrupt process with ML
 
         Returns:
-            Result of running the command
+            result of running the command
 
         """
         raise NotImplementedError
 
     @abstractmethod
-    def close(self):
+    def close(self) -> None:
         """Destroy the sandbox, but preserve temp files."""
 
     @abstractmethod
-    def destroy(self):
+    def destroy(self) -> None:
         """Destroy the sandbox and delete all temp files."""

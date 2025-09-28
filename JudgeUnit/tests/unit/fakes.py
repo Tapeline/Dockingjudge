@@ -1,5 +1,6 @@
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import Any, ClassVar, Mapping, Sequence
+from typing import Any, ClassVar
 
 from judgelet.application.interfaces import (
     LanguageBackendFactory,
@@ -22,7 +23,7 @@ class _FakeCompilerBase(LanguageBackend):
         self,
         fs: FileSystem,
         target_file: str,
-        sandbox: Sandbox
+        sandbox: Sandbox,
     ) -> RunResult:
         return self.fake_prepare_result
 
@@ -31,7 +32,7 @@ class _FakeCompilerBase(LanguageBackend):
         fs: FileSystem,
         target_file: str,
         compile_timeout_s: float,
-        sandbox: Sandbox
+        sandbox: Sandbox,
     ) -> RunResult:
         return self.fake_compile_result
 
@@ -40,7 +41,7 @@ class _FakeCompilerBase(LanguageBackend):
         stdin: str,
         timeout_s: float,
         mem_limit_mb: float,
-        sandbox: Sandbox
+        sandbox: Sandbox,
     ) -> RunResult:
         return self.fake_run_result
 
@@ -54,7 +55,7 @@ class FakePrepareErrorCompiler(_FakeCompilerBase):
         stdout="preparation error",
         stderr="preparation error",
         return_code=1,
-        state=ExitState.ERROR
+        state=ExitState.ERROR,
     )
 
 
@@ -63,7 +64,7 @@ class FakeCompileErrorCompiler(_FakeCompilerBase):
         stdout="compilation error",
         stderr="compilation error",
         return_code=1,
-        state=ExitState.ERROR
+        state=ExitState.ERROR,
     )
 
 
@@ -72,7 +73,7 @@ class FakeRuntimeErrorCompiler(_FakeCompilerBase):
         stdout="runtime error",
         stderr="runtime error",
         return_code=1,
-        state=ExitState.ERROR
+        state=ExitState.ERROR,
     )
 
 
@@ -81,7 +82,7 @@ class FakeCompileTimeLimitCompiler(_FakeCompilerBase):
         stdout="",
         stderr="",
         return_code=1,
-        state=ExitState.TIME_LIMIT
+        state=ExitState.TIME_LIMIT,
     )
 
 
@@ -90,7 +91,7 @@ class FakeCompileMemoryLimitCompiler(_FakeCompilerBase):
         stdout="",
         stderr="",
         return_code=1,
-        state=ExitState.MEM_LIMIT
+        state=ExitState.MEM_LIMIT,
     )
 
 
@@ -99,7 +100,7 @@ class FakeRunTimeLimitCompiler(_FakeCompilerBase):
         stdout="",
         stderr="",
         return_code=1,
-        state=ExitState.TIME_LIMIT
+        state=ExitState.TIME_LIMIT,
     )
 
 
@@ -108,7 +109,7 @@ class FakeRunMemoryLimitCompiler(_FakeCompilerBase):
         stdout="",
         stderr="",
         return_code=1,
-        state=ExitState.MEM_LIMIT
+        state=ExitState.MEM_LIMIT,
     )
 
 
@@ -123,7 +124,7 @@ class _FakeValidatorBase(Validator[NoArgs]):
         self,
         result: RunResult,
         test_case: "TestCase",
-        output_files: Mapping[str, str]
+        output_files: Mapping[str, str],
     ) -> Verdict:
         return self.fake_verdict
 
@@ -176,13 +177,13 @@ class FakeSandbox(Sandbox):
         cmd: str,
         proc_input: str,
         timeout_s: float,
-        memory_limit_mb: float
+        memory_limit_mb: float,
     ) -> SandboxResult:
         return SandboxResult(
             return_code=0,
             cause=SandboxExitCause.PROCESS_EXITED,
             stderr="",
-            stdout=""
+            stdout="",
         )
 
     def close(self):
@@ -211,7 +212,7 @@ def create_fake_empty_runner():
         FakeOkCompiler(),
         FakeEmptySolution(),
         fs,
-        FakeSandbox(fs)
+        FakeSandbox(fs),
     )
 
 
@@ -219,7 +220,7 @@ class FakeCompilerFactory(LanguageBackendFactory):
     def __init__(
         self,
         compiler_cls: Any,
-        **compiler_args: Any
+        **compiler_args: Any,
     ) -> None:
         self.compiler_cls = compiler_cls
         self.compiler_args = compiler_args
@@ -227,7 +228,7 @@ class FakeCompilerFactory(LanguageBackendFactory):
     def create_backend(
         self,
         name: str,
-        solution: Solution
+        solution: Solution,
     ) -> LanguageBackend | None:
         return self.compiler_cls(**self.compiler_args)
 
@@ -238,14 +239,13 @@ class FakeSandboxFactory(SandboxFactory):
         fs: FileSystem,
         sandbox_dir: str,
         encoding: str | None = None,
-        environment: Mapping[str, str] | None = None
+        environment: Mapping[str, str] | None = None,
     ) -> Sandbox:
         return FakeSandbox(fs)
 
 
 class FakeCompilerWorksOnlyIfFilePresent(_FakeCompilerBase):
-    """
-    Compiles successfully only if specified files are present.
+    """Compiles successfully only if specified files are present.
 
     Used for file placement testing purposes.
 
@@ -259,14 +259,13 @@ class FakeCompilerWorksOnlyIfFilePresent(_FakeCompilerBase):
         fs: FileSystem,
         target_file: str,
         compile_timeout_s: float,
-        sandbox: Sandbox
+        sandbox: Sandbox,
     ) -> RunResult:
         return _ensure_files_placed(self.expected_files, fs)
 
 
 class FakeCompilerWorksOnlyIfFilePresentInRuntime(_FakeCompilerBase):
-    """
-    Runs successfully only if specified files are present.
+    """Runs successfully only if specified files are present.
 
     Used for file placement testing purposes.
 
@@ -280,14 +279,14 @@ class FakeCompilerWorksOnlyIfFilePresentInRuntime(_FakeCompilerBase):
         stdin: str,
         timeout_s: float,
         mem_limit_mb: float,
-        sandbox: Sandbox
+        sandbox: Sandbox,
     ) -> RunResult:
         return _ensure_files_placed(self.expected_files, sandbox.fs)
 
 
 def _ensure_files_placed(
     expected_files: dict[str, str],
-    fs: FileSystem
+    fs: FileSystem,
 ):
     for filename, contents in expected_files.items():
         fs_file = fs.get_file(filename)
@@ -296,6 +295,6 @@ def _ensure_files_placed(
                 stdout=f"file {filename} assertion failed",
                 stderr=f"file {filename} assertion failed",
                 return_code=1,
-                state=ExitState.ERROR
+                state=ExitState.ERROR,
             )
     return RunResult.blank_ok()

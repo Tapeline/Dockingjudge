@@ -3,7 +3,7 @@ import shutil
 from pathlib import Path
 from typing import override
 
-from judgelet.domain.files import FileSystem, File, Solution
+from judgelet.domain.files import File, FileSystem, Solution
 
 
 class RealFileSystem(FileSystem):
@@ -11,7 +11,7 @@ class RealFileSystem(FileSystem):
 
     def __init__(self, root: str = "solutions") -> None:
         self.root = root
-        self.solution = None
+        self.solution: Solution | None = None
         self._ensure_root_exists()
 
     @override
@@ -27,11 +27,15 @@ class RealFileSystem(FileSystem):
 
     @override
     def cleanup(self, solution: Solution) -> None:
+        if not self.solution:
+            return
         _delete(self._solution_root(solution.uid))
         self.solution = None
 
     @override
     def get_file(self, path: str) -> File | None:
+        if not self.solution:
+            return None
         file_path = Path(self._solution_root(self.solution.uid), path)
         if not file_path.exists():
             return None
@@ -39,11 +43,15 @@ class RealFileSystem(FileSystem):
 
     @override
     def save_file(self, file: File) -> None:
+        if not self.solution:
+            return
         file_path = Path(self._solution_root(self.solution.uid), file.name)
         file_path.write_text(file.contents)
 
     @override
     def delete_file(self, filename: str) -> None:
+        if not self.solution:
+            return
         file_path = Path(self._solution_root(self.solution.uid), filename)
         _delete(file_path)
 
@@ -54,7 +62,7 @@ class RealFileSystem(FileSystem):
         return Path(self.root, f"s_{uid}")
 
 
-def _delete(path: Path):
+def _delete(path: Path) -> None:
     if path.exists():
         if path.is_dir():
             shutil.rmtree(path)

@@ -1,19 +1,20 @@
-import os
 import re
+from collections.abc import Collection, Mapping
 from types import MappingProxyType
-from typing import Final, override
+from typing import Any, Final, override
 
 from pydantic import BaseModel
 
 from judgelet.application.constants import NO_IMPORT_PATTERNS
-from judgelet.domain.checking import PrecompileChecker, NoArgs
+from judgelet.domain.checking import NoArgs, PrecompileChecker
 from judgelet.domain.files import FileSystem
 from judgelet.domain.results import Verdict
 
-
 type LanguageName = str
 type RegexPattern = str
-type AssociatedLanguagePatterns = dict[LanguageName, list[RegexPattern]]
+type AssociatedLanguagePatterns = Mapping[
+    LanguageName, Collection[RegexPattern],
+]
 
 
 class _PatternCheckerArgs(BaseModel):
@@ -28,7 +29,7 @@ class HasPatternChecker(PrecompileChecker[_PatternCheckerArgs]):
     @override
     def check(self, filesystem: FileSystem, path: str) -> Verdict:
         return _perform_pattern_check(
-            filesystem, path, self.args.patterns, is_positive=True
+            filesystem, path, self.args.patterns, is_positive=True,
         )
 
 
@@ -40,7 +41,7 @@ class NoPatternChecker(PrecompileChecker[_PatternCheckerArgs]):
     @override
     def check(self, filesystem: FileSystem, path: str) -> Verdict:
         return _perform_pattern_check(
-            filesystem, path, self.args.patterns, is_positive=False
+            filesystem, path, self.args.patterns, is_positive=False,
         )
 
 
@@ -52,7 +53,7 @@ class NoImportChecker(PrecompileChecker[NoArgs]):
     @override
     def check(self, filesystem: FileSystem, path: str) -> Verdict:
         return _perform_pattern_check(
-            filesystem, path, NO_IMPORT_PATTERNS, is_positive=False
+            filesystem, path, NO_IMPORT_PATTERNS, is_positive=False,
         )
 
 
@@ -74,39 +75,45 @@ class _RegexChecker:
         self,
         fs: FileSystem,
         patterns: AssociatedLanguagePatterns,
-        is_positive: bool
+        *,
+        is_positive: bool,
     ) -> None:
         """
         Create regex pattern precompile checker.
 
         Args:
             patterns: dict, where key is compiler name and value
-                is the list of all wanted patterns
+                is the list of all wanted patterns.
             is_positive: if positive, enforces the file to have at least
                 one occurrence of one of aforementioned patterns.
                 if negative, enforces the file to not have any
-                defined pattern
+                defined pattern.
+            fs: desired filesystem.
 
         """
         self._patterns = patterns
         self._is_positive = is_positive
         self._fs = fs
 
-    def perform_check(self, filename: str):
+    def perform_check(self, filename: str) -> bool:
         """Check single file."""
-        extension = os.path.basename(filename).split(".")[-1]
+        extension = filename.split(".")[-1]
         if extension not in self._patterns:
             return True
         patterns = self._patterns[extension]
         target_file = self._fs.get_file(filename)
+        if not target_file:
+            return not self._is_positive
         for pattern in patterns:
             if re.search(pattern, target_file.contents):
                 return self._is_positive
         return not self._is_positive
 
 
-CHECKERS: Final = MappingProxyType({
+CHECKERS: Final[
+    Mapping[str, type[PrecompileChecker[Any]]]
+] = MappingProxyType({
     "has_pattern": HasPatternChecker,
     "no_pattern": NoPatternChecker,
-    "no_import": NoImportChecker
+    "no_import": NoImportChecker,
 })

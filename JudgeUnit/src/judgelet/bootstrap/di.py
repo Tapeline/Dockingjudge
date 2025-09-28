@@ -1,4 +1,4 @@
-from dishka import Provider, from_context, Scope, provide
+from dishka import Provider, Scope, from_context, provide
 
 from judgelet.application.interactors import CheckSolutionInteractor
 from judgelet.application.interfaces import (
@@ -9,7 +9,7 @@ from judgelet.config import Config
 from judgelet.domain.files import FileSystem
 from judgelet.infrastructure.filesystem import RealFileSystem
 from judgelet.infrastructure.languages.factory import (
-    DefaultLanguageBackendFactory
+    DefaultLanguageBackendFactory,
 )
 from judgelet.infrastructure.sandboxes.simple import SimpleSandboxFactory
 
@@ -20,13 +20,13 @@ class AppProvider(Provider):
     lbr = provide(
         DefaultLanguageBackendFactory,
         provides=LanguageBackendFactory,
-        scope=Scope.APP
+        scope=Scope.APP,
     )
 
     sandbox_factory = provide(
         SimpleSandboxFactory,
         provides=SandboxFactory,
-        scope=Scope.APP
+        scope=Scope.APP,
     )
 
     @provide(scope=Scope.APP)
@@ -35,5 +35,5 @@ class AppProvider(Provider):
 
     interactor = provide(
         CheckSolutionInteractor,
-        scope=Scope.REQUEST
+        scope=Scope.REQUEST,
     )

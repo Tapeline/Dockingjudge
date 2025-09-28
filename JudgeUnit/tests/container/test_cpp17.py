@@ -9,16 +9,17 @@ from .conftest import (
 
 
 def test_simple(post_str_solution: StrSolutionPoster):
+    """Test that CPP17 works."""
     test_suite = create_suite(
         create_group(
             "A",
             create_test(
                 create_validator("stdout", expected="Hello, World!"),
-                stdin=""
-            )
-        )
+                stdin="",
+            ),
+        ),
     )
-    is_ok, result, response = post_str_solution(
+    is_ok, result, _ = post_str_solution(
         """
         #include <iostream>
         int main() {
@@ -27,7 +28,7 @@ def test_simple(post_str_solution: StrSolutionPoster):
         }
         """,
         "cpp17",
-        test_suite
+        test_suite,
     )
     assert is_ok, result
     assert result.verdict == "OK", result
@@ -35,16 +36,17 @@ def test_simple(post_str_solution: StrSolutionPoster):
 
 
 def test_imports(post_zip_solution: ZipSolutionPoster):
+    """Test that CPP17 multi-file compilation works."""
     test_suite = create_suite(
         create_group(
             "A",
             create_test(
                 create_validator("stdout", expected="Hello, World!"),
-                stdin=""
-            )
-        )
+                stdin="",
+            ),
+        ),
     )
-    is_ok, result, response = post_zip_solution(
+    is_ok, result, _ = post_zip_solution(
         {
             "main.cpp":
                 """
@@ -58,11 +60,11 @@ def test_imports(post_zip_solution: ZipSolutionPoster):
             "hello_world.h":
                 """
                 #define SAY(something) std::cout << something << std::endl
-                """
+                """,
         },
         "main.cpp",
         "cpp17",
-        test_suite
+        test_suite,
     )
     assert is_ok, result
     assert result.verdict == "OK", result

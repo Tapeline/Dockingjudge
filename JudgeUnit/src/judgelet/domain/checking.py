@@ -1,20 +1,20 @@
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import ClassVar, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from judgelet.domain.files import FileSystem
-from judgelet.domain.results import Verdict, RunResult
+from judgelet.domain.results import RunResult, Verdict
 
 if TYPE_CHECKING:
     from judgelet.domain.test_case import TestCase
 
 
-class Validator[_ArgsT](ABC):
+class Validator[ArgsT](ABC):
     """ABC for validators."""
 
-    args_cls: type[_ArgsT]
+    args_cls: type[ArgsT]
 
-    def __init__(self, args: _ArgsT) -> None:
+    def __init__(self, args: ArgsT) -> None:
         """Create validator with arguments."""
         self.args = args
 
@@ -23,18 +23,18 @@ class Validator[_ArgsT](ABC):
         self,
         result: RunResult,
         test_case: "TestCase",
-        output_files: Mapping[str, str]
+        output_files: Mapping[str, str],
     ) -> Verdict:
         """Perform checking of the result."""
         raise NotImplementedError
 
 
-class PrecompileChecker[_ArgsT](ABC):
+class PrecompileChecker[ArgsT](ABC):
     """ABC for precompile checks."""
 
-    args_cls: type[_ArgsT]
+    args_cls: type[ArgsT]
 
-    def __init__(self, args: _ArgsT) -> None:
+    def __init__(self, args: ArgsT) -> None:
         """Create precompile checker with arguments."""
         self.args = args
 
@@ -47,5 +47,5 @@ class PrecompileChecker[_ArgsT](ABC):
 class NoArgs:
     """Dummy config class."""
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
         ...

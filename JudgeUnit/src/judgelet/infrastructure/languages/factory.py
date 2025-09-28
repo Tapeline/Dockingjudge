@@ -11,10 +11,9 @@ class DefaultLanguageBackendFactory(LanguageBackendFactory):
 
     @override
     def create_backend(
-        self, name: str, solution: Solution
+        self, name: str, solution: Solution,
     ) -> LanguageBackend | None:
         if name not in LANGUAGES:
             return None
         backend_cls = LANGUAGES[name]
-        backend = backend_cls()
-        return backend
+        return backend_cls()  # type: ignore[misc]

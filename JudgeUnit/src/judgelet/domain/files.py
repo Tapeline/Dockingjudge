@@ -1,9 +1,9 @@
 """Contains classes related to files and file system."""
 
 from abc import ABC, abstractmethod
-from collections.abc import Collection, Sequence, Mapping
-from contextlib import contextmanager
+from collections.abc import Collection, Mapping, Sequence
 from pathlib import Path
+from typing import Any
 
 from attrs import frozen
 
@@ -36,6 +36,13 @@ class Solution(ABC):
 
     @property
     def main_file(self) -> File:
+        """
+        Get main file.
+
+        If main_file_name is specified, then use it,
+        otherwise use first file in collection.
+
+        """
         filename = self.main_file_name
         if filename is None:
             return self.files[0]
@@ -83,7 +90,7 @@ class FileIO:
         self,
         fs: FileSystem,
         input_files: Mapping[str, str],
-        output_files: Collection[str]
+        output_files: Collection[str],
     ) -> None:
         self.fs = fs
         self.input_files = input_files
@@ -95,13 +102,18 @@ class FileIO:
         for filename, contents in self.input_files.items():
             self.fs.save_file(File(filename, contents))
 
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+    def __exit__(
+        self,
+        exc_type: type[Exception] | None,
+        exc_val: Exception | None,
+        exc_tb: Any,
+    ) -> None:
         """Load required answer files from solution dir."""
         files = {}
         for filename in self.output_files:
             file = self.fs.get_file(filename)
-            files[filename] = file.contents if file else None
+            files[filename] = file.contents if file else ""
             self.fs.delete_file(filename)
         self.output_files_data = files
-        for filename in self.input_files.keys():
+        for filename in self.input_files:
             self.fs.delete_file(filename)
