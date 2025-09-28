@@ -6,7 +6,9 @@ from judgelet.domain.files import FileSystem, Solution
 from judgelet.domain.sandbox import Sandbox
 
 
-class LanguageBackendRepository(ABC):
+class LanguageBackendFactory(ABC):
+    """Language backend creator."""
+
     @abstractmethod
     def create_backend(
             self, name: str, solution: Solution
@@ -16,6 +18,8 @@ class LanguageBackendRepository(ABC):
 
 
 class SandboxFactory(ABC):
+    """Sandbox creator."""
+
     @abstractmethod
     def __call__(
             self,

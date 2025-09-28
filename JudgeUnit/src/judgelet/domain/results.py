@@ -5,6 +5,8 @@ from attrs import frozen
 
 
 class ExitState(Enum):
+    """Describes what caused the test to exit."""
+
     FINISHED = 0
     ERROR = 1
     TIME_LIMIT = 2
@@ -13,6 +15,8 @@ class ExitState(Enum):
 
 @frozen
 class RunResult:
+    """Report about a single run."""
+
     stdout: str
     stderr: str
     return_code: int
@@ -29,6 +33,8 @@ class RunResult:
 
 @frozen
 class Verdict:
+    """A brief report about a single test."""
+    
     codename: str
     is_successful: bool
     details: str

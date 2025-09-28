@@ -1,8 +1,7 @@
-"""Contains classes related to test group."""
-
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
 from operator import attrgetter
+from typing import Protocol
 
 from attrs import frozen
 
@@ -30,7 +29,7 @@ class GroupProtocol:
         )
 
 
-class ScoringPolicy(ABC):
+class ScoringPolicy(Protocol):
     """Determines how many points should a solution get."""
 
     @abstractmethod
@@ -39,27 +38,20 @@ class ScoringPolicy(ABC):
         raise NotImplementedError
 
 
+@frozen
 class TestGroup:
     """Represents a test group entity."""
 
-    def __init__(
-            self,
-            name: str,
-            test_cases: Sequence[TestCase],
-            full_score: int,
-            scoring_policy: ScoringPolicy
-    ) -> None:
-        """Create test group."""
-        self.name = name
-        self.cases = test_cases
-        self.full_score = full_score
-        self.scoring_policy = scoring_policy
+    name: str
+    test_cases: Sequence[TestCase]
+    full_score: int
+    scoring_policy: ScoringPolicy
 
     async def run(self, runner: SolutionRunner) -> GroupProtocol:
         """Run test group."""
         verdicts: list[Verdict] = []
         passed_count = 0
-        for case in self.cases:
+        for case in self.test_cases:
             case_verdict = await case.run(runner)
             verdicts.append(case_verdict)
             passed_count += case_verdict.is_successful

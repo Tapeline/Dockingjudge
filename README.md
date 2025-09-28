@@ -73,3 +73,12 @@ Dockingjudge consists of several services:
 - [ ] Add tests
 - [ ] Lint and test in CI
 - [ ] Move config to config files
+- [ ] Add tracing
+- [ ] Load testing
+- [ ] add DL (disk limit) verdict
+      returned when sandbox occupies too much disk space
+- [ ] Frontend design adjustments
+- [ ] Add contest timer
+- [ ] Add messages
+- [ ] Add profile pictures
+- [ ] deploy from ghcr.io

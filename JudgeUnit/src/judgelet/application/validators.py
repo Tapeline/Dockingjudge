@@ -1,5 +1,5 @@
 from types import MappingProxyType
-from typing import Final, Mapping
+from typing import Final, Mapping, override
 
 from pydantic import BaseModel
 
@@ -14,13 +14,16 @@ class _StdoutValidatorArgs(BaseModel):
 
 
 class StdoutValidator(Validator[_StdoutValidatorArgs]):
-    _args_cls = _StdoutValidatorArgs
+    """Validates stdout."""
 
+    args_cls = _StdoutValidatorArgs
+
+    @override
     def validate(
-            self,
-            result: RunResult,
-            test_case: TestCase,
-            output_files: Mapping[str, str]
+        self,
+        result: RunResult,
+        test_case: TestCase,
+        output_files: Mapping[str, str]
     ) -> Verdict:
         actual = result.stdout
         expected = self.args.expected
@@ -39,13 +42,16 @@ class _FileValidatorArgs(BaseModel):
 
 
 class FileValidator(Validator[_FileValidatorArgs]):
-    _args_cls = _FileValidatorArgs
+    """Validates files contents."""
 
+    args_cls = _FileValidatorArgs
+
+    @override
     def validate(
-            self,
-            result: RunResult,
-            test_case: TestCase,
-            output_files: Mapping[str, str]
+        self,
+        result: RunResult,
+        test_case: TestCase,
+        output_files: Mapping[str, str]
     ) -> Verdict:
         if self.args.filename not in output_files:
             return Verdict.PE(f"file {self.args.filename} not found")

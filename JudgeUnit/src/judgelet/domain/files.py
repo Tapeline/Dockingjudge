@@ -67,27 +67,36 @@ class FileSystem(ABC):
 
     @abstractmethod
     def delete_file(self, filename: str) -> None:
-        """Delete file by path."""
+        """
+        Delete file by path.
+
+        If file does not exist, do not throw an error.
+
+        """
         raise NotImplementedError
 
 
 class FileIO:
+    """Context manager to safely handle file IO within solution test."""
+
     def __init__(
-            self,
-            fs: FileSystem,
-            input_files: Mapping[str, str],
-            output_files: Collection[str]
-    ):
+        self,
+        fs: FileSystem,
+        input_files: Mapping[str, str],
+        output_files: Collection[str]
+    ) -> None:
         self.fs = fs
         self.input_files = input_files
         self.output_files = output_files
         self.output_files_data: Mapping[str, str] = {}
 
     def __enter__(self) -> None:
+        """Place input files into solution dir."""
         for filename, contents in self.input_files.items():
             self.fs.save_file(File(filename, contents))
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Load required answer files from solution dir."""
         files = {}
         for filename in self.output_files:
             file = self.fs.get_file(filename)

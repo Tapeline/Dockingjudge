@@ -31,15 +31,18 @@ async def execute_in_shell(
         io_encoding: str | None = "utf-8"
 ) -> ShellResult:
     """
-    Execute command in shell as an asyncio subprocess
+    Execute command in shell as an asyncio subprocess.
+
     Args:
         command: target command
         proc_input: stdin for process
         cwd: working directory for process
         env: environment dict
         io_encoding: stdin, stdout, stderr encoding
+
     Returns:
         return code, decoded stdout and stderr
+
     """
     if not io_encoding:
         io_encoding = "utf-8"
@@ -55,12 +58,12 @@ async def execute_in_shell(
 
 
 async def _execute_in_async_shell(
-        command: str,
-        *,
-        proc_input: str = "",
-        cwd: str | None = None,
-        env: Any | None = None,
-        io_encoding: str = "utf-8"
+    command: str,
+    *,
+    proc_input: str = "",
+    cwd: str | None = None,
+    env: Any | None = None,
+    io_encoding: str = "utf-8"
 ) -> ShellResult:
     proc = await asyncio.create_subprocess_shell(
         command,
@@ -85,12 +88,12 @@ async def _execute_in_async_shell(
 
 
 def _execute_in_sync_shell(
-        command: str,
-        *,
-        proc_input: str = "",
-        cwd: str | None = None,
-        env: Any | None = None,
-        io_encoding: str = "utf-8"
+    command: str,
+    *,
+    proc_input: str = "",
+    cwd: str | None = None,
+    env: Any | None = None,
+    io_encoding: str = "utf-8"
 ) -> ShellResult:
     proc = subprocess.Popen(
         command,

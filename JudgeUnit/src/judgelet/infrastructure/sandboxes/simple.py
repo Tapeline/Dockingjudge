@@ -2,7 +2,7 @@ import shutil
 import sys
 import time
 from pathlib import Path
-from typing import Mapping
+from typing import Mapping, override
 
 from structlog import get_logger
 
@@ -17,12 +17,14 @@ from judgelet.infrastructure.shell_executor import (
 
 
 class SimpleSandbox(Sandbox):
+    """Simple sandbox that uses llaunch to control resources."""
+
     def __init__(
-            self,
-            fs: FileSystem,
-            sandbox_dir: str,
-            encoding: str | None = None,
-            environment: Mapping[str, str] | None = None
+        self,
+        fs: FileSystem,
+        sandbox_dir: str,
+        encoding: str | None = None,
+        environment: Mapping[str, str] | None = None
     ):
         super().__init__(fs, sandbox_dir, encoding, environment)
         self.log = get_logger().bind(dir=sandbox_dir)
@@ -75,9 +77,11 @@ class SimpleSandbox(Sandbox):
             cause=SandboxExitCause.PROCESS_EXITED
         )
 
+    @override
     def close(self):
         """Destroy the sandbox, but preserve temp files."""
 
+    @override
     def destroy(self):
         """Destroy the sandbox and delete all temp files."""
         self.close()
@@ -89,7 +93,8 @@ def _get_command(time_limit: float, mem_limit: float, target: str) -> str:
     return f'python3 -m llaunch {time_limit} {mem_limit} "{target}"'
 
 
-class SimpleSandboxFactoryImpl(SandboxFactory):
+class SimpleSandboxFactory(SandboxFactory):
+    @override
     def __call__(
             self,
             fs: FileSystem,

@@ -1,7 +1,7 @@
-"""Contains classes related to test case."""
-
 from collections.abc import Mapping, Collection, Sequence
 from typing import TYPE_CHECKING
+
+from attrs import frozen
 
 from judgelet.domain.execution import SolutionRunner
 from judgelet.domain.files import FileIO
@@ -11,25 +11,16 @@ if TYPE_CHECKING:
     from judgelet.domain.checking import Validator
 
 
+@frozen
 class TestCase:
     """Represents a single test case."""
 
-    def __init__(
-            self,
-            stdin: str,
-            time_limit_s: float,
-            memory_limit_mb: float,
-            input_files: Mapping[str, str],
-            output_files: Collection[str],
-            validators: Sequence["Validator"]
-    ) -> None:
-        """Create test case."""
-        self.stdin = stdin
-        self.time_limit_s = time_limit_s
-        self.memory_limit_mb = memory_limit_mb
-        self.input_files = input_files
-        self.output_files = output_files
-        self.validators = validators
+    stdin: str
+    time_limit_s: float
+    memory_limit_mb: float
+    input_files: Mapping[str, str]
+    output_files: Collection[str]
+    validators: Sequence["Validator"]
 
     async def run(self, runner: SolutionRunner) -> Verdict:
         """Run the solution and check the answer."""
@@ -49,9 +40,9 @@ class TestCase:
         return self._perform_validation(result, file_io.output_files_data)
 
     def _perform_validation(
-            self,
-            result: RunResult,
-            output_files: Mapping[str, str]
+        self,
+        result: RunResult,
+        output_files: Mapping[str, str]
     ) -> Verdict:
         """Get first validator error or OK."""
         verdicts = (

@@ -1,13 +1,7 @@
-import os
-
-from pydantic import Field, BaseModel
+from dataclasses import dataclass
 
 
-class ModeConfig(BaseModel):
-    debug_mode: bool = Field(alias="DEBUG", default=True)
-
-
-class Config(BaseModel):
-    mode: ModeConfig = Field(
-        default_factory=lambda: ModeConfig(**os.environ)
-    )
+@dataclass
+class Config:
+    debug_mode: bool = True
+    enable_lock: bool = True

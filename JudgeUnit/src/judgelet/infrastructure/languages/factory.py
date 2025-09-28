@@ -1,12 +1,17 @@
-from judgelet.application.interfaces import LanguageBackendRepository
+from typing import override
+
+from judgelet.application.interfaces import LanguageBackendFactory
 from judgelet.domain.execution import LanguageBackend
 from judgelet.domain.files import Solution
 from judgelet.infrastructure.languages.lang_list import LANGUAGES
 
 
-class LanguageBackendRepositoryImpl(LanguageBackendRepository):
+class DefaultLanguageBackendFactory(LanguageBackendFactory):
+    """Default implementation for language backend factory."""
+
+    @override
     def create_backend(
-            self, name: str, solution: Solution
+        self, name: str, solution: Solution
     ) -> LanguageBackend | None:
         if name not in LANGUAGES:
             return None

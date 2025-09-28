@@ -1,7 +1,4 @@
-"""Contains classes related to test suite."""
-
 from collections.abc import Sequence, Mapping
-from functools import partial
 from typing import Any
 
 from attrs import frozen
@@ -28,25 +25,16 @@ class SuiteResult:
         }
 
 
+@frozen
 class TestSuite:
     """Represents a test suite."""
 
-    def __init__(
-            self,
-            test_groups: Sequence[TestGroup],
-            precompile_checks: Sequence[PrecompileChecker[Any]],
-            compilation_timeout_s: float,
-            test_group_dependencies: Mapping[str, Sequence[str]],
-            additional_files: Mapping[str, str],
-            envs: Mapping[str, str]
-    ) -> None:
-        """Create suite."""
-        self.groups = test_groups
-        self.precompile_checks = precompile_checks
-        self.compilation_timeout_s = compilation_timeout_s
-        self.depends = test_group_dependencies
-        self.additional_files = additional_files
-        self.envs = envs
+    test_groups: Sequence[TestGroup]
+    precompile_checks: Sequence[PrecompileChecker[Any]]
+    compilation_timeout_s: float
+    test_group_dependencies: Mapping[str, Sequence[str]]
+    additional_files: Mapping[str, str]
+    envs: Mapping[str, str]
 
     async def run(self, runner: SolutionRunner) -> SuiteResult:
         result = await runner.compile(self.compilation_timeout_s)
@@ -56,18 +44,32 @@ class TestSuite:
         total_score: int = 0
         is_successful: bool = True
         verdict = Verdict.OK()
-        for group in self.groups:
-            group_protocol = await group.run(runner)
-            protocol[group.name] = group_protocol
-            total_score += group_protocol.score
-            is_successful = is_successful and group_protocol.is_successful
-            if not group_protocol.is_successful:
-                verdict = group_protocol.verdict
+        for group in self.test_groups:
+            if self._have_dependencies_passed(group.name, protocol):
+                group_protocol = await group.run(runner)
+                protocol[group.name] = group_protocol
+                total_score += group_protocol.score
+                is_successful = is_successful and group_protocol.is_successful
+                if not group_protocol.is_successful:
+                    verdict = group_protocol.verdict
+            else:
+                is_successful = False
         return SuiteResult(
             is_successful=is_successful,
             score=total_score,
             protocol=protocol,
             verdict=verdict
+        )
+
+    def _have_dependencies_passed(
+        self, group_name: str, protocol: dict[str, GroupProtocol]
+    ) -> bool:
+        if group_name not in self.test_group_dependencies:
+            return True
+        group_deps = self.test_group_dependencies[group_name]
+        return all(
+            dep_name in protocol and protocol[dep_name].is_successful
+            for dep_name in group_deps
         )
 
 

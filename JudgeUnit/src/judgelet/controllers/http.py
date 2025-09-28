@@ -112,7 +112,7 @@ def _load_solution(data: RunRequest) -> Solution:
         return ZipSolution(
             data.id,
             base64.b64decode(data.code.b64),
-            data.main
+            data.code.main
         )
     assert_never(data.code.type)
 
@@ -127,7 +127,7 @@ def _get_validator(validator: ValidatorSchema) -> Validator[Any]:
     if validator.type not in VALIDATORS:
         raise ValidationException(f"bad validator {validator.type}")
     validator_cls = VALIDATORS[validator.type]
-    return validator_cls(validator_cls._args_cls(**validator.args))
+    return validator_cls(validator_cls.args_cls(**validator.args))
 
 
 def _get_precompile_checker(
@@ -136,7 +136,7 @@ def _get_precompile_checker(
     if checker.type not in CHECKERS:
         raise ValidationException(f"bad precompile checker {checker.type}")
     checker_cls = CHECKERS[checker.type]
-    return checker_cls(checker_cls._args_cls(**checker.args))
+    return checker_cls(checker_cls.args_cls(**checker.args))
 
 
 def _transform_protocol(protocol: GroupProtocol) -> GroupProtocolSchema:

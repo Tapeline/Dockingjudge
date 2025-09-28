@@ -1,8 +1,6 @@
-"""This module contains checking classes."""
-
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
-from typing import TYPE_CHECKING
+from typing import ClassVar, TYPE_CHECKING
 
 from judgelet.domain.files import FileSystem
 from judgelet.domain.results import Verdict, RunResult
@@ -13,7 +11,8 @@ if TYPE_CHECKING:
 
 class Validator[_ArgsT](ABC):
     """ABC for validators."""
-    _args_cls: type[_ArgsT]
+
+    args_cls: type[_ArgsT]
 
     def __init__(self, args: _ArgsT) -> None:
         """Create validator with arguments."""
@@ -21,10 +20,10 @@ class Validator[_ArgsT](ABC):
 
     @abstractmethod
     def validate(
-            self,
-            result: RunResult,
-            test_case: "TestCase",
-            output_files: Mapping[str, str]
+        self,
+        result: RunResult,
+        test_case: "TestCase",
+        output_files: Mapping[str, str]
     ) -> Verdict:
         """Perform checking of the result."""
         raise NotImplementedError
@@ -32,7 +31,8 @@ class Validator[_ArgsT](ABC):
 
 class PrecompileChecker[_ArgsT](ABC):
     """ABC for precompile checks."""
-    _args_cls: type[_ArgsT]
+
+    args_cls: type[_ArgsT]
 
     def __init__(self, args: _ArgsT) -> None:
         """Create precompile checker with arguments."""
@@ -45,5 +45,7 @@ class PrecompileChecker[_ArgsT](ABC):
 
 
 class NoArgs:
+    """Dummy config class."""
+
     def __init__(self, *args, **kwargs) -> None:
-        pass  # noqa
+        ...
