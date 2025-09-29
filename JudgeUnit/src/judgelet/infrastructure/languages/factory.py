@@ -1,4 +1,4 @@
-from typing import override
+from typing import Any, cast, override
 
 from judgelet.application.interfaces import LanguageBackendFactory
 from judgelet.domain.execution import LanguageBackend
@@ -15,5 +15,5 @@ class DefaultLanguageBackendFactory(LanguageBackendFactory):
     ) -> LanguageBackend | None:
         if name not in LANGUAGES:
             return None
-        backend_cls = LANGUAGES[name]
-        return backend_cls()  # type: ignore[misc]
+        backend_cls: Any = LANGUAGES[name]
+        return cast(LanguageBackend, backend_cls())
