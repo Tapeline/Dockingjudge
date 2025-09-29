@@ -1,0 +1,82 @@
+name: Judgelet lint and test
+
+on:
+  workflow_call:
+    outputs:
+      unit_status:
+        description: "Unit tests passed"
+        value: ${{ jobs.tests.outputs.unit_status }}
+      integration_status:
+        description: "Integration tests status"
+        value: ${{ jobs.tests.outputs.integration_status }}
+      container_status:
+        description: "Container tests status"
+        value: ${{ jobs.tests.outputs.container_status }}
+      mypy_status:
+        description: "Mypy status"
+        value: ${{ jobs.analysis.outputs.mypy_status }}
+      lint_status:
+        description: "Lint status"
+        value: ${{ jobs.analysis.outputs.lint_status }}
+
+
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    outputs:
+      mypy_status: ${{ steps.mypy.outcome }}
+      lint_status: ${{ steps.lint.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - uses: extractions/setup-just@v3
+
+      - name: Sync
+        working-directory: ./JudgeUnit
+        run: uv sync --group lint
+
+      - id: mypy
+        working-directory: ./JudgeUnit
+        continue-on-error: true
+        run: just check types
+
+      - id: lint
+        working-directory: ./JudgeUnit
+        continue-on-error: true
+        run: just check style
+
+
+  tests:
+    runs-on: ubuntu-latest
+    needs: [analysis]
+    outputs:
+      unit_status: ${{ steps.unit_test.outcome }}
+      integration_status: ${{ steps.integration_test.outcome }}
+      container_status: ${{ steps.container_test.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - uses: extractions/setup-just@v3
+
+      - name: Sync
+        working-directory: ./JudgeUnit
+        run: uv sync --group test
+
+      - id: unit_test
+        working-directory: ./JudgeUnit
+        continue-on-error: true
+        run: just test unit
+
+      - id: integration_test
+        working-directory: ./JudgeUnit
+        continue-on-error: true
+        run: just test integration
+
+      - id: container_test
+        working-directory: ./JudgeUnit
+        continue-on-error: true
+        run: just test container

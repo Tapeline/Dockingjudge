@@ -1,0 +1,11 @@
+name: Main Workflow
+
+on:
+  push:
+    branches: ["develop", "master"]
+  workflow_dispatch:
+
+
+jobs:
+  judgelet_tests:
+    uses: ./.github/workflows/test/judgelet.yml
