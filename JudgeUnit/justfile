@@ -7,6 +7,7 @@ set shell := ["sh", "-c"]
 build $variant="full":
   docker build -t dockingjudge-unit --build-arg build_variant={{variant}} .
 
+
 test $what="all":
   just __test_{{what}}
 
@@ -32,3 +33,24 @@ __test_cleanup:
   docker rm -f judgelet-integration-testing
   docker rm -f judgelet-container-testing
   rm .coverage
+
+
+check $what="all":
+  just __check_{{what}}
+
+__check_all:
+  just __check_types
+  just __check_style
+
+__check_style:
+  just __check_ruff
+  just __check_wps
+
+__check_ruff:
+  ruff check
+
+__check_wps:
+  flake8 src
+
+__check_types:
+  mypy src
