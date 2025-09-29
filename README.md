@@ -11,6 +11,10 @@
     * [Dev env](#dev-env)
   * [Structure](#structure)
   * [Planned](#planned)
+    * [First round](#first-round)
+    * [Second round](#second-round)
+    * [Third round](#third-round)
+    * [Bugs](#bugs)
 <!-- TOC -->
 
 ---
@@ -64,25 +68,62 @@ Dockingjudge consists of several services:
 
 ## Planned
 
-- [ ] More security on judgelet
-- [ ] Bug fixes
-- [ ] Public/private contests
+### First round
+
+- [x] More security on judgelet
+- [x] Add more compilers (at least cpp)
 - [ ] Migrate from RMQ to NATS/Kafka
-- [ ] Make frontend locally deployable in container
-- [ ] Add more compilers (at least cpp)
+- [ ] deploy from ghcr.io
 - [ ] Add tests
+    - [x] judgelet
+    - [ ] judge svc
+    - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
+    - [ ] e2e
 - [ ] Lint and test in CI
+    - [x] judgelet
+    - [ ] judge svc
+    - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
+    - [ ] e2e
 - [ ] Move config to config files
+    - [x] judgelet
+    - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
 - [ ] Add tracing
+    - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
+
+### Second round
+
 - [ ] Load testing
-- [ ] add DL (disk limit) verdict
-      returned when sandbox occupies too much disk space
-- [ ] Frontend design adjustments
+- [ ] Make frontend locally deployable in container
+- [ ] Massive frontend rework
+
+### Third round
+
 - [ ] Add contest timer
 - [ ] Add messages
 - [ ] Add profile pictures
-- [ ] deploy from ghcr.io
+- [ ] add DL (disk limit) verdict
+      returned when sandbox occupies too much disk space
+- [ ] Public/private contests
 
-## Bugs
+### Bugs
+
 - [ ] registration 400 "a server error occurred". Add more informative error message.
 - [ ] standings are messed up
+
+### Docs
+
+- [ ] Describe each service separately
+    - [ ] judgelet
+    - [ ] judge svc
+    - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
+- [ ] Add openapi to docs
