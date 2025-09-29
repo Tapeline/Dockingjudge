@@ -88,6 +88,7 @@ ignore = [
     "TRY003",
 
     "PTH107",  # os.remove is better
+    "PTH",  # breaks my code
 ]
 external = ["WPS"]
 exclude = [

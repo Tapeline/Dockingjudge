@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import pytest
@@ -32,7 +33,7 @@ def test_str_container(
     solution = StringSolution(uid="1", filename=filename, content=src)
     solution_path = real_fs.place_solution(solution)
 
-    assert set(solution_path.iterdir()) == {filename}
+    assert set(os.listdir(solution_path)) == {filename}
     assert Path(solution_path, filename).read_text() == src
 
     # This is kind of an unrelated assert, but I don't know where to put it.
@@ -61,7 +62,7 @@ def test_zip_container(
     solution = ZipSolution(uid="1", bin_data=zip_data, main_file=main_file)
     solution_path = real_fs.place_solution(solution)
 
-    assert set(solution_path.iterdir()) == archive_data.keys()
+    assert set(os.listdir(solution_path)) == archive_data.keys()
 
     for filename, file_contents in archive_data.items():
         assert Path(

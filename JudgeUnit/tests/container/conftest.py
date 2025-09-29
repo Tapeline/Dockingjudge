@@ -7,7 +7,7 @@ from typing import Any
 import pytest
 import requests
 
-from judgelet.controllers.schemas import RunResponse
+from judgelet.controllers.schemas.response import RunResponse
 from tests.integration.conftest import create_zip_archive, to_base64
 
 SolutionPosterReturn = tuple[bool, RunResponse | dict, requests.Response]

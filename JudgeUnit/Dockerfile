@@ -9,9 +9,13 @@ RUN apk add uv
 RUN apk add g++ gcc python3-dev musl-dev linux-headers
 RUN apk add git
 
-COPY . .
+RUN addgroup -S limgroup
+RUN adduser -S limited -G limgroup
+RUN chown limited:limgroup /app
 
-RUN adduser -D limited && chown -R limited /app
+COPY --chown=limited:limgroup . .
+RUN chmod +x ./start.sh
+
 USER limited
 
 FROM base AS sync_full
@@ -21,4 +25,4 @@ FROM base AS sync_min
 RUN uv sync
 
 FROM sync_${build_variant} AS final
-CMD chmod +x ./start.sh ; ./start.sh
+CMD ./start.sh
