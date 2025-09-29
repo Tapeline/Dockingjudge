@@ -16,4 +16,4 @@ class DefaultLanguageBackendFactory(LanguageBackendFactory):
         if name not in LANGUAGES:
             return None
         backend_cls = LANGUAGES[name]
-        return backend_cls()  # type: ignore[misc]
+        return backend_cls()
