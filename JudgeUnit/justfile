@@ -47,10 +47,10 @@ __check_style:
   just __check_wps
 
 __check_ruff:
-  ruff check
+  uv run ruff check
 
 __check_wps:
-  flake8 src
+  uv run flake8 src
 
 __check_types:
-  mypy src
+  uv run mypy src

@@ -47,6 +47,17 @@ jobs:
         continue-on-error: true
         run: just check style
 
+      - name: Check test status
+        if: always()
+        run: |
+          if [[ "${{ steps.mypy.outcome }}" == "failure" || \
+                "${{ steps.lint.outcome }}" == "failure" ]]; then
+            echo "One or more tests failed."
+            exit 1
+          else
+            echo "All tests passed successfully."
+          fi
+
 
   tests:
     runs-on: ubuntu-latest
@@ -66,6 +77,10 @@ jobs:
         working-directory: ./JudgeUnit
         run: uv sync --group test
 
+      - name: Build Docker
+        working-directory: ./JudgeUnit
+        run: just build
+
       - id: unit_test
         working-directory: ./JudgeUnit
         continue-on-error: true
@@ -80,3 +95,15 @@ jobs:
         working-directory: ./JudgeUnit
         continue-on-error: true
         run: just test container
+
+      - name: Check test status
+        if: always()
+        run: |
+          if [[ "${{ steps.unit_test.outcome }}" == "failure" || \
+                "${{ steps.integration_test.outcome }}" == "failure" || \
+                "${{ steps.container_test.outcome }}" == "failure" ]]; then
+            echo "One or more tests failed."
+            exit 1
+          else
+            echo "All tests passed successfully."
+          fi
