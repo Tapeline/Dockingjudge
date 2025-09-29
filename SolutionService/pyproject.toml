@@ -3,11 +3,9 @@ name = "solution_service"
 version = "0.1.0"
 description = ""
 authors = [
-    {name = "Tapeline",email = "yt.redstone.mail@gmail.com"}
+    {name = "Tapeline", email = "mail@tapeline.dev"}
 ]
-package-mode = false
 license = {text = "GNU GPL v3.0"}
-readme = "README.md"
 requires-python = ">=3.13,<4.0"
 dependencies = [
     "litestar[prometheus,sqlalchemy] (>=2.15.1,<3.0.0)",
@@ -21,9 +19,31 @@ dependencies = [
     "uvicorn (>=0.34.0,<0.35.0)",
     "aiohttp (>=3.11.16,<4.0.0)",
     "psycopg[binary,pool] (>=3.2.3)",
+    "fuente"
 ]
 
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools >= 80.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.uv.sources]
+fuente = { git = "https://github.com/Tishka17/fuente.git" }
+
+[dependency-groups]
+lint = [
+    "import-linter>=2.5",
+    "mypy>=1.18.2",
+    "ruff>=0.13.1",
+    "wemake-python-styleguide>=1.4.0",
+]
+test = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "requests>=2.32.5",
+    "smart-covdefaults>=0.1.0",
+]
