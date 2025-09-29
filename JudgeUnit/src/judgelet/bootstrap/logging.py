@@ -15,7 +15,7 @@ shared_processors = [
 
 def setup_processors() -> list[Any]:
     """Setup structlog processors."""
-    if sys.stderr.isatty() and True:
+    if sys.stderr.isatty():
         return [
             *shared_processors,
             structlog.processors.TimeStamper(

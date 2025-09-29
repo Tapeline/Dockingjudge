@@ -74,7 +74,7 @@ class SolutionSchema(BaseModel):
     main: str | None = None
 
     @model_validator(mode="after")
-    def validate_type(self) -> Self:
+    def validate_type(self) -> Self:  # noqa: WPS
         """Ensure variants are valid."""
         match self.type:
             case "str":
@@ -97,40 +97,3 @@ class RunRequest(BaseModel):
     code: SolutionSchema
     compiler: str
     suite: TestSuite
-
-
-class TestCaseResult(BaseModel):
-    """Result for a test case."""
-
-    return_code: int
-    stdout: str
-    stderr: str
-    verdict: str
-    is_successful: bool
-
-
-class VerdictSchema(BaseModel):
-    """Single verdict."""
-
-    codename: str
-    is_successful: bool
-    details: str
-
-
-class GroupProtocolSchema(BaseModel):
-    """Group run result."""
-
-    score: int
-    verdicts: list[VerdictSchema]
-    is_successful: bool
-    verdict: VerdictSchema
-
-
-class RunResponse(BaseModel):
-    """Response model."""
-
-    score: int
-    verdict: str
-    group_scores: dict[str, int]
-    protocol: dict[str, GroupProtocolSchema]
-    compilation_error: str | None = None

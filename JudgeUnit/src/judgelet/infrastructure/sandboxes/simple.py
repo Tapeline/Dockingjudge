@@ -11,10 +11,6 @@ from judgelet.application.interfaces import SandboxFactory
 from judgelet.domain.files import FileSystem
 from judgelet.domain.sandbox import Sandbox, SandboxExitCause, SandboxResult
 from judgelet.infrastructure import shell_executor
-from judgelet.infrastructure.shell_executor import (
-    MEMORY_LIMIT_EXIT_CODE,
-    TIMEOUT_EXIT_CODE,
-)
 
 
 class SimpleSandbox(Sandbox):
@@ -56,13 +52,13 @@ class SimpleSandbox(Sandbox):
             env=self.environment,
         )
         elapsed = time.time() - start
-        if result.return_code == MEMORY_LIMIT_EXIT_CODE:
+        if result.return_code == shell_executor.MEMORY_LIMIT_EXIT_CODE:
             self.log.info("Memory limit exceeded")
             return SandboxResult(
                 return_code=result.return_code,
                 cause=SandboxExitCause.MEMORY_LIMIT_EXCEEDED,
             )
-        if result.return_code == TIMEOUT_EXIT_CODE:
+        if result.return_code == shell_executor.TIMEOUT_EXIT_CODE:
             self.log.info(
                 "Time limit exceeded",
                 gross_error=elapsed - timeout_s,

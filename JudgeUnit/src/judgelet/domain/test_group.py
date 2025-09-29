@@ -64,7 +64,7 @@ class TestGroup:
         verdicts: list[Verdict] = []
         passed_count = 0
         for case in self.test_cases:
-            case_verdict = await case.run(runner)
+            case_verdict = await case.run(runner)  # noqa: WPS476
             verdicts.append(case_verdict)
             passed_count += case_verdict.is_successful
         return GroupProtocol(

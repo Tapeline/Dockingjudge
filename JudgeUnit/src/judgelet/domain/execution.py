@@ -85,7 +85,7 @@ class SolutionRunner:
         mem_limit_mb: float,
     ) -> RunResult:
         """Run the solution."""
-        self.log.info("Running for %s", stdin[:32])
+        self.log.info("Running for %s", stdin[:32])  # noqa: WPS432
         return await self.backend.run(
             stdin, timeout_s, mem_limit_mb, self.sandbox,
         )

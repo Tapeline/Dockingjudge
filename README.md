@@ -82,3 +82,7 @@ Dockingjudge consists of several services:
 - [ ] Add messages
 - [ ] Add profile pictures
 - [ ] deploy from ghcr.io
+
+## Bugs
+- [ ] registration 400 "a server error occurred". Add more informative error message.
+- [ ] standings are messed up

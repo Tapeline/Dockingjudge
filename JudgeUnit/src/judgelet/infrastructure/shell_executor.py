@@ -22,6 +22,7 @@ class ShellResult:
 
 MEMORY_LIMIT_EXIT_CODE: Final = 170
 TIMEOUT_EXIT_CODE: Final = 171
+DEFAULT_ENCODING: Final = "utf-8"
 
 
 async def execute_in_shell(
@@ -30,7 +31,7 @@ async def execute_in_shell(
         proc_input: str = "",
         cwd: str | None = None,
         env: Any | None = None,
-        io_encoding: str | None = "utf-8",
+        io_encoding: str | None = None,
 ) -> ShellResult:
     """
     Execute command in shell as an asyncio subprocess.
@@ -46,9 +47,8 @@ async def execute_in_shell(
         return code, decoded stdout and stderr
 
     """
-    if not io_encoding:
-        io_encoding = "utf-8"
-    if True:  # TODO: fix async shell
+    io_encoding = io_encoding or DEFAULT_ENCODING
+    if True:  # noqa: WPS314 TODO: fix async shell
         return _execute_in_sync_shell(
             command,
             proc_input=proc_input, cwd=cwd, env=env, io_encoding=io_encoding,
@@ -65,7 +65,7 @@ async def _execute_in_async_shell(
     proc_input: str = "",
     cwd: str | None = None,
     env: Any | None = None,
-    io_encoding: str = "utf-8",
+    io_encoding: str = DEFAULT_ENCODING,
 ) -> ShellResult:
     proc = await asyncio.create_subprocess_shell(
         command,
@@ -99,8 +99,9 @@ def _execute_in_sync_shell(
     proc_input: str = "",
     cwd: str | None = None,
     env: Any | None = None,
-    io_encoding: str = "utf-8",
+    io_encoding: str | None = None,
 ) -> ShellResult:
+    io_encoding = io_encoding or DEFAULT_ENCODING
     proc = subprocess.Popen(
         command,
         stdin=subprocess.PIPE,

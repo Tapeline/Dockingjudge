@@ -55,7 +55,9 @@ class FileValidator(Validator[_FileValidatorArgs]):
         output_files: Mapping[str, str],
     ) -> Verdict:
         if self.args.filename not in output_files:
-            return Verdict.PE(f"file {self.args.filename} not found")
+            return Verdict.PE(
+                f"file {self.args.filename} not found",  # noqa: WPS237
+            )
         actual = output_files[self.args.filename]
         expected = self.args.expected
         if self.args.strip:

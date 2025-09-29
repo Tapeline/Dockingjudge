@@ -50,7 +50,7 @@ class TestSuite:
         verdict = Verdict.OK()
         for group in self.test_groups:
             if self._have_dependencies_passed(group.name, protocol):
-                group_protocol = await group.run(runner)
+                group_protocol = await group.run(runner)  # noqa: WPS476
                 protocol[group.name] = group_protocol
                 total_score += group_protocol.score
                 is_successful = is_successful and group_protocol.is_successful

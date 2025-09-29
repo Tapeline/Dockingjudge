@@ -21,8 +21,8 @@ class RunResult:
     return_code: int
     state: ExitState
 
-    @staticmethod
-    def blank_ok() -> "RunResult":
+    @classmethod
+    def blank_ok(cls) -> "RunResult":
         """Return default blank successful result."""
         return RunResult("", "", 0, ExitState.FINISHED)
 
@@ -33,7 +33,7 @@ class RunResult:
 
 
 @frozen
-class Verdict:
+class Verdict:  # noqa: WPS214
     """A brief report about a single test."""
 
     codename: str

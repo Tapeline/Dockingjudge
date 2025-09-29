@@ -1,46 +1,31 @@
 [flake8]
-show-violation-links = true
+allowed-domain-names =
+  contents
+  content
+  result
+  data
+  file
+
 ignore =
-    # Because it conflicts with pylint and common sense
-    WPS323,
-    WPS305,
 
-    # Another common sense conflict on trailing commas topic
-    C812,
-    C816,
-
-    # Because I don't agree with docstring format
-    D400,
-
-    # Because the linter is stupid and raises false-positives
-    D205,
-
-    # Because exceptions are named exceptions
-    N818,
-
-    # Because enums
-    WPS115,
-
-    # Retarded rules, conflict with isort
-    WPS318,
-    WPS319,
-
-    # Ok, but in this project there features
-    # are not used in a retarded way
-    WPS431,
-    WPS615,
-
-    # Opinionated. Not argumented (staticmethod discrimination)
-    WPS602,
-    WPS605,
-
-    # Conflicts with isort (backslash for line breaking)
-    N400
-
+per-file-ignores =
+  src/judgelet/bootstrap/app.py: WPS201
+  src/judgelet/bootstrap/di.py: WPS347
+  src/judgelet/bootstrap/config.py: WPS347
+  src/judgelet/infrastructure/encoding.py: WPS
+  src/judgelet/controllers/schemas/loading.py: WPS201
+  # i need to refactor this ^
 
 
 inline-quotes = "
-max-line-length = 100
+
+max-local-variables = 8
+
+max-annotation-complexity = 5
+
+max-methods = 10
+
+max-module-members = 10
 
 # Pydocstyle
 ignore-decorators = override
