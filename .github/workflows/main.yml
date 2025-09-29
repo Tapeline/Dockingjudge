@@ -8,4 +8,4 @@ on:
 
 jobs:
   judgelet_tests:
-    uses: ./.github/workflows/test/judgelet.yml
+    uses: ./.github/workflows/judgelet.yml
