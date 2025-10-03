@@ -1,5 +1,5 @@
 import logging
-from typing import Sequence, Final
+from typing import Sequence, Final, override
 
 import aiohttp
 from dishka import FromDishka
@@ -25,7 +25,7 @@ provided_security_definitions: Final[dict[str, SecurityScheme]] = {
 }
 
 
-class AccountServiceImpl(account.AbstractAccountService):
+class AccountServiceImpl(account.AccountService):
     def __init__(
             self,
             other_services: FromDishka[Config],
@@ -33,7 +33,10 @@ class AccountServiceImpl(account.AbstractAccountService):
         self.base_url = other_services.services.account_service
         self.logger = logging.getLogger("account_service")
 
-    async def get_users_by_ids(self, ids: Sequence[int]) -> Sequence[account.UserDTO]:
+    @override
+    async def get_users_by_ids(
+        self, ids: Sequence[int]
+    ) -> Sequence[account.User]:
         self.logger.info("Getting all users")
         async with (
             aiohttp.ClientSession() as session,
@@ -47,7 +50,7 @@ class AccountServiceImpl(account.AbstractAccountService):
                 raise BadServiceResponseException("account", response)
             data = await response.json()
             return [
-                account.UserDTO(
+                account.User(
                     id=user_data["id"],
                     username=user_data["username"],
                     profile_pic=user_data["profile_pic"],
@@ -63,9 +66,10 @@ class ServiceAuthenticationMiddleware(AbstractAuthenticationMiddleware):
         super().__init__(app, **kwargs)
         self.other_services = other_services
 
+    @override
     async def authenticate_request(
-            self,
-            connection: ASGIConnection,
+        self,
+        connection: ASGIConnection,
     ) -> AuthenticationResult:
         auth_header = connection.headers.get("authorization")
         if not auth_header:
@@ -85,7 +89,7 @@ class ServiceAuthenticationMiddleware(AbstractAuthenticationMiddleware):
                 data = await response.json()
                 return AuthenticationResult(
                     auth=None,
-                    user=account.UserDTO(
+                    user=account.User(
                         id=data["id"],
                         username=data["username"],
                         settings=data["settings"],

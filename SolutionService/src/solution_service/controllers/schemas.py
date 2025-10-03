@@ -1,11 +1,8 @@
 import datetime
-from enum import Enum
-from typing import Annotated
 
 from pydantic import BaseModel
 
-from solution_service.application.interfaces.account import UserDTO
-from solution_service.domain.entities.abstract import TaskType, SubmissionType
+from solution_service.domain.abstract import TaskType, SubmissionType
 
 
 class QuizSolutionExtraSchema(BaseModel):

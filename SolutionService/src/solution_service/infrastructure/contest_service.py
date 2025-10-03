@@ -1,25 +1,31 @@
 import logging
-from typing import Sequence
+from typing import Sequence, override
 
 import aiohttp
 from dishka import FromDishka
 
 from solution_service.application.interfaces import contest
-from solution_service.application.interfaces.contest import CodeTaskDTO, QuizTaskDTO, AnyTaskDTO
-from solution_service.config import OtherServicesConfig, Config
-from solution_service.domain.entities.abstract import TaskType
+from solution_service.application.interfaces.contest import (
+    CodeTaskDTO,
+    ContestTaskHead,
+    QuizTaskDTO,
+    AnyTaskDTO,
+)
+from solution_service.config import Config
+from solution_service.domain.abstract import TaskType
 from solution_service.infrastructure.exceptions import BadServiceResponseException
 
 
-class ContestServiceImpl(contest.AbstractContestService):
+class ContestServiceImpl(contest.ContestService):
     def __init__(
-            self,
-            other_services: FromDishka[Config],
-    ):
+        self,
+        other_services: FromDishka[Config],
+    ) -> None:
         self.base_url = other_services.services.contest_service
         self.internal_base_url = other_services.services.contest_service_internal
         self.logger = logging.getLogger("contest_service")
 
+    @override
     async def get_contest_managers(self, contest_id: int) -> Sequence[int]:
         self.logger.info("Requesting contest managers for %s", contest_id)
         async with (
@@ -38,7 +44,10 @@ class ContestServiceImpl(contest.AbstractContestService):
                 raise BadServiceResponseException("contest", response)
             return await response.json()
 
-    async def get_contest_tasks(self, contest_id: int) -> Sequence[tuple[TaskType, int, str]]:
+    @override
+    async def get_contest_tasks(
+        self, contest_id: int
+    ) -> Sequence[ContestTaskHead]:
         self.logger.info("Requesting contest tasks for %s", contest_id)
         async with (
             aiohttp.ClientSession() as session,
@@ -56,10 +65,15 @@ class ContestServiceImpl(contest.AbstractContestService):
                 raise BadServiceResponseException("contest", response)
             data = await response.json()
             return [
-                (TaskType(str(task["type"])), int(task["id"]), task["title"])
+                ContestTaskHead(
+                    TaskType(str(task["type"])),
+                    int(task["id"]),
+                    task["title"]
+                )
                 for task in data
             ]
 
+    @override
     async def get_contest_participants(self, contest_id: int) -> Sequence[int]:
         self.logger.info("Requesting contest participants for %s", contest_id)
         async with (
@@ -78,7 +92,10 @@ class ContestServiceImpl(contest.AbstractContestService):
                 raise BadServiceResponseException("contest", response)
             return await response.json()
 
-    async def can_submit(self, user_id: int, task_type: TaskType, task_id: int) -> bool:
+    @override
+    async def can_submit(
+        self, user_id: int, task_type: TaskType, task_id: int
+    ) -> bool:
         async with (
             aiohttp.ClientSession() as session,
             session.get(
@@ -90,13 +107,17 @@ class ContestServiceImpl(contest.AbstractContestService):
                 return False
             return (await response.json())["can_submit"]
 
-    async def get_task(self, task_type: str, task_id: int) -> AnyTaskDTO | None:
+    @override
+    async def get_task(
+        self, task_type: str, task_id: int
+    ) -> AnyTaskDTO | None:
         if task_type.lower() == "quiz":
             return await self.get_quiz_task(task_id)
         if task_type.lower() == "code":
             return await self.get_code_task(task_id)
         return None
 
+    @override
     async def get_quiz_task(self, task_id: int) -> QuizTaskDTO | None:
         self.logger.info("Requesting task quiz:%s", task_id)
         async with (
@@ -116,6 +137,7 @@ class ContestServiceImpl(contest.AbstractContestService):
             data = await response.json()
             return contest.QuizTaskDTO(**data)
 
+    @override
     async def get_code_task(self, task_id: int) -> CodeTaskDTO | None:
         self.logger.info("Requesting task quiz:%s", task_id)
         async with (

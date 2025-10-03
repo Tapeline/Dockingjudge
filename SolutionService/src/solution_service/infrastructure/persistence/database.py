@@ -1,22 +1,23 @@
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
+from typing import Final
 
-from litestar import Litestar
-from litestar.datastructures import State
-from litestar.exceptions import InternalServerException
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 from sqlalchemy.orm import DeclarativeBase
 
 from solution_service.config import PostgresConfig
+
+_DATABASE_URI_TEMPLATE: Final = (
+    "postgresql+psycopg://{login}:{password}@{host}:{port}/{database}"
+)
 
 
 class Base(DeclarativeBase):
     pass
 
 
-def create_session_maker(postgres_config: PostgresConfig) -> async_sessionmaker[AsyncSession]:
-    database_uri = "postgresql+psycopg://{login}:{password}@{host}:{port}/{database}".format(
+def create_session_maker(
+    postgres_config: PostgresConfig
+) -> async_sessionmaker[AsyncSession]:
+    database_uri = _DATABASE_URI_TEMPLATE.format(
         login=postgres_config.username,
         password=postgres_config.password,
         host=postgres_config.host,
@@ -32,4 +33,6 @@ def create_session_maker(postgres_config: PostgresConfig) -> async_sessionmaker[
             "connect_timeout": 5,
         },
     )
-    return async_sessionmaker(engine, class_=AsyncSession, autoflush=False, expire_on_commit=False)
+    return async_sessionmaker(
+        engine, class_=AsyncSession, autoflush=False, expire_on_commit=False
+    )

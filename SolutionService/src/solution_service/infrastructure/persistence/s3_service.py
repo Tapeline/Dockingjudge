@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 import minio
 from dishka import FromDishka
 
-from solution_service.application.interfaces.storage import AbstractStorage, File, URL
+from solution_service.application.interfaces.storage import Storage, File, URL
 from solution_service.config import Config
 
 
@@ -20,7 +20,7 @@ class S3ConnectionParameters:
     is_secure: bool
 
 
-class S3Storage(AbstractStorage):
+class S3Storage(Storage):
     client: minio.Minio | None
 
     def __init__(self, config: FromDishka[Config]):

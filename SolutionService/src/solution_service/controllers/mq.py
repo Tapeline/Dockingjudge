@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from dishka import FromDishka
@@ -9,19 +10,20 @@ from faststream.rabbit import (
 )
 
 from solution_service.application.dto import SolutionCheckResult
-from solution_service.application.interactors import (
+from solution_service.application.interactors.purge_solutions import (
     PurgeTaskSolutions, PurgeUserSolutions,
-    StoreCheckedSolution,
 )
+from solution_service.application.interactors.update_solution import \
+    StoreCheckedSolution
 from solution_service.application.interfaces.publisher import \
-    AbstractSolutionPublisher
-from solution_service.application.interfaces.storage import AbstractStorage
+    SolutionPublisher
+from solution_service.application.interfaces.storage import Storage
 from solution_service.controllers.schemas import (
     MQContestEvent,
     MQSolutionAnswer,
     MQTaskEvent, MQUserEvent,
 )
-from solution_service.domain.entities.abstract import CodeSolution, TaskType
+from solution_service.domain.abstract import CodeSolution, TaskType
 
 mq_controller = RabbitRouter()
 
@@ -59,8 +61,8 @@ code_task_event_inbox = RabbitQueue(
 
 @mq_controller.subscriber(answers_inbox, answers_exchange)
 async def handle_checked_solution(
-        data: MQSolutionAnswer,
-        interactor: FromDishka[StoreCheckedSolution]
+    data: MQSolutionAnswer,
+    interactor: FromDishka[StoreCheckedSolution]
 ):
     logging.info("Received solution answer for %s", data.id)
     await interactor(
@@ -76,10 +78,10 @@ async def handle_checked_solution(
     logging.info("Updated solution %s in db", data.id)
 
 
-class RMQSolutionPublisher(AbstractSolutionPublisher):
+class RMQSolutionPublisher(SolutionPublisher):
     def __init__(
             self,
-            storage: FromDishka[AbstractStorage],
+            storage: FromDishka[Storage],
             broker: FromDishka[RabbitBroker]
     ):
         self.storage = storage
@@ -104,8 +106,8 @@ class RMQSolutionPublisher(AbstractSolutionPublisher):
 
 @mq_controller.subscriber(user_event_inbox, user_object_events)
 async def handle_user_deleted(
-        data: MQUserEvent,
-        interactor: FromDishka[PurgeUserSolutions]
+    data: MQUserEvent,
+    interactor: FromDishka[PurgeUserSolutions]
 ):
     if data.event != "DELETED":
         return
@@ -116,21 +118,24 @@ async def handle_user_deleted(
 
 @mq_controller.subscriber(contest_event_inbox, contest_object_events)
 async def handle_contest_deleted(
-        data: MQContestEvent,
-        interactor: FromDishka[PurgeTaskSolutions]
+    data: MQContestEvent,
+    interactor: FromDishka[PurgeTaskSolutions]
 ):
     if data.event != "DELETED":
         return
     logging.info("Received purge request for contest %s", data.object.id)
-    for page in data.object.pages:  # TODO: that's inefficient
+    # TODO: that's inefficient
+    await asyncio.gather(*(
         await interactor(page.type, page.id)
+        for page in data.object.pages
+    ))
     logging.info("Purged contest %s", data.object.id)
 
 
 @mq_controller.subscriber(quiz_task_event_inbox, contest_object_events)
 async def handle_quiz_task_deleted(
-        data: MQTaskEvent,
-        interactor: FromDishka[PurgeTaskSolutions]
+    data: MQTaskEvent,
+    interactor: FromDishka[PurgeTaskSolutions]
 ):
     if data.event != "DELETED":
         return
@@ -141,8 +146,8 @@ async def handle_quiz_task_deleted(
 
 @mq_controller.subscriber(code_task_event_inbox, contest_object_events)
 async def handle_code_task_deleted(
-        data: MQTaskEvent,
-        interactor: FromDishka[PurgeTaskSolutions]
+    data: MQTaskEvent,
+    interactor: FromDishka[PurgeTaskSolutions]
 ):
     if data.event != "DELETED":
         return

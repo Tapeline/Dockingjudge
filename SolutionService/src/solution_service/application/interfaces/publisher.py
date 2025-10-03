@@ -1,12 +1,17 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
+from typing import Any, Protocol
 
-from dishka import FromDishka
-
-from solution_service.application.interfaces.storage import AbstractStorage
-from solution_service.domain.entities.abstract import CodeSolution
+from solution_service.domain.abstract import CodeSolution
 
 
-class AbstractSolutionPublisher(ABC):
+class SolutionPublisher(Protocol):
+    """Handles asynchronous messaging."""
+
     @abstractmethod
-    async def publish(self, solution: CodeSolution, test_suite: dict) -> None:
+    async def publish(
+        self,
+        solution: CodeSolution,
+        test_suite: dict[str, Any]
+    ) -> None:
+        """Publish solution to the message queue."""
         raise NotImplementedError

@@ -1,10 +1,13 @@
-from abc import abstractmethod, ABC
+from abc import abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Protocol
 
 
 @dataclass
-class UserDTO:
+class User:
+    """Resembles a user."""
+
     id: int
     username: str
     settings: dict | None
@@ -12,7 +15,15 @@ class UserDTO:
     roles: list[str]
 
 
-class AbstractAccountService(ABC):
+class AccountService(Protocol):
+    """Provides methods to work with accounts."""
+
     @abstractmethod
-    async def get_users_by_ids(self, ids: Sequence[int]) -> Sequence[UserDTO]:
+    async def get_users_by_ids(self, ids: Sequence[int]) -> Sequence[User]:
+        """
+        Get list of users by a list of ids.
+
+        Users' ordering will be kept in accordance with ordering of ids.
+
+        """
         raise NotImplementedError

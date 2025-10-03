@@ -3,10 +3,7 @@ import sys
 
 from litestar.plugins.prometheus import PrometheusConfig, PrometheusController
 
-if sys.platform == "win32":
-    from asyncio import WindowsSelectorEventLoopPolicy
-
-from dishka import make_async_container
+from dishka import make_async_container, AsyncContainer
 from dishka.integrations import faststream as faststream_integration
 from dishka.integrations import litestar as litestar_integration
 from faststream import FastStream
@@ -18,33 +15,50 @@ from litestar.openapi import OpenAPIConfig
 from litestar.openapi.plugins import SwaggerRenderPlugin
 from litestar.openapi.spec import Components
 
+from solution_service.bootstrap.config import service_config_loader
+from solution_service.bootstrap.di.config import ConfigProvider
+from solution_service.bootstrap.di.interactors import InteractorProvider
+from solution_service.bootstrap.di.mq import MessageQueueProvider
+from solution_service.bootstrap.di.persistence import PersistenceProvider
+from solution_service.bootstrap.di.services import OuterServicesProvider
 from solution_service.config import Config
 from solution_service.controllers import http
 from solution_service.controllers.mq import mq_controller
-from solution_service.di import AppProvider
 from solution_service.infrastructure import account_service
 from solution_service.infrastructure.account_service import ServiceAuthenticationMiddleware
 from solution_service.infrastructure.rmq import create_broker
 
-config = Config()
-broker = create_broker(config.rabbitmq)
-container = make_async_container(
-    AppProvider(),
-    context={
-        Config: config,
-        RabbitBroker: broker
-    }
-)
+
+def _create_broker(config: Config) -> RabbitBroker:
+    return create_broker(config.rabbitmq)
 
 
-def get_faststream_app() -> FastStream:
+def _create_container(config: Config, broker: RabbitBroker) -> AsyncContainer:
+    return make_async_container(
+        ConfigProvider(),
+        InteractorProvider(),
+        MessageQueueProvider(),
+        PersistenceProvider(),
+        OuterServicesProvider(),
+        context={
+            Config: config,
+            RabbitBroker: broker
+        }
+    )
+
+
+def _get_faststream_app(
+    broker: RabbitBroker, container: AsyncContainer
+) -> FastStream:
     faststream_app = FastStream(broker)
-    faststream_integration.setup_dishka(container, faststream_app, auto_inject=True)
+    faststream_integration.setup_dishka(
+        container, faststream_app, auto_inject=True
+    )
     broker.include_router(mq_controller)
     return faststream_app
 
 
-def get_litestar_app() -> Litestar:
+def _get_litestar_app(config: Config, container: AsyncContainer) -> Litestar:
     prometheus_config = PrometheusConfig(
         app_name="solution_service",
         group_path=True,
@@ -53,7 +67,11 @@ def get_litestar_app() -> Litestar:
     logging_config = LoggingConfig(
         root={"level": "INFO", "handlers": ["queue_listener"]},
         formatters={
-            "standard": {"format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s"}
+            "standard": {
+                "format": (
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                )
+            }
         },
         log_exceptions="always",
     )
@@ -66,7 +84,7 @@ def get_litestar_app() -> Litestar:
         ]
     )
     litestar_app = Litestar(
-        debug=config.mode.debug_mode,
+        debug=config.debug_mode,
         route_handlers=[
             http.SolutionsController,
             http.ping,
@@ -96,12 +114,14 @@ def get_litestar_app() -> Litestar:
 
 def get_app():
     if sys.platform == "win32":
-        asyncio.set_event_loop_policy(WindowsSelectorEventLoopPolicy())
-    faststream_app = get_faststream_app()
-    litestar_app = get_litestar_app()
+        asyncio.set_event_loop_policy(
+            asyncio.WindowsSelectorEventLoopPolicy()
+        )
+    config = service_config_loader.load()
+    broker = _create_broker(config)
+    container = _create_container(config, broker)
+    faststream_app = _get_faststream_app(broker, container)
+    litestar_app = _get_litestar_app(config, container)
     litestar_app.on_startup.append(faststream_app.broker.start)
     litestar_app.on_shutdown.append(faststream_app.broker.close)
     return litestar_app
-
-
-app = get_app()

@@ -1,64 +1,44 @@
-import os
-
-from pydantic import Field, BaseModel
+from dataclasses import dataclass
 
 
-class RabbitMQConfig(BaseModel):
-    host: str = Field(alias="RMQ_HOST", default="localhost")
-    port: int = Field(alias="RMQ_PORT", default=5672)
-    username: str = Field(alias="RMQ_USER", default="rm_user")
-    password: str = Field(alias="RMQ_PASS", default="rm_password")
+@dataclass(frozen=True)
+class RabbitMQConfig:
+    host: str = "localhost"
+    port: int = 5672
+    username: str = "rm_user"
+    password: str = "rm_password"
 
 
-class PostgresConfig(BaseModel):
-    host: str = Field(alias="DB_HOST", default="localhost")
-    port: int = Field(alias="DB_PORT", default=5503)
-    username: str = Field(alias="DB_USER", default="pguser")
-    password: str = Field(alias="DB_PASS", default="pgpass")
-    database: str = Field(alias="DB_NAME", default="solution_db")
+@dataclass(frozen=True)
+class PostgresConfig:
+    host: str = "localhost"
+    port: int = 5503
+    username: str = "pguser"
+    password: str = "pgpass"
+    database: str = "solution_db"
 
 
-class MinioConfig(BaseModel):
-    host: str = Field(alias="S3_HOST", default="http://127.0.0.1")
-    port: int = Field(alias="S3_PORT", default=9900)
-    username: str = Field(alias="S3_USER", default="minio_user")
-    password: str = Field(alias="S3_PASS", default="minio_pass")
+@dataclass(frozen=True)
+class MinioConfig:
+    host: str = "http://127.0.0.1"
+    port: int = 9900
+    username: str = "minio_user"
+    password: str = "minio_pass"
     bucket_name: str = "solutions"
 
 
-class ModeConfig(BaseModel):
-    debug_mode: bool = Field(alias="DEBUG", default=True)
+@dataclass(frozen=True)
+class OuterServicesConfig:
+    account_service: str = "http://localhost:8001/api/v1/accounts"
+    contest_service: str = "http://localhost:8002/api/v1"
+    contest_service_internal: str = "http://localhost:8002/internal"
 
 
-class OtherServicesConfig(BaseModel):
-    account_service: str = Field(
-        alias="ACCOUNT_SERVICE",
-        default="http://localhost:8001/api/v1/accounts"
-    )
-    contest_service: str = Field(
-        alias="CONTEST_SERVICE",
-        default="http://localhost:8002/api/v1",
-    )
-    contest_service_internal: str = Field(
-        alias="CONTEST_SERVICE_INTERNAL",
-        default="http://localhost:8002/internal",
-    )
-
-
-class Config(BaseModel):
-    rabbitmq: RabbitMQConfig = Field(
-        default_factory=lambda: RabbitMQConfig(**os.environ)
-    )
-    postgres: PostgresConfig = Field(
-        default_factory=lambda: PostgresConfig(**os.environ)
-    )
-    s3: MinioConfig = Field(
-        default_factory=lambda: MinioConfig(**os.environ)
-    )
-    mode: ModeConfig = Field(
-        default_factory=lambda: ModeConfig(**os.environ)
-    )
-    services: OtherServicesConfig = Field(
-        default_factory=lambda: OtherServicesConfig(**os.environ)
-    )
+@dataclass(frozen=True)
+class Config:
+    rabbitmq: RabbitMQConfig
+    postgres: PostgresConfig
+    s3: MinioConfig
+    services: OuterServicesConfig
+    debug_mode: bool = True
     encoding: str = "UTF-8"

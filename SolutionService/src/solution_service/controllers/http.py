@@ -1,3 +1,4 @@
+import asyncio
 from typing import Annotated
 from uuid import UUID
 
@@ -8,42 +9,32 @@ from litestar.datastructures import State
 from litestar.params import Body
 
 from solution_service.application import interactors, dto
-from solution_service.application.interfaces.account import UserDTO
-from solution_service.application.interfaces.contest import AbstractContestService
+from solution_service.application.interactors.get_solution import \
+    (
+    GetBestSolutionForUserOnTask,
+    GetSolution,
+)
+from solution_service.application.interactors.list_solutions import \
+    (
+    ListMySolutions, ListMySolutionsOnTask, ListSolutionForUser,
+)
+from solution_service.application.interactors.post_code_solution import \
+    PostCodeSolution
+from solution_service.application.interactors.post_quiz_solution import \
+    PostQuizSolution
+from solution_service.application.interactors.standings import GetStandings
+from solution_service.application.interfaces.account import User
+from solution_service.application.interfaces.contest import ContestService
 from solution_service.controllers import schemas
 from solution_service.application.exceptions import NotFoundException, ForbiddenException
 from solution_service.domain.entities.abstract import TaskType, AnySolution
+
+from solution_service.controllers.dumping import serialize_solution
+from solution_service.controllers.loading import load_composite_task_id
 from solution_service.infrastructure.account_service import authenticated_user_guard
 
 
-def _serialize_solution(
-        solution: AnySolution,
-        is_safe: bool = False,
-) -> schemas.SolutionSchema:
-    if not solution:
-        return None
-    data = None
-    if not is_safe and solution.task_type == TaskType.QUIZ:
-        data = schemas.QuizSolutionExtraSchema(
-            submitted_answer=solution.submitted_answer,
-        )
-    if not is_safe and solution.task_type == TaskType.CODE:
-        data = schemas.CodeSolutionExtraSchema(
-            compiler=solution.compiler_name,
-            submission_url=solution.submission_url,
-            group_scores=solution.group_scores,
-            detailed_verdict=solution.detailed_verdict,
-        )
-    return schemas.SolutionSchema(
-        id=solution.uid,
-        task_id=solution.task_id,
-        task_type=solution.task_type,
-        user_id=solution.user_id,
-        score=solution.score,
-        short_verdict=solution.short_verdict,
-        submitted_at=solution.submitted_at,
-        data=data,
-    )
+
 
 
 inject_guards = {"guards": [authenticated_user_guard]}
@@ -60,19 +51,14 @@ class SolutionsController(Controller):
     )
     @inject
     async def get_solution(
-            self,
-            solution_uid: Annotated[UUID, Body(description="Solution ID")],
-            interactor: Depends[interactors.GetSolution],
-            contest_service: Depends[AbstractContestService],
-            request: Request[UserDTO, ..., State],
+        self,
+        solution_uid: Annotated[UUID, Body(description="Solution ID")],
+        interactor: Depends[GetSolution],
     ) -> schemas.SolutionSchema:
         solution = await interactor(solution_id=str(solution_uid))
         if solution is None:
             raise NotFoundException
-        contest_managers = await contest_service.get_contest_managers(solution.contest_id)
-        if request.user.id != solution.user_id and request.user.id not in contest_managers:
-            raise ForbiddenException
-        return _serialize_solution(solution)
+        return serialize_solution(solution)
 
     @route(
         http_method=HttpMethod.GET,
@@ -81,12 +67,11 @@ class SolutionsController(Controller):
     )
     @inject
     async def get_my_solutions(
-            self,
-            request: Request[UserDTO, ..., State],
-            interactor: Depends[interactors.ListSolutionForUser],
+        self,
+        interactor: Depends[ListMySolutions],
     ) -> list[schemas.SolutionSchema]:
-        solutions = await interactor(request.user.id)
-        return list(map(_serialize_solution, solutions))
+        solutions = await interactor()
+        return list(map(serialize_solution, solutions))
 
     @route(
         http_method=HttpMethod.GET,
@@ -95,14 +80,13 @@ class SolutionsController(Controller):
     )
     @inject
     async def get_my_solutions_for_task(
-            self,
-            request: Request[UserDTO, ..., State],
-            interactor: Depends[interactors.ListSolutionForUserOnTask],
-            task_type: str,
-            task_id: int,
+        self,
+        interactor: Depends[ListMySolutionsOnTask],
+        task_type: str,
+        task_id: int,
     ) -> list[schemas.SolutionSchema]:
-        solutions = await interactor(request.user.id, TaskType(task_type), task_id)
-        return list(map(_serialize_solution, solutions))
+        solutions = await interactor(TaskType(task_type), task_id)
+        return list(map(serialize_solution, solutions))
 
     @route(
         http_method=HttpMethod.POST,
@@ -111,14 +95,12 @@ class SolutionsController(Controller):
     )
     @inject
     async def post_code_solution(
-            self,
-            request: Request[UserDTO, ..., State],
-            data: schemas.PostCodeSolutionSchema,
-            task_id: int,
-            interactor: Depends[interactors.PostCodeSolution],
+        self,
+        data: schemas.PostCodeSolutionSchema,
+        task_id: int,
+        interactor: Depends[PostCodeSolution],
     ) -> schemas.SolutionSchema:
         solution = await interactor(
-            request.user.id,
             dto.NewCodeSolution(
                 compiler=data.compiler,
                 text=data.text,
@@ -127,7 +109,7 @@ class SolutionsController(Controller):
                 main_file=data.main_file,
             ),
         )
-        return _serialize_solution(solution)
+        return serialize_solution(solution)
 
     @route(
         http_method=HttpMethod.POST,
@@ -136,20 +118,18 @@ class SolutionsController(Controller):
     )
     @inject
     async def post_quiz_solution(
-            self,
-            request: Request[UserDTO, ..., State],
-            data: schemas.PostQuizSolutionSchema,
-            task_id: int,
-            interactor: Depends[interactors.PostQuizSolution],
+        self,
+        data: schemas.PostQuizSolutionSchema,
+        task_id: int,
+        interactor: Depends[PostQuizSolution],
     ) -> schemas.SolutionSchema:
         solution = await interactor(
-            request.user.id,
             dto.NewQuizSolution(
                 text=data.text,
                 task_id=task_id,
             ),
         )
-        return _serialize_solution(solution)
+        return serialize_solution(solution)
 
     @route(
         http_method=HttpMethod.GET,
@@ -158,16 +138,18 @@ class SolutionsController(Controller):
     )
     @inject
     async def get_score_for_tasks(
-            self,
-            request: Request[UserDTO, ..., State],
-            tasks: list[str],
-            interactor: Depends[interactors.GetBestSolutionForUserOnTask],
+        self,
+        tasks: list[str],
+        interactor: Depends[GetBestSolutionForUserOnTask],
     ) -> list[schemas.SolutionSchema]:
-        tasks = map(lambda x: x.split(":"), tasks)
-        tasks = [(str(x[0]), int(x[1])) for x in tasks]
+        tasks_ids = map(load_composite_task_id, tasks)
+        solution_dms = await asyncio.gather(*(
+            interactor(task_type, task_id)
+            for task_type, task_id in tasks_ids
+        ))
         return [
-            _serialize_solution(await interactor(request.user.id, *task), is_safe=True)
-            for task in tasks
+            serialize_solution(solution, is_safe=True)
+            for solution in solution_dms
         ]
 
     @route(
@@ -177,13 +159,16 @@ class SolutionsController(Controller):
     )
     @inject
     async def get_standings(
-            self,
-            contest_id: int,
-            interactor: Depends[interactors.GetStandings],
+        self,
+        contest_id: int,
+        interactor: Depends[GetStandings],
     ) -> schemas.StandingsSchema:
         standings, tasks = await interactor(contest_id)
         return schemas.StandingsSchema(
-            tasks=tasks,
+            tasks=[
+                (task.type, task.id, task.title)
+                for task in tasks
+            ],
             table=[
                 schemas.UserContestStatusSchema(
                     user=schemas.UserSchema(
@@ -195,7 +180,7 @@ class SolutionsController(Controller):
                     tasks_attempted=status.tasks_attempted,
                     tasks_solved=status.tasks_solved,
                     solutions=[
-                        _serialize_solution(solution, is_safe=True)
+                        serialize_solution(solution, is_safe=True)
                         for solution in status.solutions
                     ],
                     total_score=status.total_score,

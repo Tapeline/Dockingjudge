@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from enum import Enum
 
-from solution_service.application.interfaces.account import UserDTO
-from solution_service.domain.entities.abstract import (
+from solution_service.application.interfaces.account import User
+from solution_service.domain.abstract import (
     AnySolution,
     SubmissionType
 )
@@ -10,7 +9,9 @@ from solution_service.domain.entities.abstract import (
 
 @dataclass
 class EnrichedUserContestStatus:
-    user: UserDTO
+    """UserContestStatus with actual user inside."""
+
+    user: User
     tasks_attempted: int
     tasks_solved: int
     solutions: list[AnySolution]
@@ -19,6 +20,8 @@ class EnrichedUserContestStatus:
 
 @dataclass
 class NewCodeSolution:
+    """New code solution."""
+
     task_id: int
     submission_type: SubmissionType
     text: str
@@ -28,12 +31,16 @@ class NewCodeSolution:
 
 @dataclass
 class NewQuizSolution:
+    """New quiz solution."""
+
     task_id: int
     text: str
 
 
 @dataclass
 class SolutionCheckResult:
+    """Result of checking a solution."""
+
     score: int
     detailed_verdict: str
     short_verdict: str

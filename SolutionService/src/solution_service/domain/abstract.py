@@ -3,7 +3,7 @@ import datetime
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
+from typing import Any, ClassVar
 
 
 @dataclass
@@ -13,13 +13,14 @@ class QuizCheckerVerdict:
 
 
 type QuizAnswer = str
+type QuizCheckerClass = type["AbstractQuizChecker[Any]"]
 
 
 class AbstractQuizChecker[CheckerParams](ABC):
     """ABC for quiz checkers"""
     name: str
     params: CheckerParams
-    all_checkers = {}
+    all_checkers: ClassVar[dict[str, QuizCheckerClass]] = {}
 
     def __init__(self, max_score: int, parameters: CheckerParams):
         self.params: CheckerParams = parameters

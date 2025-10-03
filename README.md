@@ -103,6 +103,7 @@ Dockingjudge consists of several services:
 - [ ] Load testing
 - [ ] Make frontend locally deployable in container
 - [ ] Massive frontend rework
+- [ ] Get rid of pydantic in application layer (bruh)
 
 ### Third round
 

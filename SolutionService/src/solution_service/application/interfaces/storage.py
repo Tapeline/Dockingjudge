@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Protocol
+from uuid import UUID
 
 type URL = str
 
@@ -16,7 +17,7 @@ class File:
         return self.contents.decode(self.encoding)
 
 
-class AbstractStorage(ABC):
+class Storage(Protocol):
     @abstractmethod
     async def get_file_url(self, name: str) -> URL:
         raise NotImplementedError
@@ -33,8 +34,18 @@ class AbstractStorage(ABC):
 class DBSession(Protocol):
     @abstractmethod
     async def commit(self) -> None:
-        ...
+        raise NotImplementedError
 
     @abstractmethod
     async def flush(self) -> None:
-        ...
+        raise NotImplementedError
+
+    @abstractmethod
+    async def rollback(self) -> None:
+        raise NotImplementedError
+
+
+class IdGenerator(Protocol):
+    @abstractmethod
+    def new_id(self) -> str:
+        raise NotImplementedError
