@@ -18,22 +18,23 @@ type QuizCheckerClass = type["AbstractQuizChecker[Any]"]
 
 class AbstractQuizChecker[CheckerParams](ABC):
     """ABC for quiz checkers"""
+
     name: str
     params: CheckerParams
     all_checkers: ClassVar[dict[str, QuizCheckerClass]] = {}
 
-    def __init__(self, max_score: int, parameters: CheckerParams):
+    def __init__(self, max_score: int, parameters: CheckerParams) -> None:
         self.params: CheckerParams = parameters
         self.max_score = max_score
 
-    def __init_subclass__(cls):
+    def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         AbstractQuizChecker.all_checkers[cls.name] = cls
 
     @abstractmethod
     def check(
             self,
-            actual_answer: QuizAnswer
+            actual_answer: QuizAnswer,
     ) -> QuizCheckerVerdict:
         raise NotImplementedError
 
@@ -52,7 +53,9 @@ class GenericSolution:
     user_id: int
     score: int
     short_verdict: str
-    submitted_at: datetime.datetime = field(default_factory=datetime.datetime.now)
+    submitted_at: datetime.datetime = field(
+        default_factory=datetime.datetime.now,
+    )
 
 
 @dataclass

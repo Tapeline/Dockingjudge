@@ -21,8 +21,7 @@ def load_checker(
         params = param_class(**checker_params)
     except TypeError as arg_exception:
         raise BadCheckerParametersException from arg_exception
-    checker = checker_class(max_score, params)
-    return checker
+    return checker_class(max_score, params)
 
 
 def _get_param_class(checker_class: type[AbstractQuizChecker]) -> type | None:

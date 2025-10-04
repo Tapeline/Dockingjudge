@@ -3,12 +3,13 @@ import uuid
 from typing import Any
 
 from solution_service.application.interfaces.solutions import (
-    UserStandingRow,
     UserSolutionScore,
+    UserStandingRow,
 )
-from solution_service.domain.abstract import TaskType, QuizSolution
-from solution_service.infrastructure.persistence.repo_impl import \
-    SolutionRepoImpl
+from solution_service.domain.abstract import QuizSolution, TaskType
+from solution_service.infrastructure.persistence.repo_impl import (
+    SolutionRepoImpl,
+)
 
 
 def row(
@@ -27,21 +28,21 @@ def row(
                 user_id=user_id,
                 task_type=TaskType.QUIZ,
                 task_id=score[0],
-                score=score[1]
+                score=score[1],
             ) if score else None
             for score in scores
-        ]
+        ],
     )
 
 
 def solution(
-    score: int, task_id: int, user_id: int
+    score: int, task_id: int, user_id: int,
 ) -> dict[str, Any]:
     return {
         "score": score,
         "task_id": task_id,
         "user_id": user_id,
-        "short_verdict": "OK" if score == 100 else "WA"
+        "short_verdict": "OK" if score == 100 else "WA",
     }
 
 
@@ -56,7 +57,7 @@ def solution_factory(params: dict[str, Any]) -> QuizSolution:
             score=100,
             short_verdict="OK",
             submitted_answer="ans",
-        ) | params)
+        ) | params),
     )
 
 
@@ -68,5 +69,5 @@ async def create_solutions(
         *(
             solution_repo.create_solution(solution)
             for solution in solutions
-        )
+        ),
     )

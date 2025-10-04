@@ -3,21 +3,24 @@ from typing import Any
 import pytest
 
 from solution_service.application.exceptions import (
-    MayNotAccessSolution,
     MayNotSubmitSolution,
 )
-from solution_service.application.interactors.get_solution import GetSolution
-from solution_service.application.interactors.post_code_solution import \
-    PostCodeSolution
+from solution_service.application.interactors.post_code_solution import (
+    PostCodeSolution,
+)
 from solution_service.domain.abstract import SubmissionType
 from tests.unit.factory import (
+    CodeTaskFactory,
+    NewCodeSolutionFactory,
     UserFactory,
-    QuizSolutionFactory, CodeSolutionFactory, NewCodeSolutionFactory,
-    CodeTaskFactory, to_base64, from_base64,
+    from_base64,
+    to_base64,
 )
 from tests.unit.fakes import (
-    FakeSolutionRepository, FakeUserIdP,
-    FakeContestService, FakeSolutionPublisher, FakeObjectStore,
+    FakeContestService,
+    FakeObjectStore,
+    FakeSolutionPublisher,
+    FakeUserIdP,
 )
 
 
@@ -27,14 +30,14 @@ from tests.unit.fakes import (
         {
             "submission_type": SubmissionType.STR,
             "text": "print('Hello, World')",
-            "main_file": None
+            "main_file": None,
         },
         {
             "submission_type": SubmissionType.ZIP,
             "text": to_base64("some zip content"),
-            "main_file": "main.py"
-        }
-    ]
+            "main_file": "main.py",
+        },
+    ],
 )
 @pytest.mark.asyncio
 async def test_code_solution_posting(
@@ -46,7 +49,7 @@ async def test_code_solution_posting(
     solution_params: dict[str, Any],
     code_task_factory: CodeTaskFactory,
     fake_solution_publisher: FakeSolutionPublisher,
-    fake_object_store: FakeObjectStore
+    fake_object_store: FakeObjectStore,
 ):
     user = user_factory.build()
     fake_user_idp.user = user

@@ -2,27 +2,40 @@ import pytest
 from polyfactory.pytest_plugin import register_fixture
 
 from solution_service.application.interactors.get_solution import (
-    GetSolution,
     GetBestSolutionForUserOnTask,
+    GetSolution,
 )
-from solution_service.application.interactors.post_code_solution import \
-    PostCodeSolution
-from solution_service.application.interactors.post_quiz_solution import \
-    PostQuizSolution
+from solution_service.application.interactors.post_code_solution import (
+    PostCodeSolution,
+)
+from solution_service.application.interactors.post_quiz_solution import (
+    PostQuizSolution,
+)
 from solution_service.config import (
-    Config, RabbitMQConfig, PostgresConfig,
-    OuterServicesConfig, MinioConfig,
+    Config,
+    MinioConfig,
+    OuterServicesConfig,
+    PostgresConfig,
+    RabbitMQConfig,
 )
-from solution_service.infrastructure.persistence.id_gen import \
-    DefaultUUIDGenerator
+from solution_service.infrastructure.persistence.id_gen import (
+    DefaultUUIDGenerator,
+)
 from tests.unit.factory import (
-    UserFactory, QuizSolutionFactory,
-    CodeSolutionFactory, NewCodeSolutionFactory, CodeTaskFactory,
-    NewQuizSolutionFactory, QuizTaskFactory,
+    CodeSolutionFactory,
+    CodeTaskFactory,
+    NewCodeSolutionFactory,
+    NewQuizSolutionFactory,
+    QuizSolutionFactory,
+    QuizTaskFactory,
+    UserFactory,
 )
 from tests.unit.fakes import (
-    FakeSolutionRepository, FakeUserIdP,
-    FakeContestService, FakeObjectStore, FakeSolutionPublisher,
+    FakeContestService,
+    FakeObjectStore,
+    FakeSolutionPublisher,
+    FakeSolutionRepository,
+    FakeUserIdP,
 )
 
 
@@ -72,7 +85,7 @@ def get_solution_interactor(
     return GetSolution(
         solution_repository=fake_solution_repo,
         user_idp=fake_user_idp,
-        contest_service=fake_contest_service
+        contest_service=fake_contest_service,
     )
 
 
@@ -103,7 +116,7 @@ def post_code_solution_interactor(
         solution_publisher=fake_solution_publisher,
         config=test_config,
         user_idp=fake_user_idp,
-        id_gen=DefaultUUIDGenerator()
+        id_gen=DefaultUUIDGenerator(),
     )
 
 

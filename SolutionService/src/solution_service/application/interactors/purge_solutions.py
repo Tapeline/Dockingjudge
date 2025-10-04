@@ -1,7 +1,8 @@
 from dataclasses import dataclass
 
-from solution_service.application.interfaces.solutions import \
-    SolutionRepository
+from solution_service.application.interfaces.solutions import (
+    SolutionRepository,
+)
 from solution_service.domain.abstract import TaskType
 
 
@@ -19,5 +20,5 @@ class PurgeTaskSolutions:
 
     async def __call__(self, task_type: TaskType, task_id: int) -> None:
         await self.solution_repository.purge_task_solutions(
-            task_type, task_id
+            task_type, task_id,
         )

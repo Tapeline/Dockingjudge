@@ -1,8 +1,9 @@
 import uuid
-from typing import Sequence, override
+from collections.abc import Sequence
+from typing import Any, override
 
 import sqlalchemy
-from sqlalchemy import delete, select, and_, or_, update, func
+from sqlalchemy import and_, delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from solution_service.application.interfaces import solutions
@@ -13,16 +14,16 @@ from solution_service.application.interfaces.solutions import (
 )
 from solution_service.domain.abstract import (
     AnySolution,
-    TaskType,
     CodeSolution,
     QuizSolution,
     SubmissionType,
+    TaskType,
 )
 from solution_service.infrastructure.persistence.models import SolutionModel
 
 
 def _transform_solution_model_to_entity(
-        model: SolutionModel | None
+        model: SolutionModel | None,
 ) -> AnySolution | None:
     if model is None:
         return None
@@ -34,7 +35,7 @@ def _transform_solution_model_to_entity(
         "user_id": model.user_id,
         "score": model.score,
         "short_verdict": model.short_verdict,
-        "submitted_at": model.submitted_at
+        "submitted_at": model.submitted_at,
     }
     if model.task_type == TaskType.CODE:
         return CodeSolution(
@@ -44,23 +45,23 @@ def _transform_solution_model_to_entity(
             main_file=model.main_file,
             compiler_name=model.compiler_name,
             submission_type=SubmissionType(
-                model.code_solution_type
+                model.code_solution_type,
             ),
-            **commons
+            **commons,
         )
     if model.task_type == TaskType.QUIZ:
         return QuizSolution(
             submitted_answer=model.answer,
-            **commons
+            **commons,
         )
     raise TypeError(
         "Cannot transform solution model to entity: "
-        "unexpected type " + str(model)
+        "unexpected type " + str(model),
     )
 
 
 def _select_contest_tasks(
-        contest_tasks: Sequence[tuple[TaskType, int]]
+        contest_tasks: Sequence[tuple[TaskType, int]],
 ) -> sqlalchemy.Select:
     quiz_tasks_filter = [
         task[1] for task in contest_tasks
@@ -74,17 +75,17 @@ def _select_contest_tasks(
         or_(
             and_(
                 SolutionModel.task_type == TaskType.QUIZ,
-                SolutionModel.task_id.in_(quiz_tasks_filter)
+                SolutionModel.task_id.in_(quiz_tasks_filter),
             ),
             and_(
                 SolutionModel.task_type == TaskType.CODE,
-                SolutionModel.task_id.in_(code_tasks_filter)
-            )
-        )
+                SolutionModel.task_id.in_(code_tasks_filter),
+            ),
+        ),
     )
 
 
-def _apply_pagination(query, pagination: PaginationParameters):
+def _apply_pagination(query: Any, pagination: PaginationParameters) -> Any:
     if pagination.offset is not None:
         query = query.offset(pagination.offset)
     if pagination.limit is not None:
@@ -95,7 +96,7 @@ def _apply_pagination(query, pagination: PaginationParameters):
 class SolutionRepoImpl(solutions.SolutionRepository):
     # TODO: move .commit over to DBSession and application layer
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
     @override
@@ -103,19 +104,19 @@ class SolutionRepoImpl(solutions.SolutionRepository):
             self,
             user_id: int,
             task_type: str | None = None,
-            pagination_params: PaginationParameters | None = None
+            pagination_params: PaginationParameters | None = None,
     ) -> list[AnySolution]:
         pagination_params = pagination_params or PaginationParameters()
         query = select(SolutionModel).filter(
-            SolutionModel.user_id == user_id
+            SolutionModel.user_id == user_id,
         )
         query = _apply_pagination(query, pagination_params)
         models = await self._session.execute(query)
         return list(
             map(
                 _transform_solution_model_to_entity,
-                models.scalars().all()
-            )
+                models.scalars().all(),
+            ),
         )
 
     @override
@@ -123,7 +124,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
         self,
         user_id: int,
         contest_tasks: Sequence[tuple[TaskType, int]],
-        pagination_params: PaginationParameters | None = None
+        pagination_params: PaginationParameters | None = None,
     ) -> Sequence[AnySolution]:
         pagination_params = pagination_params or PaginationParameters()
         query = _select_contest_tasks(contest_tasks).filter(
@@ -134,8 +135,8 @@ class SolutionRepoImpl(solutions.SolutionRepository):
         return list(
             map(
                 _transform_solution_model_to_entity,
-                models.scalars().all()
-            )
+                models.scalars().all(),
+            ),
         )
 
     @override
@@ -144,30 +145,30 @@ class SolutionRepoImpl(solutions.SolutionRepository):
             user_id: int,
             task_type: TaskType,
             task_id: int,
-            pagination_params: PaginationParameters | None = None
+            pagination_params: PaginationParameters | None = None,
     ) -> list[AnySolution]:
         pagination_params = pagination_params or PaginationParameters()
         query = select(SolutionModel).filter(
             and_(
                 SolutionModel.user_id == user_id,
                 SolutionModel.task_type == task_type,
-                SolutionModel.task_id == task_id
-            )
+                SolutionModel.task_id == task_id,
+            ),
         )
         query = _apply_pagination(query, pagination_params)
         models = await self._session.execute(query)
         return list(
             map(
                 _transform_solution_model_to_entity,
-                models.scalars().all()
-            )
+                models.scalars().all(),
+            ),
         )
 
     @override
     async def get_contest_standings(
         self,
         contest_tasks: Sequence[tuple[TaskType, int]],
-        participants: Sequence[int]
+        participants: Sequence[int],
     ) -> Sequence[UserStandingRow]:
         subquery = (
             select(
@@ -189,7 +190,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
             subquery.c.task_type,
             subquery.c.best_score,
             SolutionModel.uuid,
-            SolutionModel.short_verdict
+            SolutionModel.short_verdict,
         ).join_from(
             subquery,
             SolutionModel,
@@ -211,7 +212,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
         counted = set()
         best_solutions = await self._session.execute(query)
         for (
-            user_id, task_id, task_type, score, solution_id, short_verdict
+            user_id, task_id, task_type, score, _, short_verdict,
         ) in best_solutions:
             if (task_type, task_id) not in contest_tasks:
                 # TODO: very inefficient, should move to SQL query
@@ -231,7 +232,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
                 task_type=TaskType(task_type),
                 task_id=task_id,
                 user_id=user_id,
-                score=score
+                score=score,
             )
             counted.add((task_type, task_id, user_id))
         return [statuses[participant] for participant in participants]
@@ -239,7 +240,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
     @override
     async def get_solution(self, solution_id: str) -> AnySolution | None:
         query = select(SolutionModel).filter(
-            SolutionModel.uuid == solution_id
+            SolutionModel.uuid == solution_id,
         )
         models = await self._session.execute(query)
         return _transform_solution_model_to_entity(models.scalars().one())
@@ -249,14 +250,14 @@ class SolutionRepoImpl(solutions.SolutionRepository):
             self,
             user_id: int,
             task_type: TaskType,
-            task_id: int
+            task_id: int,
     ) -> AnySolution | None:
         query = select(SolutionModel).filter(
             and_(
                 SolutionModel.user_id == user_id,
                 SolutionModel.task_type == task_type,
-                SolutionModel.task_id == task_id
-            )
+                SolutionModel.task_id == task_id,
+            ),
         ).order_by(SolutionModel.score.desc())
         models = await self._session.execute(query)
         return _transform_solution_model_to_entity(models.scalars().first())
@@ -291,7 +292,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
             detailed_verdict=detailed_verdict,
             compiler_name=compiler_name,
             main_file=main_file,
-            code_solution_type=submission_type
+            code_solution_type=submission_type,
         )
         self._session.add(model)
 
@@ -318,7 +319,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
     @override
     async def purge_user_solutions(self, user_id: int) -> None:
         await self._session.execute(
-            delete(SolutionModel).where(SolutionModel.user_id == user_id)
+            delete(SolutionModel).where(SolutionModel.user_id == user_id),
         )
         await self._session.commit()
 
@@ -326,12 +327,12 @@ class SolutionRepoImpl(solutions.SolutionRepository):
     async def purge_task_solutions(
             self,
             task_type: TaskType,
-            task_id: int
+            task_id: int,
     ) -> None:
         await self._session.execute(
             delete(SolutionModel).where(
                 SolutionModel.task_id == task_id,
-                SolutionModel.task_type == task_type
-            )
+                SolutionModel.task_type == task_type,
+            ),
         )
         await self._session.commit()

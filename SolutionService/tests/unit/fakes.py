@@ -1,22 +1,28 @@
 import uuid
-from collections.abc import Callable
-from typing import Any, Sequence
+from collections.abc import Callable, Sequence
+from typing import Any
 
 from solution_service.application.exceptions import NotAuthenticated
 from solution_service.application.interfaces.account import User
 from solution_service.application.interfaces.contest import (
-    AnyTaskDTO, CodeTaskDTO,
-    ContestService, ContestTaskHead, QuizTaskDTO,
+    AnyTaskDTO,
+    CodeTaskDTO,
+    ContestService,
+    ContestTaskHead,
+    QuizTaskDTO,
 )
 from solution_service.application.interfaces.publisher import SolutionPublisher
 from solution_service.application.interfaces.solutions import (
-    PaginationParameters, SolutionRepository, UserStandingRow,
+    PaginationParameters,
+    SolutionRepository,
+    UserStandingRow,
 )
-from solution_service.application.interfaces.storage import Storage, URL, File
+from solution_service.application.interfaces.storage import URL, File, Storage
 from solution_service.application.interfaces.user import UserIdProvider
 from solution_service.domain.abstract import (
-    AnySolution, TaskType,
+    AnySolution,
     CodeSolution,
+    TaskType,
 )
 
 
@@ -27,7 +33,7 @@ class FakeSolutionRepository(SolutionRepository):
     def _paginate(
         self,
         collection: list[AnySolution],
-        params: PaginationParameters | None
+        params: PaginationParameters | None,
     ) -> list[AnySolution]:
         params = params or PaginationParameters()
         offset = params.offset or 0
@@ -44,20 +50,22 @@ class FakeSolutionRepository(SolutionRepository):
                 solution for solution in self.solutions.values()
                 if predicate(solution)
             ],
-            pagination
+            pagination,
         )
 
     async def get_all_solutions_of_user(
         self,
         user_id: int,
         task_type: TaskType | None = None,
-        pagination_params: PaginationParameters | None = None
+        pagination_params: PaginationParameters | None = None,
     ) -> list[AnySolution]:
         return self._get_solutions_filtered_paginated(
             pagination_params,
             lambda solution: (
-                                 not task_type or solution.task_type == task_type
-                             ) and solution.user_id == user_id
+                (
+                    not task_type or solution.task_type == task_type
+                ) and solution.user_id == user_id
+            ),
         )
 
     async def get_all_solutions_of_task(
@@ -65,32 +73,32 @@ class FakeSolutionRepository(SolutionRepository):
         user_id: int,
         task_type: TaskType,
         task_id: int,
-        pagination_params: PaginationParameters | None = None
+        pagination_params: PaginationParameters | None = None,
     ) -> list[AnySolution]:
         return self._get_solutions_filtered_paginated(
             pagination_params,
             lambda solution:
             solution.task_type == task_type
             and solution.task_id == task_id
-            and solution.user_id == user_id
+            and solution.user_id == user_id,
         )
 
     async def get_all_solutions_of_user_for_contest(
         self,
         user_id: int,
         contest_tasks: Sequence[tuple[TaskType, int]],
-        pagination_params: PaginationParameters | None = None
+        pagination_params: PaginationParameters | None = None,
     ) -> Sequence[AnySolution]:
         return self._get_solutions_filtered_paginated(
             pagination_params,
             lambda solution:
-            (solution.task_type, solution.task_id) in contest_tasks
+            (solution.task_type, solution.task_id) in contest_tasks,
         )
 
     async def get_contest_standings(
         self,
         contest_tasks: Sequence[tuple[TaskType, int]],
-        participants: Sequence[int]
+        participants: Sequence[int],
     ) -> Sequence[UserStandingRow]:
         pass
 
@@ -101,15 +109,17 @@ class FakeSolutionRepository(SolutionRepository):
         self,
         user_id: int,
         task_type: TaskType,
-        task_id: int
+        task_id: int,
     ) -> AnySolution | None:
-        solutions = sorted(self._get_solutions_filtered_paginated(
-            None,
-            lambda solution:
-            solution.task_type == task_type
-            and solution.task_id == task_id
-            and solution.user_id == user_id
-        ), key=lambda solution: solution.score)
+        solutions = sorted(
+            self._get_solutions_filtered_paginated(
+                None,
+                lambda solution:
+                solution.task_type == task_type
+                and solution.task_id == task_id
+                and solution.user_id == user_id,
+            ), key=lambda solution: solution.score,
+        )
         if not solutions:
             return None
         return solutions[-1]
@@ -124,7 +134,7 @@ class FakeSolutionRepository(SolutionRepository):
         detailed_verdict: str,
         short_verdict: str,
         group_scores: dict[str, int],
-        protocol: dict[str, Any]
+        protocol: dict[str, Any],
     ) -> None:
         self.solutions[solution_id].score = score
         self.solutions[solution_id].detailed_verdict = detailed_verdict
@@ -139,7 +149,7 @@ class FakeSolutionRepository(SolutionRepository):
     async def purge_task_solutions(
         self,
         task_type: TaskType,
-        task_id: int
+        task_id: int,
     ) -> None:
         for solution_id, solution in self.solutions.items():
             if solution.task_id == task_id and solution.task_type == task_type:
@@ -176,7 +186,7 @@ class FakeContestService(ContestService):
         return self.contest_managers.get(contest_id, [])
 
     async def get_contest_tasks(
-        self, contest_id: int
+        self, contest_id: int,
     ) -> Sequence[ContestTaskHead]:
         return self.contest_tasks.get(contest_id, [])
 
@@ -187,21 +197,20 @@ class FakeContestService(ContestService):
         self,
         user_id: int,
         task_type: TaskType,
-        task_id: int
+        task_id: int,
     ) -> bool:
         return self.can_submit_task
 
     async def get_task(
         self,
         task_type: str,
-        task_id: int
+        task_id: int,
     ) -> AnyTaskDTO | None:
         if task_type.lower() == "quiz":
             return await self.get_quiz_task(task_id)
-        elif task_type.lower() == "code":
+        if task_type.lower() == "code":
             return await self.get_code_task(task_id)
-        else:
-            raise AssertionError("unknown task type")
+        raise AssertionError("unknown task type")
 
     async def get_quiz_task(self, task_id: int) -> QuizTaskDTO | None:
         return self.quiz_tasks.get(task_id, None)
@@ -234,6 +243,6 @@ class FakeSolutionPublisher(SolutionPublisher):
         self.published = []
 
     async def publish(
-        self, solution: CodeSolution, test_suite: dict[str, Any]
+        self, solution: CodeSolution, test_suite: dict[str, Any],
     ) -> None:
         self.published.append((solution, test_suite))

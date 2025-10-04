@@ -4,50 +4,45 @@ from uuid import UUID
 
 from dishka.integrations.base import FromDishka as Depends
 from dishka.integrations.litestar import inject
-from litestar import Controller, HttpMethod, route, Request, get
-from litestar.datastructures import State
+from litestar import Controller, HttpMethod, get, route
 from litestar.params import Body
 
-from solution_service.application import interactors, dto
+from solution_service.application import dto
 from solution_service.application.exceptions import NotFound
-from solution_service.application.interactors.get_solution import \
-    (
+from solution_service.application.interactors.get_solution import (
     GetBestSolutionForUserOnTask,
     GetSolution,
 )
-from solution_service.application.interactors.list_solutions import \
-    (
-    ListMySolutions, ListMySolutionsOnTask,
+from solution_service.application.interactors.list_solutions import (
+    ListMySolutions,
+    ListMySolutionsOnTask,
 )
-from solution_service.application.interactors.post_code_solution import \
-    PostCodeSolution
-from solution_service.application.interactors.post_quiz_solution import \
-    PostQuizSolution
+from solution_service.application.interactors.post_code_solution import (
+    PostCodeSolution,
+)
+from solution_service.application.interactors.post_quiz_solution import (
+    PostQuizSolution,
+)
 from solution_service.application.interactors.standings import GetStandings
-from solution_service.application.interfaces.account import User
-from solution_service.application.interfaces.contest import ContestService
 from solution_service.controllers import schemas
-
 from solution_service.controllers.dumping import serialize_solution
 from solution_service.controllers.loading import load_composite_task_id
 from solution_service.domain.abstract import TaskType
-from solution_service.infrastructure.account_service import authenticated_user_guard
-
-
-
-
+from solution_service.infrastructure.account_service import (
+    authenticated_user_guard,
+)
 
 inject_guards = {"guards": [authenticated_user_guard]}
 
 
 class SolutionsController(Controller):
     path = "/api/v1/solutions"
-    security = [{"jwt_auth": []}]
+    security = ([{"jwt_auth": []}],)
 
     @route(
         http_method=HttpMethod.GET,
         path="/{solution_uid:uuid}/",
-        **inject_guards
+        **inject_guards,
     )
     @inject
     async def get_solution(
@@ -63,7 +58,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.GET,
         path="/my/",
-        **inject_guards
+        **inject_guards,
     )
     @inject
     async def get_my_solutions(
@@ -76,7 +71,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.GET,
         path="/my/{task_type:str}/{task_id:int}/",
-        **inject_guards
+        **inject_guards,
     )
     @inject
     async def get_my_solutions_for_task(
@@ -91,7 +86,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.POST,
         path="/post/code/{task_id:int}/",
-        **inject_guards
+        **inject_guards,
     )
     @inject
     async def post_code_solution(
@@ -114,7 +109,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.POST,
         path="/post/quiz/{task_id:int}/",
-        **inject_guards
+        **inject_guards,
     )
     @inject
     async def post_quiz_solution(
@@ -134,7 +129,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.GET,
         path="/score/",
-        **inject_guards
+        **inject_guards,
     )
     @inject
     async def get_score_for_tasks(
@@ -155,7 +150,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.GET,
         path="/standings/{contest_id:int}/",
-        **inject_guards
+        **inject_guards,
     )
     @inject
     async def get_standings(
@@ -186,7 +181,7 @@ class SolutionsController(Controller):
                     total_score=status.total_score,
                 )
                 for status in standings
-            ]
+            ],
         )
 
 

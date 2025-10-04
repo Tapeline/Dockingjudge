@@ -4,12 +4,13 @@ from dataclasses import dataclass
 from solution_service.application.checker_loader import load_checker
 from solution_service.application.dto import NewQuizSolution
 from solution_service.application.exceptions import (
-    NotFound,
     MayNotSubmitSolution,
+    NotFound,
 )
 from solution_service.application.interfaces.contest import ContestService
-from solution_service.application.interfaces.solutions import \
-    SolutionRepository
+from solution_service.application.interfaces.solutions import (
+    SolutionRepository,
+)
 from solution_service.application.interfaces.storage import IdGenerator
 from solution_service.application.interfaces.user import UserIdProvider
 from solution_service.config import Config
@@ -19,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 
 class CheckerNotFoundException(NotFound):
-    def __init__(self, checker_name: str):
+    def __init__(self, checker_name: str) -> None:
         super().__init__(checker_name)
         self.checker_name = checker_name
         self.add_note(f"Checker name: {checker_name}")
@@ -35,24 +36,24 @@ class PostQuizSolution:
 
     async def __call__(
         self,
-        solution: NewQuizSolution
+        solution: NewQuizSolution,
     ) -> QuizSolution:
         user = await self.user_idp.require_user()
         logger.info("Getting quiz task %s", solution.task_id)
         task = await self.contest_service.get_quiz_task(solution.task_id)
         can_submit = await self.contest_service.can_submit(
-            user.id, TaskType.QUIZ, task.id
+            user.id, TaskType.QUIZ, task.id,
         )
         if not can_submit:
             logger.info("Rejecting submit request")
             raise MayNotSubmitSolution
         logger.info(
-            "Loading checker %s %s", task.validator.type, task.validator.args
+            "Loading checker %s %s", task.validator.type, task.validator.args,
         )
         checker = load_checker(
             task.validator.type,
             task.validator.args,
-            task.points
+            task.points,
         )
         if checker is None:
             raise CheckerNotFoundException(task.validator.type)
@@ -64,7 +65,7 @@ class PostQuizSolution:
             user_id=user.id,
             score=0,
             short_verdict="NC",
-            submitted_answer=solution.text
+            submitted_answer=solution.text,
         )
         logger.info("Checking quiz solution for task %s", task.id)
         verdict = checker.check(solution_entity.submitted_answer)

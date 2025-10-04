@@ -1,10 +1,10 @@
 from collections.abc import Collection, Sequence
 from dataclasses import dataclass
 
-from solution_service.application.interfaces.solutions import \
-    SolutionRepository
+from solution_service.application.interfaces.solutions import (
+    SolutionRepository,
+)
 from solution_service.application.interfaces.user import UserIdProvider
-
 from solution_service.domain.abstract import AnySolution, TaskType
 
 
@@ -36,5 +36,5 @@ class ListMySolutionsOnTask:
         return await self.solutions.get_all_solutions_of_task(
             user.id,
             task_type,
-            task_id
+            task_id,
         )

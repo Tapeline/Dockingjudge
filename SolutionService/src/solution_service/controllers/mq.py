@@ -3,28 +3,31 @@ import logging
 
 from dishka import FromDishka
 from faststream.rabbit import (
-    RabbitRouter,
+    RabbitBroker,
     RabbitExchange,
     RabbitQueue,
-    RabbitBroker,
+    RabbitRouter,
 )
 
 from solution_service.application.dto import SolutionCheckResult
 from solution_service.application.interactors.purge_solutions import (
-    PurgeTaskSolutions, PurgeUserSolutions,
+    PurgeTaskSolutions,
+    PurgeUserSolutions,
 )
-from solution_service.application.interactors.update_solution import \
-    StoreCheckedSolution
-from solution_service.application.interfaces.publisher import \
-    SolutionPublisher
+from solution_service.application.interactors.update_solution import (
+    StoreCheckedSolution,
+)
+from solution_service.application.interfaces.publisher import SolutionPublisher
 from solution_service.application.interfaces.storage import Storage
 from solution_service.controllers.schemas import (
     MQContestEvent,
     MQSolutionAnswer,
-    MQTaskEvent, MQUserEvent,
+    MQTaskEvent,
+    MQUserEvent,
 )
 from solution_service.domain.abstract import CodeSolution, TaskType
 
+logger = logging.getLogger(__name__)
 mq_controller = RabbitRouter()
 
 solutions_exchange = RabbitExchange("solutions_exchange", durable=True)
@@ -35,36 +38,36 @@ contest_object_events = RabbitExchange("contest_object_events", durable=True)
 answers_inbox = RabbitQueue(
     "_solution_service_inbox",
     durable=True,
-    routing_key="solution_answer"
+    routing_key="solution_answer",
 )
 user_event_inbox = RabbitQueue(
     "_solution_service_user_inbox",
     durable=True,
-    routing_key="user_event"
+    routing_key="user_event",
 )
 contest_event_inbox = RabbitQueue(
     "_solution_service_contest_inbox",
     durable=True,
-    routing_key="contest_event"
+    routing_key="contest_event",
 )
 quiz_task_event_inbox = RabbitQueue(
     "_solution_service_quiz_task_inbox",
     durable=True,
-    routing_key="quiz_task_event"
+    routing_key="quiz_task_event",
 )
 code_task_event_inbox = RabbitQueue(
     "_solution_service_code_task_inbox",
     durable=True,
-    routing_key="code_task_event"
+    routing_key="code_task_event",
 )
 
 
 @mq_controller.subscriber(answers_inbox, answers_exchange)
 async def handle_checked_solution(
     data: MQSolutionAnswer,
-    interactor: FromDishka[StoreCheckedSolution]
-):
-    logging.info("Received solution answer for %s", data.id)
+    interactor: FromDishka[StoreCheckedSolution],
+) -> None:
+    logger.info("Received solution answer for %s", data.id)
     await interactor(
         data.id,
         SolutionCheckResult(
@@ -73,17 +76,17 @@ async def handle_checked_solution(
             score=data.score,
             group_scores=data.group_scores,
             protocol=data.protocol,
-        )
+        ),
     )
-    logging.info("Updated solution %s in db", data.id)
+    logger.info("Updated solution %s in db", data.id)
 
 
 class RMQSolutionPublisher(SolutionPublisher):
     def __init__(
             self,
             storage: FromDishka[Storage],
-            broker: FromDishka[RabbitBroker]
-    ):
+            broker: FromDishka[RabbitBroker],
+    ) -> None:
         self.storage = storage
         self.broker = broker
         self.logger = logging.getLogger("solution publisher")
@@ -96,61 +99,61 @@ class RMQSolutionPublisher(SolutionPublisher):
                 "main_file": solution.main_file,
                 "submission_type": solution.submission_type.value,
                 "compiler": solution.compiler_name,
-                "suite": test_suite
+                "suite": test_suite,
             },
             exchange=solutions_exchange,
-            routing_key="solution_to_check"
+            routing_key="solution_to_check",
         )
-        self.logger.info(f"Published solution #{solution.uid}")
+        self.logger.info("Published solution #%s", solution.uid)
 
 
 @mq_controller.subscriber(user_event_inbox, user_object_events)
 async def handle_user_deleted(
     data: MQUserEvent,
-    interactor: FromDishka[PurgeUserSolutions]
-):
+    interactor: FromDishka[PurgeUserSolutions],
+) -> None:
     if data.event != "DELETED":
         return
-    logging.info("Received purge request for user %s", data.object.id)
+    logger.info("Received purge request for user %s", data.object.id)
     await interactor(data.object.id)
-    logging.info("Purged user %s", data.object.id)
+    logger.info("Purged user %s", data.object.id)
 
 
 @mq_controller.subscriber(contest_event_inbox, contest_object_events)
 async def handle_contest_deleted(
     data: MQContestEvent,
-    interactor: FromDishka[PurgeTaskSolutions]
-):
+    interactor: FromDishka[PurgeTaskSolutions],
+) -> None:
     if data.event != "DELETED":
         return
-    logging.info("Received purge request for contest %s", data.object.id)
+    logger.info("Received purge request for contest %s", data.object.id)
     # TODO: that's inefficient
     await asyncio.gather(*(
         await interactor(page.type, page.id)
         for page in data.object.pages
     ))
-    logging.info("Purged contest %s", data.object.id)
+    logger.info("Purged contest %s", data.object.id)
 
 
 @mq_controller.subscriber(quiz_task_event_inbox, contest_object_events)
 async def handle_quiz_task_deleted(
     data: MQTaskEvent,
-    interactor: FromDishka[PurgeTaskSolutions]
-):
+    interactor: FromDishka[PurgeTaskSolutions],
+) -> None:
     if data.event != "DELETED":
         return
-    logging.info("Received purge request for task quiz:%s", data.object.id)
+    logger.info("Received purge request for task quiz:%s", data.object.id)
     await interactor(TaskType.QUIZ, data.object.id)
-    logging.info("Purged task quiz:%s", data.object.id)
+    logger.info("Purged task quiz:%s", data.object.id)
 
 
 @mq_controller.subscriber(code_task_event_inbox, contest_object_events)
 async def handle_code_task_deleted(
     data: MQTaskEvent,
-    interactor: FromDishka[PurgeTaskSolutions]
-):
+    interactor: FromDishka[PurgeTaskSolutions],
+) -> None:
     if data.event != "DELETED":
         return
-    logging.info("Received purge request for task code:%s", data.object.id)
+    logger.info("Received purge request for task code:%s", data.object.id)
     await interactor(TaskType.CODE, data.object.id)
-    logging.info("Purged task code:%s", data.object.id)
+    logger.info("Purged task code:%s", data.object.id)

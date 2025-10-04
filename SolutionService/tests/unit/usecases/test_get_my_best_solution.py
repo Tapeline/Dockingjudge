@@ -2,18 +2,16 @@ from typing import Any
 
 import pytest
 
-from solution_service.application.exceptions import MayNotAccessSolution
 from solution_service.application.interactors.get_solution import (
-    GetSolution,
     GetBestSolutionForUserOnTask,
 )
 from tests.unit.factory import (
-    UserFactory,
     QuizSolutionFactory,
+    UserFactory,
 )
 from tests.unit.fakes import (
-    FakeSolutionRepository, FakeUserIdP,
-    FakeContestService,
+    FakeSolutionRepository,
+    FakeUserIdP,
 )
 
 
@@ -26,10 +24,10 @@ from tests.unit.fakes import (
         ([dict(score=20), dict(score=40)], 1),
         ([dict(score=40), dict(score=40)], 1),
         ([dict(score=40), dict(score=40), dict(score=40)], 2),
-    ]
+    ],
 )
 @pytest.mark.parametrize(
-    ("task_id", "task_type"), [(1, "quiz")]
+    ("task_id", "task_type"), [(1, "quiz")],
 )
 @pytest.mark.asyncio
 async def test_best_solution(
@@ -49,7 +47,7 @@ async def test_best_solution(
         quiz_solution_factory.build(
             user_id=user.id,
             task_id=task_id,
-            **params
+            **params,
         )
         for params in solution_params
     ]

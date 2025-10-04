@@ -88,12 +88,17 @@ ignore = [
     "TRY003",
 
     "PTH107",  # os.remove is better
-    "PTH",  # breaks my code
+    "PTH",  # breaks my code,
+
+    "C408",
+    "E731",
+    "PLE0704"
 ]
 external = ["WPS"]
 exclude = [
     "docs/**",
-    "scripts/**"
+    "scripts/**",
+    "src/solution_service/infrastructure/migrations/**"
 ]
 
 [lint.per-file-ignores]

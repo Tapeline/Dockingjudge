@@ -1,31 +1,25 @@
-from typing import Any
 
 import pytest
 
 from solution_service.application.exceptions import (
-    MayNotAccessSolution,
     MayNotSubmitSolution,
 )
-from solution_service.application.interactors.get_solution import GetSolution
-from solution_service.application.interactors.post_code_solution import \
-    PostCodeSolution
-from solution_service.application.interactors.post_quiz_solution import \
-    PostQuizSolution
+from solution_service.application.interactors.post_quiz_solution import (
+    PostQuizSolution,
+)
 from solution_service.application.interfaces.contest import ValidatorDTO
-from solution_service.domain.abstract import SubmissionType
-from tests.unit.factory import (
-    UserFactory,
-    QuizSolutionFactory, CodeSolutionFactory, NewCodeSolutionFactory,
-    CodeTaskFactory, to_base64, from_base64, NewQuizSolutionFactory,
-    QuizTaskFactory,
-)
-from tests.unit.fakes import (
-    FakeSolutionRepository, FakeUserIdP,
-    FakeContestService, FakeSolutionPublisher, FakeObjectStore,
-)
 
 # important, do not remove
 from solution_service.domain import quiz_checkers  # noqa
+from tests.unit.factory import (
+    NewQuizSolutionFactory,
+    QuizTaskFactory,
+    UserFactory,
+)
+from tests.unit.fakes import (
+    FakeContestService,
+    FakeUserIdP,
+)
 
 
 @pytest.mark.parametrize(
@@ -37,9 +31,9 @@ from solution_service.domain import quiz_checkers  # noqa
                 type="text",
                 args=dict(
                     pattern="Apple",
-                )
+                ),
             ),
-            "OK"
+            "OK",
         ),
         (
             "apppppppple",
@@ -47,9 +41,9 @@ from solution_service.domain import quiz_checkers  # noqa
                 type="regex",
                 args=dict(
                     pattern="app+le",
-                )
+                ),
             ),
-            "OK"
+            "OK",
         ),
         (
             "aple",
@@ -57,11 +51,11 @@ from solution_service.domain import quiz_checkers  # noqa
                 type="regex",
                 args=dict(
                     pattern="app+le",
-                )
+                ),
             ),
-            "WA"
-        )
-    ]
+            "WA",
+        ),
+    ],
 )
 @pytest.mark.asyncio
 async def test_solution_posting(

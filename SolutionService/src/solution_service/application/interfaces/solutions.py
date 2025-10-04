@@ -52,7 +52,7 @@ class SolutionRepository(Protocol):
         self,
         user_id: int,
         task_type: TaskType | None = None,
-        pagination_params: PaginationParameters | None = None
+        pagination_params: PaginationParameters | None = None,
     ) -> list[AnySolution]:
         """Get all authored solutions."""
         raise NotImplementedError
@@ -63,7 +63,7 @@ class SolutionRepository(Protocol):
         user_id: int,
         task_type: TaskType,
         task_id: int,
-        pagination_params: PaginationParameters | None = None
+        pagination_params: PaginationParameters | None = None,
     ) -> list[AnySolution]:
         """Get all task solutions."""
         raise NotImplementedError
@@ -73,7 +73,7 @@ class SolutionRepository(Protocol):
         self,
         user_id: int,
         contest_tasks: Sequence[tuple[TaskType, int]],
-        pagination_params: PaginationParameters | None = None
+        pagination_params: PaginationParameters | None = None,
     ) -> Sequence[AnySolution]:
         raise NotImplementedError
 
@@ -88,7 +88,7 @@ class SolutionRepository(Protocol):
     @abstractmethod
     async def get_solution(
         self,
-        solution_id: str
+        solution_id: str,
     ) -> AnySolution | None:
         raise NotImplementedError
 
@@ -104,7 +104,7 @@ class SolutionRepository(Protocol):
     @abstractmethod
     async def create_solution(
         self,
-        solution: AnySolution
+        solution: AnySolution,
     ) -> None:
         raise NotImplementedError
 
@@ -126,6 +126,6 @@ class SolutionRepository(Protocol):
 
     @abstractmethod
     async def purge_task_solutions(
-        self, task_type: TaskType, task_id: int
+        self, task_type: TaskType, task_id: int,
     ) -> None:
         raise NotImplementedError

@@ -10,8 +10,9 @@ from solution_service.application.interfaces.contest import (
     QuizTaskDTO,
 )
 from solution_service.domain.abstract import (
-    QuizSolution, TaskType,
     CodeSolution,
+    QuizSolution,
+    TaskType,
 )
 
 

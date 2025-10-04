@@ -6,13 +6,14 @@ from typing import Final, assert_never
 
 from solution_service.application.dto import NewCodeSolution
 from solution_service.application.exceptions import (
-    NotFound,
     MayNotSubmitSolution,
+    NotFound,
 )
 from solution_service.application.interfaces.contest import ContestService
 from solution_service.application.interfaces.publisher import SolutionPublisher
-from solution_service.application.interfaces.solutions import \
-    SolutionRepository
+from solution_service.application.interfaces.solutions import (
+    SolutionRepository,
+)
 from solution_service.application.interfaces.storage import (
     File,
     IdGenerator,
@@ -39,7 +40,7 @@ class PostCodeSolution:
 
     async def __call__(
         self,
-        solution: NewCodeSolution
+        solution: NewCodeSolution,
     ) -> CodeSolution:
         user = await self.user_idp.require_user()
         logger.info("Getting code task %s", solution.task_id)
@@ -47,7 +48,7 @@ class PostCodeSolution:
         if task is None:
             raise NotFound
         can_submit = await self.contest_service.can_submit(
-            user.id, TaskType.CODE, task.id
+            user.id, TaskType.CODE, task.id,
         )
         if not can_submit:
             logger.info("Rejecting submit request")

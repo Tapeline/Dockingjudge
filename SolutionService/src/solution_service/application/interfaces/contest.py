@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from collections.abc import Sequence
 from typing import Any, NamedTuple, Protocol
 
@@ -56,28 +56,28 @@ class ContestService(Protocol):
 
     @abstractmethod
     async def get_contest_tasks(
-        self, contest_id: int
+        self, contest_id: int,
     ) -> Sequence[ContestTaskHead]:
         """Get tasks of contest (header info only)."""
         raise NotImplementedError
 
     @abstractmethod
     async def get_contest_participants(
-        self, contest_id: int
+        self, contest_id: int,
     ) -> Sequence[int]:
         """Get list of users who participate in this contest."""
         raise NotImplementedError
 
     @abstractmethod
     async def can_submit(
-        self, user_id: int, task_type: TaskType, task_id: int
+        self, user_id: int, task_type: TaskType, task_id: int,
     ) -> bool:
         """Ask contest service a permission to submit this task."""
         raise NotImplementedError
 
     @abstractmethod
     async def get_task(
-        self, task_type: str, task_id: int
+        self, task_type: str, task_id: int,
     ) -> AnyTaskDTO | None:
         """Get full task definition."""
         raise NotImplementedError

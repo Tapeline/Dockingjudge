@@ -11,7 +11,7 @@ class SolutionPublisher(Protocol):
     async def publish(
         self,
         solution: CodeSolution,
-        test_suite: dict[str, Any]
+        test_suite: dict[str, Any],
     ) -> None:
         """Publish solution to the message queue."""
         raise NotImplementedError

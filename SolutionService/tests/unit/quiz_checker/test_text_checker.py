@@ -2,8 +2,10 @@ from typing import Final
 
 import pytest
 
-from solution_service.domain.quiz_checkers import QuizTextChecker, QuizTextCheckerParams
-
+from solution_service.domain.quiz_checkers import (
+    QuizTextChecker,
+    QuizTextCheckerParams,
+)
 
 CASE_SENSITIVE: Final = True  # Alias
 STRICT: Final = True  # Alias
@@ -14,14 +16,14 @@ STRICT: Final = True  # Alias
     [
         ("Apple", "Apple", CASE_SENSITIVE, STRICT),
         ("Apple", "aPPlE", not CASE_SENSITIVE, STRICT),
-        ("Apple", "Aple", ..., not STRICT)
-    ]
+        ("Apple", "Aple", ..., not STRICT),
+    ],
 )
 def test_right_answers(
     expected_answer,
     actual_answer,
     is_case_sensitive,
-    is_strict
+    is_strict,
 ):
     checker = QuizTextChecker(
         max_score=100,
@@ -44,13 +46,13 @@ def test_right_answers(
     [
         ("Apple", "apple", CASE_SENSITIVE, STRICT),
         ("Apple", "aple", not CASE_SENSITIVE, STRICT),
-    ]
+    ],
 )
 def test_wrong_answers(
     expected_answer,
     actual_answer,
     is_case_sensitive,
-    is_strict
+    is_strict,
 ):
     checker = QuizTextChecker(
         max_score=100,

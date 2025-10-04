@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 
 from solution_service.application.dto import SolutionCheckResult
-from solution_service.application.interfaces.solutions import \
-    SolutionRepository
+from solution_service.application.interfaces.solutions import (
+    SolutionRepository,
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -12,7 +13,7 @@ class StoreCheckedSolution:
     async def __call__(
         self,
         solution_id: str,
-        check_result: SolutionCheckResult
+        check_result: SolutionCheckResult,
     ) -> None:
         await self.solution_repository.store_solution_check_result(
             solution_id,

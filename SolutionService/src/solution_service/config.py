@@ -6,7 +6,7 @@ class RabbitMQConfig:
     host: str = "localhost"
     port: int = 5672
     username: str = "rm_user"
-    password: str = "rm_password"
+    password: str = "rm_password"  # noqa: S105
 
 
 @dataclass(frozen=True)
@@ -14,7 +14,7 @@ class PostgresConfig:
     host: str = "localhost"
     port: int = 5503
     username: str = "pguser"
-    password: str = "pgpass"
+    password: str = "pgpass"  # noqa: S105
     database: str = "solution_db"
 
 
@@ -23,7 +23,7 @@ class MinioConfig:
     host: str = "http://127.0.0.1"
     port: int = 9900
     username: str = "minio_user"
-    password: str = "minio_pass"
+    password: str = "minio_pass"  # noqa: S105
     bucket_name: str = "solutions"
 
 

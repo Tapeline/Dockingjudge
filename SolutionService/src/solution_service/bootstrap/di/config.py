@@ -1,4 +1,5 @@
-from dishka import Provider, from_context, Scope
+from dishka import Provider, Scope, from_context
+
 from solution_service.config import Config
 
 

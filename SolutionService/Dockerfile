@@ -1,9 +1,10 @@
-ARG build_variant
+ARG build_variant=full
 
 FROM python:3.13.2-alpine3.21 AS base
 
 WORKDIR /app
 
+RUN apk add uv git
 RUN addgroup -S limgroup
 RUN adduser -S limited -G limgroup
 RUN chown limited:limgroup /app

@@ -1,7 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from dataclasses import dataclass
 from typing import Protocol
-from uuid import UUID
 
 type URL = str
 

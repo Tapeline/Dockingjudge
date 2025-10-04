@@ -1,7 +1,8 @@
 from typing import overload
 
 from solution_service.controllers.schemas import (
-    CodeSolutionExtraSchema, QuizSolutionExtraSchema,
+    CodeSolutionExtraSchema,
+    QuizSolutionExtraSchema,
     SolutionSchema,
 )
 from solution_service.domain.abstract import AnySolution, TaskType
@@ -9,20 +10,20 @@ from solution_service.domain.abstract import AnySolution, TaskType
 
 @overload
 def serialize_solution(
-    solution: AnySolution,
+    solution: AnySolution, *,
     is_safe: bool = False,
 ) -> SolutionSchema: ...
 
 
 @overload
 def serialize_solution(
-    solution: None,
+    solution: None, *,
     is_safe: bool = False,
 ) -> None: ...
 
 
 def serialize_solution(
-    solution: AnySolution | None,
+    solution: AnySolution | None, *,
     is_safe: bool = False,
 ) -> SolutionSchema | None:
     """Serialize solution DM into solution response model."""

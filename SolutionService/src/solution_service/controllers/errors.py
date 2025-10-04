@@ -2,15 +2,17 @@ from typing import Final
 
 from solution_service.application.exceptions import (
     MayNotAccessSolution,
+    MayNotSubmitSolution,
     NotAuthenticated,
-    NotFound, MayNotSubmitSolution,
+    NotFound,
 )
 from solution_service.controllers.error_commons import (
     gen_handler_mapping,
     infer_code,
 )
-from solution_service.infrastructure.exceptions import \
-    BadServiceResponseException
+from solution_service.infrastructure.exceptions import (
+    BadServiceResponseException,
+)
 
 handlers: Final = gen_handler_mapping({
     NotFound: (404, infer_code),

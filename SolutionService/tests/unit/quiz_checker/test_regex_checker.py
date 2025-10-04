@@ -3,8 +3,8 @@ from typing import Final
 import pytest
 
 from solution_service.domain.quiz_checkers import (
-    QuizTextChecker,
-    QuizTextCheckerParams, QuizTextRegexChecker, QuizTextRegexCheckerParams,
+    QuizTextRegexChecker,
+    QuizTextRegexCheckerParams,
 )
 
 CASE_SENSITIVE: Final = True  # Alias
@@ -17,7 +17,7 @@ STRICT: Final = True  # Alias
         ("Apple", "Apple"),
         ("(A|a)pple", "apple"),
         ("app+le", "apple"),
-    ]
+    ],
 )
 def test_right_answers(
     expected_answer,
@@ -39,7 +39,7 @@ def test_right_answers(
         ("Apple", "apple"),
         ("(A|a)pple", "Aapple"),
         ("app+le", "aple"),
-    ]
+    ],
 )
 def test_wrong_answers(
     expected_answer,

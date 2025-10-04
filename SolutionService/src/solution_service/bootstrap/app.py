@@ -1,9 +1,7 @@
 import asyncio
 import sys
 
-from litestar.plugins.prometheus import PrometheusConfig, PrometheusController
-
-from dishka import make_async_container, AsyncContainer
+from dishka import AsyncContainer, make_async_container
 from dishka.integrations import faststream as faststream_integration
 from dishka.integrations import litestar as litestar_integration
 from faststream import FastStream
@@ -14,6 +12,7 @@ from litestar.middleware.base import DefineMiddleware
 from litestar.openapi import OpenAPIConfig
 from litestar.openapi.plugins import SwaggerRenderPlugin
 from litestar.openapi.spec import Components
+from litestar.plugins.prometheus import PrometheusConfig, PrometheusController
 
 from solution_service.bootstrap.config import service_config_loader
 from solution_service.bootstrap.di.config import ConfigProvider
@@ -25,7 +24,9 @@ from solution_service.config import Config
 from solution_service.controllers import http
 from solution_service.controllers.mq import mq_controller
 from solution_service.infrastructure import account_service
-from solution_service.infrastructure.account_service import ServiceAuthenticationMiddleware
+from solution_service.infrastructure.account_service import (
+    ServiceAuthenticationMiddleware,
+)
 from solution_service.infrastructure.rmq import create_broker
 
 
@@ -42,17 +43,17 @@ def _create_container(config: Config, broker: RabbitBroker) -> AsyncContainer:
         OuterServicesProvider(),
         context={
             Config: config,
-            RabbitBroker: broker
-        }
+            RabbitBroker: broker,
+        },
     )
 
 
 def _get_faststream_app(
-    broker: RabbitBroker, container: AsyncContainer
+    broker: RabbitBroker, container: AsyncContainer,
 ) -> FastStream:
     faststream_app = FastStream(broker)
     faststream_integration.setup_dishka(
-        container, faststream_app, auto_inject=True
+        container, faststream_app, auto_inject=True,
     )
     broker.include_router(mq_controller)
     return faststream_app
@@ -62,7 +63,7 @@ def _get_litestar_app(config: Config, container: AsyncContainer) -> Litestar:
     prometheus_config = PrometheusConfig(
         app_name="solution_service",
         group_path=True,
-        exclude=["/metrics"]
+        exclude=["/metrics"],
     )
     logging_config = LoggingConfig(
         root={"level": "INFO", "handlers": ["queue_listener"]},
@@ -70,8 +71,8 @@ def _get_litestar_app(config: Config, container: AsyncContainer) -> Litestar:
             "standard": {
                 "format": (
                     "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-                )
-            }
+                ),
+            },
         },
         log_exceptions="always",
     )
@@ -81,7 +82,7 @@ def _get_litestar_app(config: Config, container: AsyncContainer) -> Litestar:
         exclude=[
             "/api/v1/solutions/docs",
             "/metrics",
-        ]
+        ],
     )
     litestar_app = Litestar(
         debug=config.debug_mode,
@@ -98,24 +99,24 @@ def _get_litestar_app(config: Config, container: AsyncContainer) -> Litestar:
             path="/api/v1/solutions/docs",
             components=Components(
                 security_schemes={
-                    **account_service.provided_security_definitions
-                }
-            )
+                    **account_service.provided_security_definitions,
+                },
+            ),
         ),
         logging_config=logging_config,
         middleware=[
             prometheus_config.middleware,
-            auth_mw
+            auth_mw,
         ],
     )
     litestar_integration.setup_dishka(container, litestar_app)
     return litestar_app
 
 
-def get_app():
+def get_app() -> Litestar:
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(
-            asyncio.WindowsSelectorEventLoopPolicy()
+            asyncio.WindowsSelectorEventLoopPolicy(),
         )
     config = service_config_loader.load()
     broker = _create_broker(config)

@@ -17,7 +17,7 @@ type EnrichedHandlerDef[_Exc_T: Exception] = (
 )
 type HandlerDef = SimpleHandlerDef | EnrichedHandlerDef[Any]
 type LitestarErrHandler = Callable[
-    [Request[Any, Any, Any], Exception], Response[Any]
+    [Request[Any, Any, Any], Exception], Response[Any],
 ]
 
 
@@ -35,7 +35,7 @@ def _create_handler(handler_def: HandlerDef) -> LitestarErrHandler:
         status, code, enricher = handler_def
 
     def handler_func(
-            request: Request[Any, Any, Any], exc: Exception
+            request: Request[Any, Any, Any], exc: Exception,
     ) -> Response[Any]:
         nonlocal code  # noqa: WPS420
         extras = enricher(exc)
@@ -45,15 +45,15 @@ def _create_handler(handler_def: HandlerDef) -> LitestarErrHandler:
             status_code=status,
             content={
                 "code": code,
-                "extras": extras
-            }
+                "extras": extras,
+            },
         )
 
     return handler_func
 
 
 def gen_handler_mapping(
-        handler_defs: Mapping[type[Exception], HandlerDef]
+        handler_defs: Mapping[type[Exception], HandlerDef],
 ) -> Mapping[type[Exception], LitestarErrHandler]:
     """Generate Litestar exc handlers from DSL."""
     return (

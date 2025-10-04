@@ -2,7 +2,7 @@ import datetime
 
 from pydantic import BaseModel
 
-from solution_service.domain.abstract import TaskType, SubmissionType
+from solution_service.domain.abstract import SubmissionType, TaskType
 
 
 class QuizSolutionExtraSchema(BaseModel):

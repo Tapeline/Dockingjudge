@@ -1,18 +1,19 @@
 import os
+import sqlite3
 from collections.abc import AsyncGenerator
 from typing import Any
 
 import pytest
-import sqlite3
-
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import (
-    create_async_engine, async_sessionmaker,
     AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
 )
 
-from solution_service.infrastructure.persistence.repo_impl import \
-    SolutionRepoImpl
+from solution_service.infrastructure.persistence.repo_impl import (
+    SolutionRepoImpl,
+)
 
 
 @pytest.fixture
@@ -44,21 +45,20 @@ def use_solution_table(conn: sqlite3.Connection):
             detailed_verdict TEXT NULL,
             main_file TEXT NULL
         );
-        """
+        """,
     )
     conn.commit()
 
 
 @pytest_asyncio.fixture
 async def solution_repo(
-    sqlite_base: str
+    sqlite_base: str,
 ) -> AsyncGenerator[SolutionRepoImpl, Any]:
     engine = create_async_engine(
         f"sqlite+aiosqlite:///./{sqlite_base}",
-        #echo=True
     )
     async_session_maker = async_sessionmaker(
-        engine, expire_on_commit=False, class_=AsyncSession
+        engine, expire_on_commit=False, class_=AsyncSession,
     )
     async with async_session_maker() as session:
         yield SolutionRepoImpl(session)

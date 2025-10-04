@@ -2,10 +2,7 @@ from dataclasses import dataclass
 
 from solution_service.application.interfaces.account import User
 from solution_service.application.interfaces.solutions import UserSolutionScore
-from solution_service.domain.abstract import (
-    AnySolution,
-    SubmissionType
-)
+from solution_service.domain.abstract import AnySolution, SubmissionType
 
 
 @dataclass

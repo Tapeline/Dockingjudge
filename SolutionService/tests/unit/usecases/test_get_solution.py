@@ -3,12 +3,13 @@ import pytest
 from solution_service.application.exceptions import MayNotAccessSolution
 from solution_service.application.interactors.get_solution import GetSolution
 from tests.unit.factory import (
-    UserFactory,
     QuizSolutionFactory,
+    UserFactory,
 )
 from tests.unit.fakes import (
-    FakeSolutionRepository, FakeUserIdP,
     FakeContestService,
+    FakeSolutionRepository,
+    FakeUserIdP,
 )
 
 

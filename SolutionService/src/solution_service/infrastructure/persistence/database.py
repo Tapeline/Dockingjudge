@@ -1,6 +1,10 @@
 from typing import Final
 
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
+from sqlalchemy.ext.asyncio import (
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlalchemy.orm import DeclarativeBase
 
 from solution_service.config import PostgresConfig
@@ -15,7 +19,7 @@ class Base(DeclarativeBase):
 
 
 def create_session_maker(
-    postgres_config: PostgresConfig
+    postgres_config: PostgresConfig,
 ) -> async_sessionmaker[AsyncSession]:
     database_uri = _DATABASE_URI_TEMPLATE.format(
         login=postgres_config.username,
@@ -34,5 +38,5 @@ def create_session_maker(
         },
     )
     return async_sessionmaker(
-        engine, class_=AsyncSession, autoflush=False, expire_on_commit=False
+        engine, class_=AsyncSession, autoflush=False, expire_on_commit=False,
     )

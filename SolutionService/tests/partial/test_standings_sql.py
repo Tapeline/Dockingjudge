@@ -1,20 +1,20 @@
-import asyncio
 import sqlite3
-import uuid
 from typing import Any
 
 import pytest
 
 from solution_service.application.interfaces.solutions import (
     UserStandingRow,
-    UserSolutionScore,
 )
-from solution_service.domain.abstract import QuizSolution, TaskType
-from solution_service.infrastructure.persistence.repo_impl import \
-    SolutionRepoImpl
+from solution_service.domain.abstract import TaskType
+from solution_service.infrastructure.persistence.repo_impl import (
+    SolutionRepoImpl,
+)
 from tests.partial.helpers import (
-    solution, row, solution_factory,
     create_solutions,
+    row,
+    solution,
+    solution_factory,
 )
 
 
@@ -39,7 +39,7 @@ from tests.partial.helpers import (
                     solved=2,
                     total=200,
                 ),
-            ]
+            ],
         ),
         # multiple users
         (
@@ -68,7 +68,7 @@ from tests.partial.helpers import (
                     solved=2,
                     total=200,
                 ),
-            ]
+            ],
         ),
         # user with no solutions
         (
@@ -92,7 +92,7 @@ from tests.partial.helpers import (
                     solved=0,
                     total=0,
                 ),
-            ]
+            ],
         ),
         # solutions from other contests (tasks not in contest_tasks)
         (
@@ -111,7 +111,7 @@ from tests.partial.helpers import (
                     solved=1,
                     total=100,
                 ),
-            ]
+            ],
         ),
         # multiple attempts on the same task, only best counts
         (
@@ -130,7 +130,7 @@ from tests.partial.helpers import (
                     solved=1,
                     total=100,
                 ),
-            ]
+            ],
         ),
         # multiple solutions with the same max score
         (
@@ -148,7 +148,7 @@ from tests.partial.helpers import (
                     solved=1,
                     total=100,
                 ),
-            ]
+            ],
         ),
         # empty participants list
         (
@@ -157,7 +157,7 @@ from tests.partial.helpers import (
             ],
             [1],
             [],
-            []
+            [],
         ),
         # empty contest_tasks list
         (
@@ -173,7 +173,7 @@ from tests.partial.helpers import (
                     solved=0,
                     total=0,
                 ),
-            ]
+            ],
         ),
         # user with solutions but not in participants list
         (
@@ -191,7 +191,7 @@ from tests.partial.helpers import (
                     solved=1,
                     total=100,
                 ),
-            ]
+            ],
         ),
         # participant order is preserved
         (
@@ -216,9 +216,9 @@ from tests.partial.helpers import (
                     solved=1,
                     total=100,
                 ),
-            ]
+            ],
         ),
-    ]
+    ],
 )
 @pytest.mark.asyncio
 async def test_standings(
@@ -227,7 +227,7 @@ async def test_standings(
     solutions_params: list[dict[str, Any]],
     contest_tasks: list[int],
     participants: list[int],
-    expected: list[UserStandingRow]
+    expected: list[UserStandingRow],
 ):
     solutions = list(map(solution_factory, solutions_params))
     await create_solutions(solutions, solution_repo)

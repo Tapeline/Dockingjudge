@@ -1,4 +1,4 @@
-from dishka import Provider, from_context, Scope, provide
+from dishka import Provider, Scope, from_context, provide
 from faststream.rabbit import RabbitBroker
 
 from solution_service.application.interfaces.publisher import SolutionPublisher
@@ -11,5 +11,5 @@ class MessageQueueProvider(Provider):
     publisher_impl = provide(
         RMQSolutionPublisher,
         provides=SolutionPublisher,
-        scope=Scope.APP
+        scope=Scope.APP,
     )

@@ -7,7 +7,7 @@ from urllib.parse import urlsplit
 import minio
 from dishka import FromDishka
 
-from solution_service.application.interfaces.storage import Storage, File, URL
+from solution_service.application.interfaces.storage import URL, File, Storage
 from solution_service.config import Config
 
 
@@ -23,23 +23,25 @@ class S3ConnectionParameters:
 class S3Storage(Storage):
     client: minio.Minio | None
 
-    def __init__(self, config: FromDishka[Config]):
+    def __init__(self, config: FromDishka[Config]) -> None:
         self.client = None
         self.params = S3ConnectionParameters(
             bucket_name=config.s3.bucket_name,
             endpoint="{host}:{port}".format(
-               host=config.s3.host.replace("https://", "").replace("http://", ""),
+               host=config.s3.host
+               .replace("https://", "")
+               .replace("http://", ""),
                port=config.s3.port,
             ),
             username=config.s3.username,
             password=config.s3.password,
-            is_secure=config.s3.host.startswith("https")
+            is_secure=config.s3.host.startswith("https"),
         )
         self.logger = logging.getLogger("s3")
         self.connect()
         self.create_bucket_if_not_present()
 
-    def create_bucket_if_not_present(self):
+    def create_bucket_if_not_present(self) -> None:
         if not self.client.bucket_exists(self.params.bucket_name):
             self.logger.info("Bucket not found, creating")
             self.client.make_bucket(self.params.bucket_name)
@@ -51,31 +53,39 @@ class S3Storage(Storage):
                         {
                             "Effect": "Allow",
                             "Principal": {"AWS": "*"},
-                            "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
-                            "Resource": f"arn:aws:s3:::{self.params.bucket_name}",
+                            "Action": [
+                                "s3:GetBucketLocation", "s3:ListBucket",
+                            ],
+                            "Resource": (
+                                f"arn:aws:s3:::{self.params.bucket_name}"
+                            ),
                         },
                         {
                             "Effect": "Allow",
                             "Principal": {"AWS": "*"},
                             "Action": "s3:GetObject",
-                            "Resource": f"arn:aws:s3:::{self.params.bucket_name}/*",
+                            "Resource": (
+                                f"arn:aws:s3:::{self.params.bucket_name}/*"
+                            ),
                         },
                     ],
-                })
+                }),
             )
 
-    def connect(self):
+    def connect(self) -> None:
         self.logger.info("Connecting to S3")
         self.client = minio.Minio(
             self.params.endpoint,
             access_key=self.params.username,
             secret_key=self.params.password,
-            secure=self.params.is_secure
+            secure=self.params.is_secure,
         )
 
     async def get_file_url(self, name: str) -> URL:
         self.logger.info("Getting file url for %s", name)
-        signed_url = self.client.get_presigned_url("GET", self.params.bucket_name, name)
+        signed_url = self.client.get_presigned_url(
+            "GET", self.params.bucket_name, name,
+        )
         url = urlsplit(signed_url)
         return url.path
 
@@ -86,7 +96,7 @@ class S3Storage(Storage):
             bucket_name=self.params.bucket_name,
             object_name=file.name,
             data=fake_io,
-            length=len(file.contents)
+            length=len(file.contents),
         )
         return await self.get_file_url(file.name)
 
@@ -99,7 +109,7 @@ class S3Storage(Storage):
             response = self.client.get_object(bucket_name, object_id)
             return File(
                 name=object_id,
-                contents=response.read()
+                contents=response.read(),
             )
         finally:
             if response is not None:
