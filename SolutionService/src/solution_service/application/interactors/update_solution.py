@@ -4,11 +4,13 @@ from solution_service.application.dto import SolutionCheckResult
 from solution_service.application.interfaces.solutions import (
     SolutionRepository,
 )
+from solution_service.application.interfaces.storage import DBSession
 
 
 @dataclass(frozen=True, slots=True)
 class StoreCheckedSolution:
     solution_repository: SolutionRepository
+    session: DBSession
 
     async def __call__(
         self,
@@ -23,3 +25,4 @@ class StoreCheckedSolution:
             check_result.group_scores,
             check_result.protocol,
         )
+        await self.session.commit()

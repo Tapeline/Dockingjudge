@@ -105,8 +105,6 @@ def _apply_pagination(query: Any, pagination: PaginationParameters) -> Any:
 
 
 class SolutionRepoImpl(solutions.SolutionRepository):
-    # TODO: move .commit over to DBSession and application layer
-
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
@@ -325,14 +323,12 @@ class SolutionRepoImpl(solutions.SolutionRepository):
             group_scores=group_scores,
         )
         await self._session.execute(query)
-        await self._session.commit()
 
     @override
     async def purge_user_solutions(self, user_id: int) -> None:
         await self._session.execute(
             delete(SolutionModel).where(SolutionModel.user_id == user_id),
         )
-        await self._session.commit()
 
     @override
     async def purge_task_solutions(
@@ -346,4 +342,3 @@ class SolutionRepoImpl(solutions.SolutionRepository):
                 SolutionModel.task_type == task_type,
             ),
         )
-        await self._session.commit()
