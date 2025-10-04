@@ -11,7 +11,10 @@ from solution_service.application.interfaces.contest import ContestService
 from solution_service.application.interfaces.solutions import (
     SolutionRepository,
 )
-from solution_service.application.interfaces.storage import IdGenerator
+from solution_service.application.interfaces.storage import (
+    IdGenerator,
+    DBSession,
+)
 from solution_service.application.interfaces.user import UserIdProvider
 from solution_service.config import Config
 from solution_service.domain.abstract import QuizSolution, TaskType
@@ -33,6 +36,7 @@ class PostQuizSolution:
     config: Config
     user_idp: UserIdProvider
     id_gen: IdGenerator
+    session: DBSession
 
     async def __call__(
         self,
@@ -75,4 +79,5 @@ class PostQuizSolution:
         solution_entity.score = verdict.score
         logger.info("Saving solution")
         await self.solution_repository.create_solution(solution_entity)
+        await self.session.commit()
         return solution_entity

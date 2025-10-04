@@ -24,6 +24,7 @@ from solution_service.application.interactors.post_quiz_solution import (
     PostQuizSolution,
 )
 from solution_service.application.interactors.standings import GetStandings
+from solution_service.application.interfaces.solutions import UserSolutionScore
 from solution_service.controllers import schemas
 from solution_service.controllers.dumping import serialize_solution
 from solution_service.controllers.loading import load_composite_task_id
@@ -174,10 +175,7 @@ class SolutionsController(Controller):
                     ),
                     tasks_attempted=status.tasks_attempted,
                     tasks_solved=status.tasks_solved,
-                    solutions=[
-                        serialize_solution(solution, is_safe=True)
-                        for solution in status.solutions
-                    ],
+                    solutions=status.solutions,
                     total_score=status.total_score,
                 )
                 for status in standings

@@ -15,7 +15,7 @@ from litestar.openapi.spec import SecurityScheme
 from litestar.types import ASGIApp
 
 from solution_service.application.interfaces import account
-from solution_service.config import Config, OtherServicesConfig
+from solution_service.config import Config, OuterServicesConfig
 from solution_service.infrastructure.exceptions import (
     BadServiceResponseException,
 )
@@ -72,7 +72,7 @@ class ServiceAuthenticationMiddleware(AbstractAuthenticationMiddleware):
     def __init__(
         self,
         app: ASGIApp,
-        other_services: OtherServicesConfig,
+        other_services: OuterServicesConfig,
         **kwargs: Any,
     ) -> None:
         super().__init__(app, **kwargs)

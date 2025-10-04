@@ -1,9 +1,12 @@
 import asyncio
+import logging
 import sys
+import pprint
 
 from dishka import AsyncContainer, make_async_container
 from dishka.integrations import faststream as faststream_integration
 from dishka.integrations import litestar as litestar_integration
+from dishka.integrations.litestar import LitestarProvider
 from faststream import FastStream
 from faststream.rabbit import RabbitBroker
 from litestar import Litestar
@@ -15,6 +18,7 @@ from litestar.openapi.spec import Components
 from litestar.plugins.prometheus import PrometheusConfig, PrometheusController
 
 from solution_service.bootstrap.config import service_config_loader
+from solution_service.bootstrap.di.auth import AuthProvider
 from solution_service.bootstrap.di.config import ConfigProvider
 from solution_service.bootstrap.di.interactors import InteractorProvider
 from solution_service.bootstrap.di.mq import MessageQueueProvider
@@ -36,11 +40,13 @@ def _create_broker(config: Config) -> RabbitBroker:
 
 def _create_container(config: Config, broker: RabbitBroker) -> AsyncContainer:
     return make_async_container(
+        LitestarProvider(),
         ConfigProvider(),
         InteractorProvider(),
         MessageQueueProvider(),
         PersistenceProvider(),
         OuterServicesProvider(),
+        AuthProvider(),
         context={
             Config: config,
             RabbitBroker: broker,
@@ -119,6 +125,7 @@ def get_app() -> Litestar:
             asyncio.WindowsSelectorEventLoopPolicy(),
         )
     config = service_config_loader.load()
+    print("Config loaded:", pprint.pformat(config, indent=2))
     broker = _create_broker(config)
     container = _create_container(config, broker)
     faststream_app = _get_faststream_app(broker, container)

@@ -2,6 +2,7 @@ import datetime
 
 from pydantic import BaseModel
 
+from solution_service.application.interfaces.solutions import UserSolutionScore
 from solution_service.domain.abstract import SubmissionType, TaskType
 
 
@@ -57,7 +58,7 @@ class UserStandingsRowSchema(BaseModel):
     user: UserSchema
     tasks_attempted: int
     tasks_solved: int
-    solutions: list[str | None]
+    solutions: list[UserSolutionScore | None]
     total_score: int
 
 

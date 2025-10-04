@@ -1,0 +1,25 @@
+encoding: utf-8
+debug_mode: true
+
+rabbitmq:
+  host: localhost
+  port: 5672
+  username: rm_user
+  password: rm_password
+
+postgres:
+  host: localhost
+  port: 5503
+  username: pguser
+  password: pgpass
+
+s3:
+  host: http://127.0.0.1
+  port: 9900
+  username: minio_user
+  password: minio_pass
+
+services:
+  account_service: http://localhost:8001/api/v1/accounts
+  contest_service: http://localhost:8002/api/v1
+  contest_service_internal: http://localhost:8002/internal

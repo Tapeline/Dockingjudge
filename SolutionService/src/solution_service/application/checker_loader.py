@@ -1,5 +1,8 @@
 from solution_service.domain.abstract import AbstractQuizChecker
 
+# important, do not remove
+from solution_service.domain import quiz_checkers  # noqa
+
 
 class BadCheckerParametersException(Exception):
     """Thrown when parameters in loader are malformed."""

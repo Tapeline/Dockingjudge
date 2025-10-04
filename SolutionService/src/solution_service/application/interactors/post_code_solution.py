@@ -17,7 +17,7 @@ from solution_service.application.interfaces.solutions import (
 from solution_service.application.interfaces.storage import (
     File,
     IdGenerator,
-    Storage,
+    Storage, DBSession,
 )
 from solution_service.application.interfaces.user import UserIdProvider
 from solution_service.config import Config
@@ -37,6 +37,7 @@ class PostCodeSolution:
     config: Config
     user_idp: UserIdProvider
     id_gen: IdGenerator
+    session: DBSession
 
     async def __call__(
         self,
@@ -73,6 +74,7 @@ class PostCodeSolution:
         await self.solutions.create_solution(solution_entity)
         logger.info("Publishing solution")
         await self.solution_publisher.publish(solution_entity, task.test_suite)
+        await self.session.commit()
         return solution_entity
 
     def _prepare_file(self, solution: NewCodeSolution) -> File:
