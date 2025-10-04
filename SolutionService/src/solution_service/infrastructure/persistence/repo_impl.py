@@ -1,3 +1,4 @@
+import uuid
 from typing import Sequence, override
 
 import sqlalchemy
@@ -207,10 +208,19 @@ class SolutionRepoImpl(solutions.SolutionRepository):
             )
             for participant in participants
         }
+        counted = set()
         best_solutions = await self._session.execute(query)
         for (
             user_id, task_id, task_type, score, solution_id, short_verdict
         ) in best_solutions:
+            if (task_type, task_id) not in contest_tasks:
+                # TODO: very inefficient, should move to SQL query
+                continue
+            if user_id not in participants:
+                # TODO: very inefficient, should move to SQL query
+                continue
+            if (task_type, task_id, user_id) in counted:
+                continue
             status = statuses[user_id]
             status.tasks_attempted += 1
             status.total_score += score
@@ -223,6 +233,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
                 user_id=user_id,
                 score=score
             )
+            counted.add((task_type, task_id, user_id))
         return [statuses[participant] for participant in participants]
 
     @override
@@ -268,7 +279,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
             main_file = solution.main_file
             submission_type = solution.submission_type
         model = SolutionModel(
-            uuid=solution.uid,
+            uuid=uuid.UUID(solution.uid),
             contest_id=solution.contest_id,
             task_id=solution.task_id,
             task_type=solution.task_type,
