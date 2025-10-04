@@ -130,6 +130,6 @@ def get_app() -> Litestar:
     container = _create_container(config, broker)
     faststream_app = _get_faststream_app(broker, container)
     litestar_app = _get_litestar_app(config, container)
-    litestar_app.on_startup.append(faststream_app.broker.start)
-    litestar_app.on_shutdown.append(faststream_app.broker.close)
+    litestar_app.on_startup.append(broker.start)
+    litestar_app.on_shutdown.append(broker.stop)
     return litestar_app

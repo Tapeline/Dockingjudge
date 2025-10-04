@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from typing import Any, override
 
 from dishka import FromDishka
 from faststream.rabbit import (
@@ -83,15 +84,18 @@ async def handle_checked_solution(
 
 class RMQSolutionPublisher(SolutionPublisher):
     def __init__(
-            self,
-            storage: FromDishka[Storage],
-            broker: FromDishka[RabbitBroker],
+        self,
+        storage: FromDishka[Storage],
+        broker: FromDishka[RabbitBroker],
     ) -> None:
         self.storage = storage
         self.broker = broker
         self.logger = logging.getLogger("solution publisher")
 
-    async def publish(self, solution: CodeSolution, test_suite: dict) -> None:
+    @override
+    async def publish(
+        self, solution: CodeSolution, test_suite: dict[str, Any]
+    ) -> None:
         await self.broker.publish(
             {
                 "id": f"{solution.uid}",
@@ -128,10 +132,12 @@ async def handle_contest_deleted(
         return
     logger.info("Received purge request for contest %s", data.object.id)
     # TODO: that's inefficient
-    await asyncio.gather(*(
-        await interactor(page.type, page.id)
-        for page in data.object.pages
-    ))
+    await asyncio.gather(
+        *(
+            interactor(page.type, page.id)
+            for page in data.object.pages
+        )
+    )
     logger.info("Purged contest %s", data.object.id)
 
 

@@ -1,5 +1,6 @@
 import datetime
 import uuid
+from typing import Any
 
 from sqlalchemy import JSON, UUID, DateTime, Enum, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
@@ -43,7 +44,7 @@ class SolutionModel(Base):
         nullable=True,
         default=None,
     )
-    group_scores: Mapped[dict] = mapped_column(
+    group_scores: Mapped[dict[str, Any]] = mapped_column(
         JSON,
         nullable=True,
         default=None,

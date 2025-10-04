@@ -3,7 +3,7 @@ import datetime
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, ClassVar
+from typing import Any, ClassVar, override
 
 
 @dataclass
@@ -27,6 +27,7 @@ class AbstractQuizChecker[CheckerParams](ABC):
         self.params: CheckerParams = parameters
         self.max_score = max_score
 
+    @override
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         AbstractQuizChecker.all_checkers[cls.name] = cls

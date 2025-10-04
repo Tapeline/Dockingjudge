@@ -1,6 +1,6 @@
 import uuid
 from collections.abc import Sequence
-from typing import Any, override
+from typing import Any, override, overload
 
 import sqlalchemy
 from sqlalchemy import and_, delete, func, or_, select, update
@@ -22,6 +22,17 @@ from solution_service.domain.abstract import (
 from solution_service.infrastructure.persistence.models import SolutionModel
 
 
+@overload
+def _transform_solution_model_to_entity(
+        model: SolutionModel,
+) -> AnySolution: ...
+
+
+@overload
+def _transform_solution_model_to_entity(
+        model: None,
+) -> None: ...
+
 def _transform_solution_model_to_entity(
         model: SolutionModel | None,
 ) -> AnySolution | None:
@@ -37,8 +48,8 @@ def _transform_solution_model_to_entity(
         "short_verdict": model.short_verdict,
         "submitted_at": model.submitted_at,
     }
-    if model.task_type == TaskType.CODE:
-        return CodeSolution(
+    if model.task_type == TaskType.CODE:  # type: ignore[comparison-overlap]
+        return CodeSolution(  # type: ignore[unreachable]
             detailed_verdict=model.detailed_verdict or "NC",
             group_scores=model.group_scores or {},
             submission_url=model.answer,
@@ -49,8 +60,8 @@ def _transform_solution_model_to_entity(
             ),
             **commons,
         )
-    if model.task_type == TaskType.QUIZ:
-        return QuizSolution(
+    if model.task_type == TaskType.QUIZ:  # type: ignore[comparison-overlap]
+        return QuizSolution(  # type: ignore[unreachable]
             submitted_answer=model.answer,
             **commons,
         )
@@ -62,7 +73,7 @@ def _transform_solution_model_to_entity(
 
 def _select_contest_tasks(
         contest_tasks: Sequence[tuple[TaskType, int]],
-) -> sqlalchemy.Select:
+) -> sqlalchemy.Select[Any]:
     quiz_tasks_filter = [
         task[1] for task in contest_tasks
         if task[0] == TaskType.QUIZ
@@ -101,10 +112,10 @@ class SolutionRepoImpl(solutions.SolutionRepository):
 
     @override
     async def get_all_solutions_of_user(
-            self,
-            user_id: int,
-            task_type: str | None = None,
-            pagination_params: PaginationParameters | None = None,
+        self,
+        user_id: int,
+        task_type: TaskType | None = None,
+        pagination_params: PaginationParameters | None = None,
     ) -> list[AnySolution]:
         pagination_params = pagination_params or PaginationParameters()
         query = select(SolutionModel).filter(
@@ -304,7 +315,7 @@ class SolutionRepoImpl(solutions.SolutionRepository):
         detailed_verdict: str,
         short_verdict: str,
         group_scores: dict[str, int],
-        protocol: dict,
+        protocol: dict[str, Any],
     ) -> None:
         query = update(SolutionModel).where(SolutionModel.uuid == solution_id)
         query = query.values(

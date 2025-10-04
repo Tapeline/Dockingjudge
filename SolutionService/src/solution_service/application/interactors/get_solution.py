@@ -36,8 +36,10 @@ class GetSolution:
     async def __call__(
         self,
         solution_id: str,
-    ) -> AnySolution:
+    ) -> AnySolution | None:
         solution = await self.solution_repository.get_solution(solution_id)
+        if not solution:
+            return None
         contest_managers = await self.contest_service.get_contest_managers(
             solution.contest_id,
         )

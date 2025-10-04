@@ -45,6 +45,9 @@ class PostQuizSolution:
         user = await self.user_idp.require_user()
         logger.info("Getting quiz task %s", solution.task_id)
         task = await self.contest_service.get_quiz_task(solution.task_id)
+        if not task:
+            logger.warning("No task %s", solution.task_id)
+            raise NotFound
         can_submit = await self.contest_service.can_submit(
             user.id, TaskType.QUIZ, task.id,
         )

@@ -1,11 +1,14 @@
-from typing import overload
+from typing import overload, Any
 
 from solution_service.controllers.schemas import (
     CodeSolutionExtraSchema,
     QuizSolutionExtraSchema,
     SolutionSchema,
 )
-from solution_service.domain.abstract import AnySolution, TaskType
+from solution_service.domain.abstract import (
+    AnySolution, TaskType,
+    QuizSolution, CodeSolution,
+)
 
 
 @overload
@@ -29,12 +32,12 @@ def serialize_solution(
     """Serialize solution DM into solution response model."""
     if not solution:
         return None
-    data = None
-    if not is_safe and solution.task_type == TaskType.QUIZ:
+    data: Any = None
+    if not is_safe and isinstance(solution, QuizSolution):
         data = QuizSolutionExtraSchema(
             submitted_answer=solution.submitted_answer,
         )
-    if not is_safe and solution.task_type == TaskType.CODE:
+    if not is_safe and isinstance(solution, CodeSolution):
         data = CodeSolutionExtraSchema(
             compiler=solution.compiler_name,
             submission_url=solution.submission_url,

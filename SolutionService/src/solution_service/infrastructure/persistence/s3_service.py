@@ -2,6 +2,7 @@ import json
 import logging
 from dataclasses import dataclass
 from io import BytesIO
+from typing import override
 from urllib.parse import urlsplit
 
 import minio
@@ -21,10 +22,9 @@ class S3ConnectionParameters:
 
 
 class S3Storage(Storage):
-    client: minio.Minio | None
+    client: minio.Minio
 
     def __init__(self, config: FromDishka[Config]) -> None:
-        self.client = None
         self.params = S3ConnectionParameters(
             bucket_name=config.s3.bucket_name,
             endpoint="{host}:{port}".format(
@@ -38,7 +38,12 @@ class S3Storage(Storage):
             is_secure=config.s3.host.startswith("https"),
         )
         self.logger = logging.getLogger("s3")
-        self.connect()
+        self.client = minio.Minio(
+            self.params.endpoint,
+            access_key=self.params.username,
+            secret_key=self.params.password,
+            secure=self.params.is_secure,
+        )
         self.create_bucket_if_not_present()
 
     def create_bucket_if_not_present(self) -> None:
@@ -74,13 +79,8 @@ class S3Storage(Storage):
 
     def connect(self) -> None:
         self.logger.info("Connecting to S3")
-        self.client = minio.Minio(
-            self.params.endpoint,
-            access_key=self.params.username,
-            secret_key=self.params.password,
-            secure=self.params.is_secure,
-        )
 
+    @override
     async def get_file_url(self, name: str) -> URL:
         self.logger.info("Getting file url for %s", name)
         signed_url = self.client.get_presigned_url(
@@ -89,6 +89,7 @@ class S3Storage(Storage):
         url = urlsplit(signed_url)
         return url.path
 
+    @override
     async def save_file(self, file: File) -> URL:
         self.logger.info("Saving file %s", file.name)
         fake_io = BytesIO(file.contents)
@@ -100,6 +101,7 @@ class S3Storage(Storage):
         )
         return await self.get_file_url(file.name)
 
+    @override
     async def get_file(self, url: URL) -> File:
         self.logger.info("Getting file by url %s", url)
         url = url.removeprefix("/").removesuffix("/")

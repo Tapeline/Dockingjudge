@@ -1,3 +1,5 @@
+from typing import Any
+
 from solution_service.domain.abstract import AbstractQuizChecker
 
 # important, do not remove
@@ -10,9 +12,9 @@ class BadCheckerParametersException(Exception):
 
 def load_checker(
     checker_type: str,
-    checker_params: dict,
+    checker_params: dict[str, Any],
     max_score: int,
-) -> AbstractQuizChecker | None:
+) -> AbstractQuizChecker[Any] | None:
     """Instantiate checker of a specific type."""
     if checker_type not in AbstractQuizChecker.all_checkers:
         return None
@@ -27,5 +29,7 @@ def load_checker(
     return checker_class(max_score, params)
 
 
-def _get_param_class(checker_class: type[AbstractQuizChecker]) -> type | None:
+def _get_param_class(
+    checker_class: type[AbstractQuizChecker[Any]]
+) -> type | None:
     return checker_class.__annotations__.get("params")

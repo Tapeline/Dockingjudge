@@ -43,7 +43,7 @@ class CodeTask(models.Model):
 
     def save(self, **kwargs):
         validation.validate_test_suite(self.test_suite)
-        super().save(**kwargs)
+        super().save(**kwargs)  # no
 
 
 class QuizTask(models.Model):

@@ -1,5 +1,6 @@
 import re
 from dataclasses import dataclass
+from typing import override
 
 import Levenshtein
 
@@ -17,10 +18,11 @@ class QuizTextCheckerParams:
     strict_match: bool = True
 
 
-class QuizTextChecker(AbstractQuizChecker):
+class QuizTextChecker(AbstractQuizChecker[QuizTextCheckerParams]):
     params: QuizTextCheckerParams
     name = "text"
 
+    @override
     def check(
             self,
             actual_answer: QuizAnswer,
@@ -55,10 +57,11 @@ class QuizTextRegexCheckerParams:
     pattern: str
 
 
-class QuizTextRegexChecker(AbstractQuizChecker):
+class QuizTextRegexChecker(AbstractQuizChecker[QuizTextRegexCheckerParams]):
     params: QuizTextRegexCheckerParams
     name = "regex"
 
+    @override
     def check(
             self,
             actual_answer: QuizAnswer,

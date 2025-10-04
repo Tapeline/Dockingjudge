@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Protocol
+from typing import Protocol, Any
 
 
 @dataclass
@@ -10,7 +10,7 @@ class User:
 
     id: int
     username: str
-    settings: dict | None
+    settings: dict[str, Any] | None
     profile_pic: str | None
     roles: list[str]
 

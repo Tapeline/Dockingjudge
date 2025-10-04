@@ -32,7 +32,7 @@ class CodeTaskDTO(BaseModel):
     id: int
     title: str
     description: str
-    test_suite: dict
+    test_suite: dict[str, Any]
 
 
 type AnyTaskDTO = QuizTaskDTO | CodeTaskDTO

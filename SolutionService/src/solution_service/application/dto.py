@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 from solution_service.application.interfaces.account import User
 from solution_service.application.interfaces.solutions import UserSolutionScore
@@ -54,4 +55,4 @@ class SolutionCheckResult:
     detailed_verdict: str
     short_verdict: str
     group_scores: dict[str, int]
-    protocol: dict
+    protocol: dict[str, Any]

@@ -81,7 +81,7 @@ class ServiceAuthenticationMiddleware(AbstractAuthenticationMiddleware):
     @override
     async def authenticate_request(
         self,
-        connection: ASGIConnection,
+        connection: ASGIConnection[Any, Any, Any, Any],
     ) -> AuthenticationResult:
         auth_header = connection.headers.get("authorization")
         if not auth_header:
@@ -111,7 +111,7 @@ class ServiceAuthenticationMiddleware(AbstractAuthenticationMiddleware):
 
 
 def authenticated_user_guard(
-        connection: ASGIConnection,
+        connection: ASGIConnection[Any, Any, Any, Any],
         _: BaseRouteHandler,
 ) -> None:
     if connection.user is None:

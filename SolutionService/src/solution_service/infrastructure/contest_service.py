@@ -47,7 +47,7 @@ class ContestServiceImpl(contest.ContestService):
                     contest_id, response.status, await response.text(),
                 )
                 raise BadServiceResponseException("contest", response)
-            return await response.json()
+            return await response.json()  # type: ignore[no-any-return]
 
     @override
     async def get_contest_tasks(
@@ -95,7 +95,7 @@ class ContestServiceImpl(contest.ContestService):
                     contest_id, response.status, await response.text(),
                 )
                 raise BadServiceResponseException("contest", response)
-            return await response.json()
+            return await response.json()  # type: ignore[no-any-return]
 
     @override
     async def can_submit(
@@ -110,7 +110,8 @@ class ContestServiceImpl(contest.ContestService):
         ):
             if response.status != 200:
                 return False
-            return (await response.json())["can_submit"]
+            json = await response.json()
+            return json["can_submit"]  # type: ignore[no-any-return]
 
     @override
     async def get_task(

@@ -46,7 +46,8 @@ class PostCodeSolution:
         user = await self.user_idp.require_user()
         logger.info("Getting code task %s", solution.task_id)
         task = await self.contest_service.get_code_task(solution.task_id)
-        if task is None:
+        if not task:
+            logger.warning("No task %s", solution.task_id)
             raise NotFound
         can_submit = await self.contest_service.can_submit(
             user.id, TaskType.CODE, task.id,
@@ -92,4 +93,6 @@ class PostCodeSolution:
                     encoding=self.config.encoding,
                 )
             case _:
-                assert_never(solution.submission_type)
+                assert_never(
+                    solution.submission_type  # type: ignore[arg-type]
+                )

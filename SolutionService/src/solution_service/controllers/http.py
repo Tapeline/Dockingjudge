@@ -2,7 +2,7 @@ import asyncio
 from typing import Annotated
 from uuid import UUID
 
-from dishka.integrations.base import FromDishka as Depends
+from dishka import FromDishka as Depends
 from dishka.integrations.litestar import inject
 from litestar import Controller, HttpMethod, get, route
 from litestar.params import Body
@@ -38,12 +38,12 @@ inject_guards = {"guards": [authenticated_user_guard]}
 
 class SolutionsController(Controller):
     path = "/api/v1/solutions"
-    security = ([{"jwt_auth": []}],)
+    security = ({"jwt_auth": []},)  # type: ignore[mutable-override]
 
     @route(
         http_method=HttpMethod.GET,
         path="/{solution_uid:uuid}/",
-        **inject_guards,
+        **inject_guards,  # type: ignore[arg-type]
     )
     @inject
     async def get_solution(
@@ -59,7 +59,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.GET,
         path="/my/",
-        **inject_guards,
+        **inject_guards,  # type: ignore[arg-type]
     )
     @inject
     async def get_my_solutions(
@@ -72,7 +72,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.GET,
         path="/my/{task_type:str}/{task_id:int}/",
-        **inject_guards,
+        **inject_guards,  # type: ignore[arg-type]
     )
     @inject
     async def get_my_solutions_for_task(
@@ -87,7 +87,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.POST,
         path="/post/code/{task_id:int}/",
-        **inject_guards,
+        **inject_guards,  # type: ignore[arg-type]
     )
     @inject
     async def post_code_solution(
@@ -110,7 +110,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.POST,
         path="/post/quiz/{task_id:int}/",
-        **inject_guards,
+        **inject_guards,  # type: ignore[arg-type]
     )
     @inject
     async def post_quiz_solution(
@@ -130,14 +130,14 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.GET,
         path="/score/",
-        **inject_guards,
+        **inject_guards,  # type: ignore[arg-type]
     )
     @inject
     async def get_score_for_tasks(
         self,
         tasks: list[str],
         interactor: Depends[GetBestSolutionForUserOnTask],
-    ) -> list[schemas.SolutionSchema]:
+    ) -> list[schemas.SolutionSchema | None]:
         tasks_ids = map(load_composite_task_id, tasks)
         solution_dms = await asyncio.gather(*(
             interactor(task_type, task_id)
@@ -151,7 +151,7 @@ class SolutionsController(Controller):
     @route(
         http_method=HttpMethod.GET,
         path="/standings/{contest_id:int}/",
-        **inject_guards,
+        **inject_guards,  # type: ignore[arg-type]
     )
     @inject
     async def get_standings(
