@@ -1,3 +1,4 @@
+import uuid
 from collections.abc import Callable
 from typing import Any, Sequence
 
@@ -7,11 +8,16 @@ from solution_service.application.interfaces.contest import (
     AnyTaskDTO, CodeTaskDTO,
     ContestService, ContestTaskHead, QuizTaskDTO,
 )
+from solution_service.application.interfaces.publisher import SolutionPublisher
 from solution_service.application.interfaces.solutions import (
     PaginationParameters, SolutionRepository, UserStandingRow,
 )
+from solution_service.application.interfaces.storage import Storage, URL, File
 from solution_service.application.interfaces.user import UserIdProvider
-from solution_service.domain.abstract import AnySolution, TaskType
+from solution_service.domain.abstract import (
+    AnySolution, TaskType,
+    CodeSolution,
+)
 
 
 class FakeSolutionRepository(SolutionRepository):
@@ -23,6 +29,7 @@ class FakeSolutionRepository(SolutionRepository):
         collection: list[AnySolution],
         params: PaginationParameters | None
     ) -> list[AnySolution]:
+        params = params or PaginationParameters()
         offset = params.offset or 0
         limit = params.limit or len(collection)
         return collection[offset:offset + limit]
@@ -96,14 +103,16 @@ class FakeSolutionRepository(SolutionRepository):
         task_type: TaskType,
         task_id: int
     ) -> AnySolution | None:
-        solutions = self._get_solutions_filtered_paginated(
+        solutions = sorted(self._get_solutions_filtered_paginated(
             None,
             lambda solution:
             solution.task_type == task_type
             and solution.task_id == task_id
             and solution.user_id == user_id
-        )
-        return sorted(solutions, key=lambda solution: solution.score)[-1]
+        ), key=lambda solution: solution.score)
+        if not solutions:
+            return None
+        return solutions[-1]
 
     async def create_solution(self, solution: AnySolution) -> None:
         self.solutions[solution.uid] = solution
@@ -136,6 +145,10 @@ class FakeSolutionRepository(SolutionRepository):
             if solution.task_id == task_id and solution.task_type == task_type:
                 self.solutions.pop(solution_id)
 
+    def place_solutions(self, *solutions: AnySolution) -> None:
+        for solution in solutions:
+            self.solutions[solution.uid] = solution
+
 
 class FakeUserIdP(UserIdProvider):
     def __init__(self):
@@ -151,15 +164,24 @@ class FakeUserIdP(UserIdProvider):
 
 
 class FakeContestService(ContestService):
-    async def get_contest_managers(self, contest_id: int) -> Sequence[int]:
-        pass
+    def __init__(self):
+        self.contest_managers: dict[int, list[int]] = {}
+        self.contest_tasks: dict[int, list[ContestTaskHead]] = {}
+        self.contest_participants: dict[int, list[int]] = {}
+        self.can_submit_task = True
+        self.quiz_tasks: dict[int, QuizTaskDTO] = {}
+        self.code_tasks: dict[int, CodeTaskDTO] = {}
 
-    async def get_contest_tasks(self, contest_id: int) -> Sequence[
-        ContestTaskHead]:
-        pass
+    async def get_contest_managers(self, contest_id: int) -> Sequence[int]:
+        return self.contest_managers.get(contest_id, [])
+
+    async def get_contest_tasks(
+        self, contest_id: int
+    ) -> Sequence[ContestTaskHead]:
+        return self.contest_tasks.get(contest_id, [])
 
     async def get_contest_participants(self, contest_id: int) -> Sequence[int]:
-        pass
+        return self.contest_participants.get(contest_id, [])
 
     async def can_submit(
         self,
@@ -167,17 +189,51 @@ class FakeContestService(ContestService):
         task_type: TaskType,
         task_id: int
     ) -> bool:
-        pass
+        return self.can_submit_task
 
     async def get_task(
         self,
         task_type: str,
         task_id: int
     ) -> AnyTaskDTO | None:
-        pass
+        if task_type.lower() == "quiz":
+            return await self.get_quiz_task(task_id)
+        elif task_type.lower() == "code":
+            return await self.get_code_task(task_id)
+        else:
+            raise AssertionError("unknown task type")
 
     async def get_quiz_task(self, task_id: int) -> QuizTaskDTO | None:
-        pass
+        return self.quiz_tasks.get(task_id, None)
 
     async def get_code_task(self, task_id: int) -> CodeTaskDTO | None:
-        pass
+        return self.code_tasks.get(task_id, None)
+
+
+class FakeObjectStore(Storage):
+    def __init__(self) -> None:
+        self.files = {}
+        self.filenames_to_uids = {}
+
+    async def get_file_url(self, name: str) -> URL:
+        if name not in self.filenames_to_uids:
+            self.filenames_to_uids[name] = f"fake_s3://{uuid.uuid4()}"
+        return self.filenames_to_uids[name]
+
+    async def save_file(self, file: File) -> URL:
+        url = await self.get_file_url(file.name)
+        self.files[url] = file
+        return url
+
+    async def get_file(self, url: URL) -> File:
+        return self.files[url]
+
+
+class FakeSolutionPublisher(SolutionPublisher):
+    def __init__(self) -> None:
+        self.published = []
+
+    async def publish(
+        self, solution: CodeSolution, test_suite: dict[str, Any]
+    ) -> None:
+        self.published.append((solution, test_suite))

@@ -45,7 +45,7 @@ class TaskType(Enum):
 
 @dataclass
 class GenericSolution:
-    uid: str | None
+    uid: str
     contest_id: int
     task_id: int
     task_type: TaskType

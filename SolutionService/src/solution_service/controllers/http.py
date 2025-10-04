@@ -9,6 +9,7 @@ from litestar.datastructures import State
 from litestar.params import Body
 
 from solution_service.application import interactors, dto
+from solution_service.application.exceptions import NotFound
 from solution_service.application.interactors.get_solution import \
     (
     GetBestSolutionForUserOnTask,
@@ -16,7 +17,7 @@ from solution_service.application.interactors.get_solution import \
 )
 from solution_service.application.interactors.list_solutions import \
     (
-    ListMySolutions, ListMySolutionsOnTask, ListSolutionForUser,
+    ListMySolutions, ListMySolutionsOnTask,
 )
 from solution_service.application.interactors.post_code_solution import \
     PostCodeSolution
@@ -26,11 +27,10 @@ from solution_service.application.interactors.standings import GetStandings
 from solution_service.application.interfaces.account import User
 from solution_service.application.interfaces.contest import ContestService
 from solution_service.controllers import schemas
-from solution_service.application.exceptions import NotFoundException, ForbiddenException
-from solution_service.domain.entities.abstract import TaskType, AnySolution
 
 from solution_service.controllers.dumping import serialize_solution
 from solution_service.controllers.loading import load_composite_task_id
+from solution_service.domain.abstract import TaskType
 from solution_service.infrastructure.account_service import authenticated_user_guard
 
 
@@ -57,7 +57,7 @@ class SolutionsController(Controller):
     ) -> schemas.SolutionSchema:
         solution = await interactor(solution_id=str(solution_uid))
         if solution is None:
-            raise NotFoundException
+            raise NotFound
         return serialize_solution(solution)
 
     @route(
@@ -170,7 +170,7 @@ class SolutionsController(Controller):
                 for task in tasks
             ],
             table=[
-                schemas.UserContestStatusSchema(
+                schemas.UserStandingsRowSchema(
                     user=schemas.UserSchema(
                         id=status.user.id,
                         username=status.user.username,

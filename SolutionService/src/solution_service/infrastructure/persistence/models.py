@@ -5,7 +5,7 @@ from sqlalchemy import Integer, Enum, String, JSON, UUID, DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 import uuid
 
-from solution_service.domain.entities.abstract import TaskType, SubmissionType
+from solution_service.domain.abstract import TaskType, SubmissionType
 from solution_service.infrastructure.persistence.database import Base
 
 

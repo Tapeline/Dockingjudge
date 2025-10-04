@@ -8,3 +8,7 @@ class MayNotAccessSolution(Exception):
 
 class NotAuthenticated(Exception):
     """Raised when you did not provide credentials."""
+
+
+class MayNotSubmitSolution(Exception):
+    """Raised when you cannot submit a solution."""

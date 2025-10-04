@@ -17,7 +17,7 @@ class GetBestSolutionForUserOnTask:
         self,
         task_type: str,
         task_id: int
-    ) -> AnySolution:
+    ) -> AnySolution | None:
         user = await self.user_idp.require_user()
         return await self.solution_repository.get_best_solution_by_user_task(
             user.id,

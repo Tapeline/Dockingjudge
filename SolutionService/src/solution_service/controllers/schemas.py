@@ -53,9 +53,17 @@ class UserContestStatusSchema(BaseModel):
     total_score: int
 
 
+class UserStandingsRowSchema(BaseModel):
+    user: UserSchema
+    tasks_attempted: int
+    tasks_solved: int
+    solutions: list[str | None]
+    total_score: int
+
+
 class StandingsSchema(BaseModel):
     tasks: list[tuple[TaskType, int, str]]
-    table: list[UserContestStatusSchema]
+    table: list[UserStandingsRowSchema]
 
 
 class VerdictSchema(BaseModel):

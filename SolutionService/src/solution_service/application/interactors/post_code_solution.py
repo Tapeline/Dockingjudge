@@ -1,10 +1,14 @@
 import base64
 import logging
 import uuid
+from dataclasses import dataclass
 from typing import Final, assert_never
 
 from solution_service.application.dto import NewCodeSolution
-from solution_service.application.exceptions import NotFound
+from solution_service.application.exceptions import (
+    NotFound,
+    MayNotSubmitSolution,
+)
 from solution_service.application.interfaces.contest import ContestService
 from solution_service.application.interfaces.publisher import SolutionPublisher
 from solution_service.application.interfaces.solutions import \
@@ -23,6 +27,7 @@ logger = logging.getLogger(__name__)
 _DEFAULT_FILENAME: Final = "file{0}"
 
 
+@dataclass(frozen=True, slots=True)
 class PostCodeSolution:
     object_storage: Storage
     solutions: SolutionRepository
@@ -41,6 +46,12 @@ class PostCodeSolution:
         task = await self.contest_service.get_code_task(solution.task_id)
         if task is None:
             raise NotFound
+        can_submit = await self.contest_service.can_submit(
+            user.id, TaskType.CODE, task.id
+        )
+        if not can_submit:
+            logger.info("Rejecting submit request")
+            raise MayNotSubmitSolution
         logger.info("Saving file")
         solution_file = self._prepare_file(solution)
         solution_url = await self.object_storage.save_file(solution_file)

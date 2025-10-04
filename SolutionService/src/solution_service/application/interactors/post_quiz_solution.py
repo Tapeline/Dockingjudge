@@ -3,7 +3,10 @@ from dataclasses import dataclass
 
 from solution_service.application.checker_loader import load_checker
 from solution_service.application.dto import NewQuizSolution
-from solution_service.application.exceptions import NotFound
+from solution_service.application.exceptions import (
+    NotFound,
+    MayNotSubmitSolution,
+)
 from solution_service.application.interfaces.contest import ContestService
 from solution_service.application.interfaces.solutions import \
     SolutionRepository
@@ -37,6 +40,12 @@ class PostQuizSolution:
         user = await self.user_idp.require_user()
         logger.info("Getting quiz task %s", solution.task_id)
         task = await self.contest_service.get_quiz_task(solution.task_id)
+        can_submit = await self.contest_service.can_submit(
+            user.id, TaskType.QUIZ, task.id
+        )
+        if not can_submit:
+            logger.info("Rejecting submit request")
+            raise MayNotSubmitSolution
         logger.info(
             "Loading checker %s %s", task.validator.type, task.validator.args
         )

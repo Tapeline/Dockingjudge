@@ -3,7 +3,7 @@ from typing import Final
 from solution_service.application.exceptions import (
     MayNotAccessSolution,
     NotAuthenticated,
-    NotFound,
+    NotFound, MayNotSubmitSolution,
 )
 from solution_service.controllers.error_commons import (
     gen_handler_mapping,
@@ -17,4 +17,5 @@ handlers: Final = gen_handler_mapping({
     MayNotAccessSolution: (403, infer_code),
     BadServiceResponseException: (500, "bad_dependency_response"),
     NotAuthenticated: (401, infer_code),
+    MayNotSubmitSolution: (403, infer_code),
 })

@@ -3,7 +3,10 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from operator import itemgetter
 
-from solution_service.application.dto import EnrichedUserContestStatus
+from solution_service.application.dto import (
+    EnrichedUserContestStatus,
+    EnrichedUserStandingRow,
+)
 from solution_service.application.interfaces.account import AccountService
 from solution_service.application.interfaces.contest import (
     ContestService,
@@ -25,7 +28,7 @@ class GetStandings:
         self,
         contest_id: int
     ) -> tuple[
-        Sequence[EnrichedUserContestStatus],
+        Sequence[EnrichedUserStandingRow],
         Sequence[ContestTaskHead]
     ]:
         logger.info("Getting participants")
@@ -42,7 +45,7 @@ class GetStandings:
         )
         logger.info("Serializing standings %s", str(standings))
         return [
-            EnrichedUserContestStatus(
+            EnrichedUserStandingRow(
                 user=participant_objects[i],
                 solutions=standings[i].solutions,
                 tasks_solved=standings[i].tasks_solved,

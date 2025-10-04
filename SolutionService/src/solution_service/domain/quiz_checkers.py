@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 import Levenshtein
 
-from solution_service.domain.entities.abstract import (AbstractQuizChecker,
+from solution_service.domain.abstract import (AbstractQuizChecker,
                                                        QuizCheckerVerdict,
                                                        QuizAnswer)
 
