@@ -1,7 +1,7 @@
 import logging
 from collections.abc import Sequence
 from dataclasses import dataclass
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 
 from solution_service.application.dto import (
     EnrichedUserStandingRow,
@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 @dataclass(frozen=True, slots=True)
 class GetStandings:
     """Gets standings for a contest."""
+
     solution_repository: SolutionRepository
     contest_service: ContestService
     account_service: AccountService
@@ -51,13 +52,15 @@ class GetStandings:
             participants,
         )
         logger.info("Serializing standings %s", str(standings))
-        return [
+        rows = [
             EnrichedUserStandingRow(
-                user=participant_objects[row_n],
-                solutions=row.solutions,
-                tasks_solved=row.tasks_solved,
-                tasks_attempted=row.tasks_attempted,
-                total_score=row.total_score,
+                user=participant,
+                solutions=standings[participant.id].solutions,
+                tasks_solved=standings[participant.id].tasks_solved,
+                tasks_attempted=standings[participant.id].tasks_attempted,
+                total_score=standings[participant.id].total_score,
             )
-            for row_n, row in enumerate(standings)
-        ], contest_tasks
+            for participant in participant_objects
+        ]
+        rows.sort(key=attrgetter("total_score"), reverse=True)
+        return rows, contest_tasks

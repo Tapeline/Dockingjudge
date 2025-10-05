@@ -29,8 +29,8 @@ from tests.partial.helpers import (
             ],
             [1, 2, 3],
             [1],
-            [
-                row(
+            {
+                1: row(
                     (1, 100),
                     (2, 100),
                     (3, 0),
@@ -39,7 +39,7 @@ from tests.partial.helpers import (
                     solved=2,
                     total=200,
                 ),
-            ],
+            },
         ),
         # multiple users
         (
@@ -51,8 +51,8 @@ from tests.partial.helpers import (
             ],
             [1, 2],
             [1, 2],
-            [
-                row(
+            {
+                1: row(
                     (1, 100),
                     (2, 50),
                     user_id=1,
@@ -60,7 +60,7 @@ from tests.partial.helpers import (
                     solved=1,
                     total=150,
                 ),
-                row(
+                2: row(
                     (1, 100),
                     (2, 100),
                     user_id=2,
@@ -68,7 +68,7 @@ from tests.partial.helpers import (
                     solved=2,
                     total=200,
                 ),
-            ],
+            },
         ),
         # user with no solutions
         (
@@ -77,22 +77,22 @@ from tests.partial.helpers import (
             ],
             [1],
             [1, 2],
-            [
-                row(
+            {
+                1: row(
                     (1, 100),
                     user_id=1,
                     attempted=1,
                     solved=1,
                     total=100,
                 ),
-                row(
+                2: row(
                     None,
                     user_id=2,
                     attempted=0,
                     solved=0,
                     total=0,
                 ),
-            ],
+            },
         ),
         # solutions from other contests (tasks not in contest_tasks)
         (
@@ -102,8 +102,8 @@ from tests.partial.helpers import (
             ],
             [1, 2],
             [1],
-            [
-                row(
+            {
+                1: row(
                     (1, 100),
                     None,
                     user_id=1,
@@ -111,7 +111,7 @@ from tests.partial.helpers import (
                     solved=1,
                     total=100,
                 ),
-            ],
+            },
         ),
         # multiple attempts on the same task, only best counts
         (
@@ -122,15 +122,15 @@ from tests.partial.helpers import (
             ],
             [1],
             [1],
-            [
-                row(
+            {
+                1: row(
                     (1, 100),
                     user_id=1,
                     attempted=1,
                     solved=1,
                     total=100,
                 ),
-            ],
+            },
         ),
         # multiple solutions with the same max score
         (
@@ -140,15 +140,15 @@ from tests.partial.helpers import (
             ],
             [1],
             [1],
-            [
-                row(
+            {
+                1: row(
                     (1, 100),
                     user_id=1,
                     attempted=1,
                     solved=1,
                     total=100,
                 ),
-            ],
+            },
         ),
         # empty participants list
         (
@@ -157,7 +157,7 @@ from tests.partial.helpers import (
             ],
             [1],
             [],
-            [],
+            {},
         ),
         # empty contest_tasks list
         (
@@ -166,14 +166,14 @@ from tests.partial.helpers import (
             ],
             [],
             [1],
-            [
-                row(
+            {
+                1: row(
                     user_id=1,
                     attempted=0,
                     solved=0,
                     total=0,
                 ),
-            ],
+            },
         ),
         # user with solutions but not in participants list
         (
@@ -183,15 +183,15 @@ from tests.partial.helpers import (
             ],
             [1],
             [1],
-            [
-                row(
+            {
+                1: row(
                     (1, 100),
                     user_id=1,
                     attempted=1,
                     solved=1,
                     total=100,
                 ),
-            ],
+            },
         ),
         # participant order is preserved
         (
@@ -201,22 +201,22 @@ from tests.partial.helpers import (
             ],
             [1],
             [2, 1],
-            [
-                row(
+            {
+                2: row(
                     (1, 50),
                     user_id=2,
                     attempted=1,
                     solved=0,
                     total=50,
                 ),
-                row(
+                1: row(
                     (1, 100),
                     user_id=1,
                     attempted=1,
                     solved=1,
                     total=100,
                 ),
-            ],
+            },
         ),
     ],
 )

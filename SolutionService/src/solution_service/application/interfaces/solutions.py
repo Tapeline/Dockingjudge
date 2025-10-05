@@ -24,6 +24,7 @@ class UserSolutionScore:
     task_type: TaskType
     user_id: int
     score: int
+    short_verdict: str
 
 
 @dataclass
@@ -83,7 +84,7 @@ class SolutionRepository(Protocol):
         self,
         contest_tasks: Sequence[tuple[TaskType, int]],
         participants: Sequence[int],
-    ) -> Sequence[UserStandingRow]:
+    ) -> dict[int, UserStandingRow]:
         """Get contest standings."""
         raise NotImplementedError
 

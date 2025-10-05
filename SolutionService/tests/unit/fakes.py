@@ -104,7 +104,7 @@ class FakeSolutionRepository(SolutionRepository):
         self,
         contest_tasks: Sequence[tuple[TaskType, int]],
         participants: Sequence[int],
-    ) -> Sequence[UserStandingRow]:
+    ) -> dict[int, UserStandingRow]:
         pass
 
     async def get_solution(self, solution_id: str) -> AnySolution | None:

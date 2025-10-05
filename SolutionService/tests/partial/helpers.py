@@ -29,6 +29,7 @@ def row(
                 task_type=TaskType.QUIZ,
                 task_id=score[0],
                 score=score[1],
+                short_verdict="OK" if score[1] == 100 else "WA"
             ) if score else None
             for score in scores
         ],

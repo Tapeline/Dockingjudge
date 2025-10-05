@@ -180,7 +180,7 @@ class SolutionRepoImpl(SolutionRepository):  # noqa: WPS214
         self,
         contest_tasks: Sequence[tuple[TaskType, int]],
         participants: Sequence[int],
-    ) -> Sequence[UserStandingRow]:
+    ) -> dict[int, UserStandingRow]:
         subquery = (
             select(
                 SolutionModel.user_id,
@@ -212,10 +212,9 @@ class SolutionRepoImpl(SolutionRepository):  # noqa: WPS214
             ),
         )
         best_solutions = await self._session.execute(query)
-        statuses = _form_standings(
+        return _form_standings(
             contest_tasks, participants, best_solutions,
         )
-        return [statuses[participant] for participant in participants]
 
     @override
     async def get_solution(self, solution_id: str) -> AnySolution | None:
@@ -353,6 +352,7 @@ def _form_standings(  # noqa: WPS231
             task_id=task_id,
             user_id=user_id,
             score=score,
+            short_verdict=short_verdict,
         )
         counted.add((task_type, task_id, user_id))
     return statuses
