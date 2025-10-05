@@ -12,8 +12,8 @@ from solution_service.application.interfaces.solutions import (
     SolutionRepository,
 )
 from solution_service.application.interfaces.storage import (
-    IdGenerator,
     DBSession,
+    IdGenerator,
 )
 from solution_service.application.interfaces.user import UserIdProvider
 from solution_service.config import Config

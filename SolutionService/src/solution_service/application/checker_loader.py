@@ -1,9 +1,8 @@
 from typing import Any
 
-from solution_service.domain.abstract import AbstractQuizChecker
-
 # important, do not remove
 from solution_service.domain import quiz_checkers  # noqa
+from solution_service.domain.abstract import AbstractQuizChecker
 
 
 class BadCheckerParametersException(Exception):
@@ -30,6 +29,6 @@ def load_checker(
 
 
 def _get_param_class(
-    checker_class: type[AbstractQuizChecker[Any]]
+    checker_class: type[AbstractQuizChecker[Any]],
 ) -> type | None:
     return checker_class.__annotations__.get("params")

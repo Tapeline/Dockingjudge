@@ -24,7 +24,6 @@ from solution_service.application.interactors.post_quiz_solution import (
     PostQuizSolution,
 )
 from solution_service.application.interactors.standings import GetStandings
-from solution_service.application.interfaces.solutions import UserSolutionScore
 from solution_service.controllers import schemas
 from solution_service.controllers.dumping import serialize_solution
 from solution_service.controllers.loading import load_composite_task_id

@@ -1,7 +1,6 @@
 import asyncio
-import logging
-import sys
 import pprint
+import sys
 
 from dishka import AsyncContainer, make_async_container
 from dishka.integrations import faststream as faststream_integration
@@ -130,6 +129,10 @@ def get_app() -> Litestar:
     container = _create_container(config, broker)
     faststream_app = _get_faststream_app(broker, container)
     litestar_app = _get_litestar_app(config, container)
-    litestar_app.on_startup.append(broker.start)
-    litestar_app.on_shutdown.append(broker.stop)
+    litestar_app.on_startup.append(
+        faststream_app.broker.start,  # type: ignore[union-attr]
+    )
+    litestar_app.on_shutdown.append(
+        faststream_app.broker.stop,  # type: ignore[union-attr]
+    )
     return litestar_app

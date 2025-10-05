@@ -1,6 +1,6 @@
-from typing import Any, override
+from typing import override
 
-from dishka import Provider, provide, Scope
+from dishka import Provider, Scope, provide
 from litestar import Request
 
 from solution_service.application.exceptions import NotAuthenticated
@@ -11,7 +11,7 @@ from solution_service.application.interfaces.user import UserIdProvider
 class AuthProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def get_current_user(
-        self, request: Request  # type: ignore[type-arg]
+        self, request: Request,  # type: ignore[type-arg]
     ) -> UserIdProvider:
         return LitestarIdProvider(request.user)
 

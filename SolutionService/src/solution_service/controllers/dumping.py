@@ -1,4 +1,4 @@
-from typing import overload, Any
+from typing import Any, overload
 
 from solution_service.controllers.schemas import (
     CodeSolutionExtraSchema,
@@ -6,8 +6,9 @@ from solution_service.controllers.schemas import (
     SolutionSchema,
 )
 from solution_service.domain.abstract import (
-    AnySolution, TaskType,
-    QuizSolution, CodeSolution,
+    AnySolution,
+    CodeSolution,
+    QuizSolution,
 )
 
 

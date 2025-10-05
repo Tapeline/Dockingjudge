@@ -94,7 +94,7 @@ class RMQSolutionPublisher(SolutionPublisher):
 
     @override
     async def publish(
-        self, solution: CodeSolution, test_suite: dict[str, Any]
+        self, solution: CodeSolution, test_suite: dict[str, Any],
     ) -> None:
         await self.broker.publish(
             {
@@ -136,7 +136,7 @@ async def handle_contest_deleted(
         *(
             interactor(page.type, page.id)
             for page in data.object.pages
-        )
+        ),
     )
     logger.info("Purged contest %s", data.object.id)
 

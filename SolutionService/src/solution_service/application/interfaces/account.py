@@ -1,7 +1,7 @@
 from abc import abstractmethod
 from collections.abc import Sequence
 from dataclasses import dataclass
-from typing import Protocol, Any
+from typing import Any, Protocol
 
 
 @dataclass

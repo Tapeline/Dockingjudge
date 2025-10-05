@@ -15,9 +15,10 @@ from solution_service.application.interfaces.solutions import (
     SolutionRepository,
 )
 from solution_service.application.interfaces.storage import (
+    DBSession,
     File,
     IdGenerator,
-    Storage, DBSession,
+    Storage,
 )
 from solution_service.application.interfaces.user import UserIdProvider
 from solution_service.config import Config
@@ -94,5 +95,5 @@ class PostCodeSolution:
                 )
             case _:
                 assert_never(
-                    solution.submission_type  # type: ignore[arg-type]
+                    solution.submission_type,  # type: ignore[arg-type]
                 )

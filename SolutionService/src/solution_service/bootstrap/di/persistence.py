@@ -10,13 +10,15 @@ from solution_service.application.interfaces.storage import (
 )
 from solution_service.config import Config
 from solution_service.infrastructure.persistence import s3_service
-from solution_service.infrastructure.persistence.database import \
-    create_session_maker
+from solution_service.infrastructure.persistence.database import (
+    create_session_maker,
+)
 from solution_service.infrastructure.persistence.id_gen import (
     DefaultUUIDGenerator,
 )
-from solution_service.infrastructure.persistence.repo_impl import \
-    SolutionRepoImpl
+from solution_service.infrastructure.persistence.repo_impl import (
+    SolutionRepoImpl,
+)
 
 
 class PersistenceProvider(Provider):
