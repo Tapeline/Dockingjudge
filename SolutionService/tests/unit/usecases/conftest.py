@@ -32,6 +32,7 @@ from tests.unit.factory import (
 )
 from tests.unit.fakes import (
     FakeContestService,
+    FakeDBSession,
     FakeObjectStore,
     FakeSolutionPublisher,
     FakeSolutionRepository,
@@ -77,6 +78,11 @@ def fake_solution_publisher() -> FakeSolutionPublisher:
 
 
 @pytest.fixture
+def fake_db_session() -> FakeDBSession:
+    return FakeDBSession()
+
+
+@pytest.fixture
 def get_solution_interactor(
     fake_solution_repo: FakeSolutionRepository,
     fake_user_idp: FakeUserIdP,
@@ -108,6 +114,7 @@ def post_code_solution_interactor(
     fake_solution_publisher: FakeSolutionPublisher,
     test_config: Config,
     fake_object_store: FakeObjectStore,
+    fake_db_session: FakeDBSession,
 ) -> PostCodeSolution:
     return PostCodeSolution(
         object_storage=fake_object_store,
@@ -117,6 +124,7 @@ def post_code_solution_interactor(
         config=test_config,
         user_idp=fake_user_idp,
         id_gen=DefaultUUIDGenerator(),
+        session=fake_db_session,
     )
 
 
@@ -126,6 +134,7 @@ def post_quiz_solution_interactor(
     fake_user_idp: FakeUserIdP,
     fake_contest_service: FakeContestService,
     test_config: Config,
+    fake_db_session: FakeDBSession,
 ) -> PostQuizSolution:
     return PostQuizSolution(
         user_idp=fake_user_idp,
@@ -133,6 +142,7 @@ def post_quiz_solution_interactor(
         contest_service=fake_contest_service,
         id_gen=DefaultUUIDGenerator(),
         config=test_config,
+        session=fake_db_session,
     )
 
 

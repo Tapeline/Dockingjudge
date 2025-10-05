@@ -22,7 +22,12 @@ def sqlite_base():
     use_solution_table(conn)
     conn.close()
     yield "test_base.db"
-    os.remove("test_base.db")
+    try:
+        os.remove("test_base.db")
+    except PermissionError:
+        conn = sqlite3.connect("test_base.db")
+        clean_solution_table(conn)
+        conn.close()
 
 
 def use_solution_table(conn: sqlite3.Connection):
@@ -45,6 +50,16 @@ def use_solution_table(conn: sqlite3.Connection):
             detailed_verdict TEXT NULL,
             main_file TEXT NULL
         );
+        """,
+    )
+    conn.commit()
+
+
+def clean_solution_table(conn: sqlite3.Connection) -> None:
+    cur = conn.cursor()
+    cur.execute(
+        """
+        DROP TABLE IF EXISTS solutions;
         """,
     )
     conn.commit()

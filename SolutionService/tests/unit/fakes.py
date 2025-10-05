@@ -17,7 +17,12 @@ from solution_service.application.interfaces.solutions import (
     SolutionRepository,
     UserStandingRow,
 )
-from solution_service.application.interfaces.storage import URL, File, Storage
+from solution_service.application.interfaces.storage import (
+    URL,
+    DBSession,
+    File,
+    Storage,
+)
 from solution_service.application.interfaces.user import UserIdProvider
 from solution_service.domain.abstract import (
     AnySolution,
@@ -246,3 +251,14 @@ class FakeSolutionPublisher(SolutionPublisher):
         self, solution: CodeSolution, test_suite: dict[str, Any],
     ) -> None:
         self.published.append((solution, test_suite))
+
+
+class FakeDBSession(DBSession):
+    async def commit(self) -> None:
+        ...
+
+    async def flush(self) -> None:
+        ...
+
+    async def rollback(self) -> None:
+        ...
