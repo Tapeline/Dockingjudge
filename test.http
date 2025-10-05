@@ -1,0 +1,64 @@
+###
+POST localhost:8001/api/v1/accounts/register/
+Content-Type: application/json
+
+{
+    "username": "Tapeline",
+    "password": "pass"
+}
+
+###
+POST localhost:8001/api/v1/accounts/login/
+Content-Type: application/json
+
+{
+    "username": "Tapeline",
+    "password": "pass"
+}
+
+###
+POST localhost:8002/api/v1/contests
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5NjgyNjk3LCJpYXQiOjE3NTk1OTYyOTcsImp0aSI6IjZkZDU0MTUyMmFlZTRkNjlhODA1MDVmZDI3ZWFkOTNjIiwidXNlcl9pZCI6Mn0.J1eEIZNbfvtVV7hYLH8AtJv0YIaTc2Oaa6nCF_f-z6c
+
+{
+  "name": "c1",
+  "is_started": true,
+  "is_ended": false,
+  "time_limit_seconds": -1,
+  "description": "test"
+}
+
+###
+POST localhost:8002/api/v1/contests/1/apply/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5NjgyNjk3LCJpYXQiOjE3NTk1OTYyOTcsImp0aSI6IjZkZDU0MTUyMmFlZTRkNjlhODA1MDVmZDI3ZWFkOTNjIiwidXNlcl9pZCI6Mn0.J1eEIZNbfvtVV7hYLH8AtJv0YIaTc2Oaa6nCF_f-z6c
+
+###
+POST localhost:8002/api/v1/contests/1/tasks/quiz/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5NjgyNjk3LCJpYXQiOjE3NTk1OTYyOTcsImp0aSI6IjZkZDU0MTUyMmFlZTRkNjlhODA1MDVmZDI3ZWFkOTNjIiwidXNlcl9pZCI6Mn0.J1eEIZNbfvtVV7hYLH8AtJv0YIaTc2Oaa6nCF_f-z6c
+
+{
+  "title": "q1",
+  "description": "test",
+  "points": 100,
+  "validator": {
+    "type": "regex",
+    "args": {
+      "pattern": "app+le"
+    }
+  }
+}
+
+###
+POST localhost:8003/api/v1/solutions/post/quiz/1/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5NjgyNjk3LCJpYXQiOjE3NTk1OTYyOTcsImp0aSI6IjZkZDU0MTUyMmFlZTRkNjlhODA1MDVmZDI3ZWFkOTNjIiwidXNlcl9pZCI6Mn0.J1eEIZNbfvtVV7hYLH8AtJv0YIaTc2Oaa6nCF_f-z6c
+
+{
+  "text": "applle"
+}
+
+###
+GET localhost:8003/api/v1/solutions/standings/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzU5NjgyNjk3LCJpYXQiOjE3NTk1OTYyOTcsImp0aSI6IjZkZDU0MTUyMmFlZTRkNjlhODA1MDVmZDI3ZWFkOTNjIiwidXNlcl9pZCI6Mn0.J1eEIZNbfvtVV7hYLH8AtJv0YIaTc2Oaa6nCF_f-z6c
