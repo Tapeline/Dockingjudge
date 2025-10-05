@@ -35,6 +35,8 @@ _DEFAULT_FILENAME: Final = "file{0}"
 
 @dataclass(frozen=True, slots=True)
 class PostCodeSolution:
+    """Posts a code solution."""
+
     object_storage: Storage
     solutions: SolutionRepository
     contest_service: ContestService
@@ -48,6 +50,7 @@ class PostCodeSolution:
         self,
         solution: NewCodeSolution,
     ) -> CodeSolution:
+        """Posts a code solution."""
         user = await self.user_idp.require_user()
         logger.info("Getting code task %s", solution.task_id)
         task = await self._retrieve_task(solution)

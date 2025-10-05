@@ -20,6 +20,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass(frozen=True, slots=True)
 class GetStandings:
+    """Gets standings for a contest."""
     solution_repository: SolutionRepository
     contest_service: ContestService
     account_service: AccountService

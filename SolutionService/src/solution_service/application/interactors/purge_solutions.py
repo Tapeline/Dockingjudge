@@ -9,6 +9,7 @@ from solution_service.domain.abstract import TaskType
 
 @dataclass(frozen=True, slots=True)
 class PurgeUserSolutions:
+    """Purges all solutions of a user."""
     solution_repository: SolutionRepository
     session: DBSession
 
@@ -19,6 +20,7 @@ class PurgeUserSolutions:
 
 @dataclass(frozen=True, slots=True)
 class PurgeTaskSolutions:
+    """Purges all solutions for a task."""
     solution_repository: SolutionRepository
     session: DBSession
 

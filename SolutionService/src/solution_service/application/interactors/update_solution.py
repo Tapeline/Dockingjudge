@@ -9,6 +9,7 @@ from solution_service.application.interfaces.storage import DBSession
 
 @dataclass(frozen=True, slots=True)
 class StoreCheckedSolution:
+    """Stores the result of a solution check."""
     solution_repository: SolutionRepository
     session: DBSession
 

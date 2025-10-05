@@ -11,6 +11,8 @@ from solution_service.domain.abstract import AnySolution, TaskType
 
 @dataclass(frozen=True, slots=True)
 class GetBestSolutionForUserOnTask:
+    """Gets the best solution for a user on a specific task."""
+
     solution_repository: SolutionRepository
     user_idp: UserIdProvider
 
@@ -19,6 +21,7 @@ class GetBestSolutionForUserOnTask:
         task_type: str,
         task_id: int,
     ) -> AnySolution | None:
+        """Gets the best solution for a user on a specific task."""
         user = await self.user_idp.require_user()
         return await self.solution_repository.get_best_solution_by_user_task(
             user.id,
@@ -29,6 +32,8 @@ class GetBestSolutionForUserOnTask:
 
 @dataclass(frozen=True, slots=True)
 class GetSolution:
+    """Gets a solution by its id."""
+
     solution_repository: SolutionRepository
     contest_service: ContestService
     user_idp: UserIdProvider
@@ -37,6 +42,7 @@ class GetSolution:
         self,
         solution_id: str,
     ) -> AnySolution | None:
+        """Gets a solution by its id."""
         solution = await self.solution_repository.get_solution(solution_id)
         if not solution:
             return None

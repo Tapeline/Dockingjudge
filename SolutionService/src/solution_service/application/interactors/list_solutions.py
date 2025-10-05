@@ -16,6 +16,7 @@ class ListMySolutions:
     user_idp: UserIdProvider
 
     async def __call__(self) -> Collection[AnySolution]:
+        """Get all my solutions."""
         user = await self.user_idp.require_user()
         return await self.solutions.get_all_solutions_of_user(user.id)
 
@@ -32,6 +33,7 @@ class ListMySolutionsOnTask:
         task_type: TaskType,
         task_id: int,
     ) -> Sequence[AnySolution]:
+        """Get all my solutions for specific task."""
         user = await self.user_idp.require_user()
         return await self.solutions.get_all_solutions_of_task(
             user.id,

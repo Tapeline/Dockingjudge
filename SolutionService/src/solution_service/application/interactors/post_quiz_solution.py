@@ -23,6 +23,8 @@ logger = logging.getLogger(__name__)
 
 
 class CheckerNotFoundException(NotFound):
+    """Raised when a checker is not found."""
+
     def __init__(self, checker_name: str) -> None:
         super().__init__(checker_name)
         self.checker_name = checker_name
@@ -31,6 +33,8 @@ class CheckerNotFoundException(NotFound):
 
 @dataclass(frozen=True, slots=True)
 class PostQuizSolution:
+    """Posts a quiz solution."""
+
     solution_repository: SolutionRepository
     contest_service: ContestService
     config: Config

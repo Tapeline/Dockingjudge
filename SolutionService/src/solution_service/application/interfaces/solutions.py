@@ -75,6 +75,7 @@ class SolutionRepository(Protocol):
         contest_tasks: Sequence[tuple[TaskType, int]],
         pagination_params: PaginationParameters | None = None,
     ) -> Sequence[AnySolution]:
+        """Get all solutions of a user for a contest."""
         raise NotImplementedError
 
     @abstractmethod
@@ -83,6 +84,7 @@ class SolutionRepository(Protocol):
         contest_tasks: Sequence[tuple[TaskType, int]],
         participants: Sequence[int],
     ) -> Sequence[UserStandingRow]:
+        """Get contest standings."""
         raise NotImplementedError
 
     @abstractmethod
@@ -90,6 +92,7 @@ class SolutionRepository(Protocol):
         self,
         solution_id: str,
     ) -> AnySolution | None:
+        """Get a solution by its id."""
         raise NotImplementedError
 
     @abstractmethod
@@ -99,6 +102,7 @@ class SolutionRepository(Protocol):
         task_type: TaskType,
         task_id: int,
     ) -> AnySolution | None:
+        """Get the best solution for a user on a task."""
         raise NotImplementedError
 
     @abstractmethod
@@ -106,6 +110,7 @@ class SolutionRepository(Protocol):
         self,
         solution: AnySolution,
     ) -> None:
+        """Create a new solution."""
         raise NotImplementedError
 
     @abstractmethod
@@ -118,14 +123,17 @@ class SolutionRepository(Protocol):
         group_scores: dict[str, int],
         protocol: dict[str, Any],
     ) -> None:
+        """Store the result of a solution check."""
         raise NotImplementedError
 
     @abstractmethod
     async def purge_user_solutions(self, user_id: int) -> None:
+        """Purge all solutions of a user."""
         raise NotImplementedError
 
     @abstractmethod
     async def purge_task_solutions(
         self, task_type: TaskType, task_id: int,
     ) -> None:
+        """Purge all solutions for a task."""
         raise NotImplementedError
