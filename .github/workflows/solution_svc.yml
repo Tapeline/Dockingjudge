@@ -69,10 +69,6 @@ jobs:
         working-directory: ./SolutionService
         run: uv sync --group test
 
-      - name: Build Docker
-        working-directory: ./SolutionService
-        run: just build
-
       - id: unit_test
         working-directory: ./SolutionService
         continue-on-error: true
