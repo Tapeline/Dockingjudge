@@ -50,8 +50,8 @@ def _transform_solution_model_to_entity(
         "short_verdict": model.short_verdict,
         "submitted_at": model.submitted_at,
     }
-    if model.task_type == TaskType.CODE:
-        return CodeSolution(
+    if model.task_type == TaskType.CODE:  # type: ignore[comparison-overlap]
+        return CodeSolution(  # type: ignore[unreachable]
             detailed_verdict=model.detailed_verdict or "NC",
             group_scores=model.group_scores or {},
             submission_url=model.answer,
@@ -62,8 +62,8 @@ def _transform_solution_model_to_entity(
             ),
             **commons,
         )
-    if model.task_type == TaskType.QUIZ:
-        return QuizSolution(
+    if model.task_type == TaskType.QUIZ:  # type: ignore[comparison-overlap]
+        return QuizSolution(  # type: ignore[unreachable]
             submitted_answer=model.answer,
             **commons,
         )
