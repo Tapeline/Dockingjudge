@@ -9,3 +9,5 @@ on:
 jobs:
   judgelet_tests:
     uses: ./.github/workflows/judgelet.yml
+  solution_svc_tests:
+    uses: ./.github/workflows/solution_svc.yml

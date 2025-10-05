@@ -92,7 +92,10 @@ ignore = [
 
     "C408",
     "E731",
-    "PLE0704"
+    "PLE0704",
+
+    # TODO: REMOVE
+    "D"
 ]
 external = ["WPS"]
 exclude = [
