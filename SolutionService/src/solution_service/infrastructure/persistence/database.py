@@ -12,10 +12,13 @@ from solution_service.config import PostgresConfig
 _DATABASE_URI_TEMPLATE: Final = (
     "postgresql+psycopg://{login}:{password}@{host}:{port}/{database}"
 )
+_POOL_SIZE: Final = 15
+_MAX_OVERFLOW: Final = 15
+_CONNECT_TIMEOUT_S: Final = 5
 
 
 class Base(DeclarativeBase):
-    pass
+    """Base for sqlalchemy models."""
 
 
 def create_session_maker(
@@ -31,10 +34,10 @@ def create_session_maker(
 
     engine = create_async_engine(
         database_uri,
-        pool_size=15,
-        max_overflow=15,
+        pool_size=_POOL_SIZE,
+        max_overflow=_MAX_OVERFLOW,
         connect_args={
-            "connect_timeout": 5,
+            "connect_timeout": _CONNECT_TIMEOUT_S,
         },
     )
     return async_sessionmaker(

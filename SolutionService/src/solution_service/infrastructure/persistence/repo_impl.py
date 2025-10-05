@@ -2,13 +2,12 @@ import uuid
 from collections.abc import Sequence
 from typing import Any, overload, override
 
-import sqlalchemy
-from sqlalchemy import and_, delete, func, or_, select, update
+from sqlalchemy import Result, Select, and_, delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from solution_service.application.interfaces import solutions
 from solution_service.application.interfaces.solutions import (
     PaginationParameters,
+    SolutionRepository,
     UserSolutionScore,
     UserStandingRow,
 )
@@ -24,17 +23,20 @@ from solution_service.infrastructure.persistence.models import SolutionModel
 
 @overload
 def _transform_solution_model_to_entity(
-        model: SolutionModel,
-) -> AnySolution: ...
+    model: SolutionModel,
+) -> AnySolution:
+    ...
 
 
 @overload
 def _transform_solution_model_to_entity(
-        model: None,
-) -> None: ...
+    model: None,
+) -> None:
+    ...
+
 
 def _transform_solution_model_to_entity(
-        model: SolutionModel | None,
+    model: SolutionModel | None,
 ) -> AnySolution | None:
     if model is None:
         return None
@@ -48,8 +50,8 @@ def _transform_solution_model_to_entity(
         "short_verdict": model.short_verdict,
         "submitted_at": model.submitted_at,
     }
-    if model.task_type == TaskType.CODE:  # type: ignore[comparison-overlap]
-        return CodeSolution(  # type: ignore[unreachable]
+    if model.task_type == TaskType.CODE:
+        return CodeSolution(
             detailed_verdict=model.detailed_verdict or "NC",
             group_scores=model.group_scores or {},
             submission_url=model.answer,
@@ -60,8 +62,8 @@ def _transform_solution_model_to_entity(
             ),
             **commons,
         )
-    if model.task_type == TaskType.QUIZ:  # type: ignore[comparison-overlap]
-        return QuizSolution(  # type: ignore[unreachable]
+    if model.task_type == TaskType.QUIZ:
+        return QuizSolution(
             submitted_answer=model.answer,
             **commons,
         )
@@ -72,8 +74,8 @@ def _transform_solution_model_to_entity(
 
 
 def _select_contest_tasks(
-        contest_tasks: Sequence[tuple[TaskType, int]],
-) -> sqlalchemy.Select[Any]:
+    contest_tasks: Sequence[tuple[TaskType, int]],
+) -> Select[Any]:
     quiz_tasks_filter = [
         task[1] for task in contest_tasks
         if task[0] == TaskType.QUIZ
@@ -104,7 +106,7 @@ def _apply_pagination(query: Any, pagination: PaginationParameters) -> Any:
     return query
 
 
-class SolutionRepoImpl(solutions.SolutionRepository):
+class SolutionRepoImpl(SolutionRepository):  # noqa: WPS214
     def __init__(self, session: AsyncSession) -> None:
         self._session = session
 
@@ -209,41 +211,10 @@ class SolutionRepoImpl(solutions.SolutionRepository):
                 SolutionModel.score == subquery.c.best_score,
             ),
         )
-        statuses = {
-            participant: UserStandingRow(
-                solutions=[None] * len(contest_tasks),
-                tasks_solved=0,
-                tasks_attempted=0,
-                total_score=0,
-            )
-            for participant in participants
-        }
-        counted = set()
         best_solutions = await self._session.execute(query)
-        for (
-            user_id, task_id, task_type, score, _, short_verdict,
-        ) in best_solutions:
-            if (task_type, task_id) not in contest_tasks:
-                # TODO: very inefficient, should move to SQL query
-                continue
-            if user_id not in participants:
-                # TODO: very inefficient, should move to SQL query
-                continue
-            if (task_type, task_id, user_id) in counted:
-                continue
-            status = statuses[user_id]
-            status.tasks_attempted += 1
-            status.total_score += score
-            status.tasks_solved += short_verdict.lower() == "ok"
-            status.solutions[
-                contest_tasks.index((task_type, task_id))
-            ] = UserSolutionScore(
-                task_type=TaskType(task_type),
-                task_id=task_id,
-                user_id=user_id,
-                score=score,
-            )
-            counted.add((task_type, task_id, user_id))
+        statuses = _form_standings(
+            contest_tasks, participants, best_solutions,
+        )
         return [statuses[participant] for participant in participants]
 
     @override
@@ -342,3 +313,46 @@ class SolutionRepoImpl(solutions.SolutionRepository):
                 SolutionModel.task_type == task_type,
             ),
         )
+
+
+def _form_standings(  # noqa: WPS231
+    contest_tasks: Sequence[tuple[TaskType, int]],
+    participants: Sequence[int],
+    best_solutions: Result[tuple[int, int, TaskType, int, str, str]],
+) -> dict[int, UserStandingRow]:
+    # TODO: maybe refactor this in future
+    statuses = {
+        participant: UserStandingRow(
+            solutions=[None for _ in range(len(contest_tasks))],
+            tasks_solved=0,
+            tasks_attempted=0,
+            total_score=0,
+        )
+        for participant in participants
+    }
+    counted = set()
+    for (
+        user_id, task_id, task_type, score, _, short_verdict,
+    ) in best_solutions:
+        if (task_type, task_id) not in contest_tasks:
+            # TODO: very inefficient, should move to SQL query
+            continue
+        if user_id not in participants:
+            # TODO: very inefficient, should move to SQL query
+            continue
+        if (task_type, task_id, user_id) in counted:
+            continue
+        status = statuses[user_id]
+        status.tasks_attempted += 1
+        status.total_score += score
+        status.tasks_solved += short_verdict.lower() == "ok"
+        status.solutions[
+            contest_tasks.index((task_type, task_id))
+        ] = UserSolutionScore(
+            task_type=TaskType(task_type),
+            task_id=task_id,
+            user_id=user_id,
+            score=score,
+        )
+        counted.add((task_type, task_id, user_id))
+    return statuses

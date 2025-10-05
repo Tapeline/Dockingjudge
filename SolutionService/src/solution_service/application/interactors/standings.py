@@ -52,11 +52,11 @@ class GetStandings:
         logger.info("Serializing standings %s", str(standings))
         return [
             EnrichedUserStandingRow(
-                user=participant_objects[i],
+                user=participant_objects[row_n],
                 solutions=row.solutions,
                 tasks_solved=row.tasks_solved,
                 tasks_attempted=row.tasks_attempted,
                 total_score=row.total_score,
             )
-            for i, row in enumerate(standings)
+            for row_n, row in enumerate(standings)
         ], contest_tasks

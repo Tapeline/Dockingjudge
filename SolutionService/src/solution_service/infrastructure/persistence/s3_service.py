@@ -28,10 +28,10 @@ class S3Storage(Storage):
         self.params = S3ConnectionParameters(
             bucket_name=config.s3.bucket_name,
             endpoint="{host}:{port}".format(
-               host=config.s3.host
-               .replace("https://", "")
-               .replace("http://", ""),
-               port=config.s3.port,
+                host=config.s3.host
+                .replace("https://", "")
+                .replace("http://", ""),
+                port=config.s3.port,
             ),
             username=config.s3.username,
             password=config.s3.password,
@@ -109,12 +109,15 @@ class S3Storage(Storage):
         response = None
         try:
             response = self.client.get_object(bucket_name, object_id)
-            return File(
-                name=object_id,
-                contents=response.read(),
-            )
-        finally:
+        except Exception:
             if response is not None:
                 response.close()
                 response.release_conn()
             raise
+        if response is not None:
+            response.close()
+            response.release_conn()
+        return File(
+            name=object_id,
+            contents=response.read(),
+        )

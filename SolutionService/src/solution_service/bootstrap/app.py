@@ -1,4 +1,5 @@
 import asyncio
+import logging
 import pprint
 import sys
 
@@ -26,11 +27,11 @@ from solution_service.bootstrap.di.services import OuterServicesProvider
 from solution_service.config import Config
 from solution_service.controllers import http
 from solution_service.controllers.mq import mq_controller
-from solution_service.infrastructure import account_service
-from solution_service.infrastructure.account_service import (
-    ServiceAuthenticationMiddleware,
-)
 from solution_service.infrastructure.rmq import create_broker
+from solution_service.infrastructure.security import (
+    ServiceAuthenticationMiddleware,
+    provided_security_definitions,
+)
 
 
 def _create_broker(config: Config) -> RabbitBroker:
@@ -104,7 +105,7 @@ def _get_litestar_app(config: Config, container: AsyncContainer) -> Litestar:
             path="/api/v1/solutions/docs",
             components=Components(
                 security_schemes={
-                    **account_service.provided_security_definitions,
+                    **provided_security_definitions,
                 },
             ),
         ),
@@ -118,13 +119,18 @@ def _get_litestar_app(config: Config, container: AsyncContainer) -> Litestar:
     return litestar_app
 
 
+def _print_config(config: Config) -> None:
+    logging.getLogger("config dump").info(
+        "Config loaded: %s", pprint.pformat(config, indent=2),
+    )
+
+
 def get_app() -> Litestar:
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(
             asyncio.WindowsSelectorEventLoopPolicy(),
         )
     config = service_config_loader.load()
-    print("Config loaded:", pprint.pformat(config, indent=2))
     broker = _create_broker(config)
     container = _create_container(config, broker)
     faststream_app = _get_faststream_app(broker, container)
@@ -134,5 +140,8 @@ def get_app() -> Litestar:
     )
     litestar_app.on_shutdown.append(
         faststream_app.broker.stop,  # type: ignore[union-attr]
+    )
+    litestar_app.on_startup.append(
+        lambda: _print_config(config),
     )
     return litestar_app

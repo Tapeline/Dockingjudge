@@ -1,7 +1,7 @@
 from typing import Any
 
 # important, do not remove
-from solution_service.domain import quiz_checkers  # noqa
+from solution_service.domain import quiz_checkers  # noqa: F401
 from solution_service.domain.abstract import AbstractQuizChecker
 
 

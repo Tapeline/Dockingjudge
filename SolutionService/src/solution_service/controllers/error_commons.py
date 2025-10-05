@@ -34,8 +34,8 @@ def _create_handler(handler_def: HandlerDef) -> LitestarErrHandler:
     else:
         status, code, enricher = handler_def
 
-    def handler_func(
-            request: Request[Any, Any, Any], exc: Exception,
+    def handler_func(  # noqa: WPS430
+        request: Request[Any, Any, Any], exc: Exception,
     ) -> Response[Any]:
         nonlocal code  # noqa: WPS420
         extras = enricher(exc)

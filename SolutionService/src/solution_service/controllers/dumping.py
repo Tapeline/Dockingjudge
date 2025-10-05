@@ -16,14 +16,16 @@ from solution_service.domain.abstract import (
 def serialize_solution(
     solution: AnySolution, *,
     is_safe: bool = False,
-) -> SolutionSchema: ...
+) -> SolutionSchema:
+    ...
 
 
 @overload
 def serialize_solution(
     solution: None, *,
     is_safe: bool = False,
-) -> None: ...
+) -> None:
+    ...
 
 
 def serialize_solution(

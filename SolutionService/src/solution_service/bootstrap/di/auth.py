@@ -21,7 +21,7 @@ class LitestarIdProvider(UserIdProvider):
         self.user = user
 
     @override
-    async def get_user(self) -> User | None:
+    async def get_user(self) -> User | None:  # noqa: WPS615
         return self.user
 
     @override

@@ -1,14 +1,15 @@
 import logging
 from collections.abc import Sequence
-from typing import override
+from http import HTTPStatus
+from typing import Final, override
 
 import aiohttp
 from dishka import FromDishka
 
-from solution_service.application.interfaces import contest
 from solution_service.application.interfaces.contest import (
     AnyTaskDTO,
     CodeTaskDTO,
+    ContestService,
     ContestTaskHead,
     QuizTaskDTO,
 )
@@ -18,15 +19,17 @@ from solution_service.infrastructure.exceptions import (
     BadServiceResponseException,
 )
 
+_SVC_NAME: Final = "contest"
 
-class ContestServiceImpl(contest.ContestService):
+
+class ContestServiceImpl(ContestService):
     def __init__(
         self,
         other_services: FromDishka[Config],
     ) -> None:
         self.base_url = other_services.services.contest_service
         self.internal_base_url = (
-             other_services.services.contest_service_internal
+            other_services.services.contest_service_internal
         )
         self.logger = logging.getLogger("contest_service")
 
@@ -39,14 +42,14 @@ class ContestServiceImpl(contest.ContestService):
                 f"{self.base_url}/contests/{contest_id}/managers/",
             ) as response,
         ):
-            if response.status == 404:
+            if response.status == HTTPStatus.NOT_FOUND:
                 return []
-            if response.status != 200:
+            if response.status != HTTPStatus.OK:
                 self.logger.error(
                     "/contests/%s/managers responded %s: %s",
                     contest_id, response.status, await response.text(),
                 )
-                raise BadServiceResponseException("contest", response)
+                raise BadServiceResponseException(_SVC_NAME, response)
             return await response.json()  # type: ignore[no-any-return]
 
     @override
@@ -60,14 +63,14 @@ class ContestServiceImpl(contest.ContestService):
                 f"{self.internal_base_url}/contests/{contest_id}/tasks/",
             ) as response,
         ):
-            if response.status == 404:
+            if response.status == HTTPStatus.NOT_FOUND:
                 return []
-            if response.status != 200:
+            if response.status != HTTPStatus.OK:
                 self.logger.error(
                     "/contests/%s/tasks responded %s: %s",
                     contest_id, response.status, await response.text(),
                 )
-                raise BadServiceResponseException("contest", response)
+                raise BadServiceResponseException(_SVC_NAME, response)
             data = await response.json()
             return [
                 ContestTaskHead(
@@ -87,14 +90,14 @@ class ContestServiceImpl(contest.ContestService):
                 f"{self.base_url}/contests/{contest_id}/participants/",
             ) as response,
         ):
-            if response.status == 404:
+            if response.status == HTTPStatus.NOT_FOUND:
                 return []
-            if response.status != 200:
+            if response.status != HTTPStatus.OK:
                 self.logger.error(
                     "/contests/%s/participants responded %s: %s",
                     contest_id, response.status, await response.text(),
                 )
-                raise BadServiceResponseException("contest", response)
+                raise BadServiceResponseException(_SVC_NAME, response)
             return await response.json()  # type: ignore[no-any-return]
 
     @override
@@ -105,10 +108,11 @@ class ContestServiceImpl(contest.ContestService):
             aiohttp.ClientSession() as session,
             session.get(
                 f"{self.base_url}/contests/tasks/"
-                f"{task_type.value}/{task_id}/can-submit/{user_id}/",
+                f"{task_type.value}/{task_id}/"
+                f"can-submit/{user_id}/",
             ) as response,
         ):
-            if response.status != 200:
+            if response.status != HTTPStatus.OK:
                 return False
             json = await response.json()
             return json["can_submit"]  # type: ignore[no-any-return]
@@ -132,16 +136,16 @@ class ContestServiceImpl(contest.ContestService):
                 f"{self.internal_base_url}/contests/tasks/quiz/{task_id}/",
             ) as response,
         ):
-            if response.status == 404:
+            if response.status == HTTPStatus.NOT_FOUND:
                 return None
-            if response.status != 200:
+            if response.status != HTTPStatus.OK:
                 self.logger.error(
                     "internal/tasks/quiz/%s responded %s: %s",
                     task_id, response.status, await response.text(),
                 )
-                raise BadServiceResponseException("contest", response)
+                raise BadServiceResponseException(_SVC_NAME, response)
             data = await response.json()
-            return contest.QuizTaskDTO(**data)
+            return QuizTaskDTO(**data)
 
     @override
     async def get_code_task(self, task_id: int) -> CodeTaskDTO | None:
@@ -152,13 +156,13 @@ class ContestServiceImpl(contest.ContestService):
                 f"{self.internal_base_url}/contests/tasks/code/{task_id}/",
             ) as response,
         ):
-            if response.status == 404:
+            if response.status == HTTPStatus.NOT_FOUND:
                 return None
-            if response.status != 200:
+            if response.status != HTTPStatus.OK:
                 self.logger.error(
                     "internal/tasks/code/%s responded %s: %s",
                     task_id, response.status, await response.text(),
                 )
-                raise BadServiceResponseException("contest", response)
+                raise BadServiceResponseException(_SVC_NAME, response)
             data = await response.json()
-            return contest.CodeTaskDTO(**data)
+            return CodeTaskDTO(**data)

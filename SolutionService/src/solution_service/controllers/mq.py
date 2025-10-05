@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Any, override
+from typing import Any, Final, override
 
 from dishka import FromDishka
 from faststream.rabbit import (
@@ -20,13 +20,15 @@ from solution_service.application.interactors.update_solution import (
 )
 from solution_service.application.interfaces.publisher import SolutionPublisher
 from solution_service.application.interfaces.storage import Storage
-from solution_service.controllers.schemas import (
+from solution_service.controllers.event_schemas import (
     MQContestEvent,
     MQSolutionAnswer,
     MQTaskEvent,
     MQUserEvent,
 )
 from solution_service.domain.abstract import CodeSolution, TaskType
+
+_DELETION_EVENT: Final = "DELETED"
 
 logger = logging.getLogger(__name__)
 mq_controller = RabbitRouter()
@@ -116,7 +118,7 @@ async def handle_user_deleted(
     data: MQUserEvent,
     interactor: FromDishka[PurgeUserSolutions],
 ) -> None:
-    if data.event != "DELETED":
+    if data.event != _DELETION_EVENT:
         return
     logger.info("Received purge request for user %s", data.object.id)
     await interactor(data.object.id)
@@ -128,7 +130,7 @@ async def handle_contest_deleted(
     data: MQContestEvent,
     interactor: FromDishka[PurgeTaskSolutions],
 ) -> None:
-    if data.event != "DELETED":
+    if data.event != _DELETION_EVENT:
         return
     logger.info("Received purge request for contest %s", data.object.id)
     # TODO: that's inefficient
@@ -146,7 +148,7 @@ async def handle_quiz_task_deleted(
     data: MQTaskEvent,
     interactor: FromDishka[PurgeTaskSolutions],
 ) -> None:
-    if data.event != "DELETED":
+    if data.event != _DELETION_EVENT:
         return
     logger.info("Received purge request for task quiz:%s", data.object.id)
     await interactor(TaskType.QUIZ, data.object.id)
@@ -158,7 +160,7 @@ async def handle_code_task_deleted(
     data: MQTaskEvent,
     interactor: FromDishka[PurgeTaskSolutions],
 ) -> None:
-    if data.event != "DELETED":
+    if data.event != _DELETION_EVENT:
         return
     logger.info("Received purge request for task code:%s", data.object.id)
     await interactor(TaskType.CODE, data.object.id)

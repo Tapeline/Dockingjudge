@@ -28,9 +28,7 @@ from solution_service.controllers import schemas
 from solution_service.controllers.dumping import serialize_solution
 from solution_service.controllers.loading import load_composite_task_id
 from solution_service.domain.abstract import TaskType
-from solution_service.infrastructure.account_service import (
-    authenticated_user_guard,
-)
+from solution_service.infrastructure.security import authenticated_user_guard
 
 inject_guards = {"guards": [authenticated_user_guard]}
 

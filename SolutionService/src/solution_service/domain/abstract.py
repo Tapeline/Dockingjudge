@@ -17,20 +17,20 @@ type QuizCheckerClass = type["AbstractQuizChecker[Any]"]
 
 
 class AbstractQuizChecker[CheckerParams](ABC):
-    """ABC for quiz checkers"""
+    """ABC for quiz checkers."""
 
     name: str
     params: CheckerParams
     all_checkers: ClassVar[dict[str, QuizCheckerClass]] = {}
 
-    def __init__(self, max_score: int, parameters: CheckerParams) -> None:
-        self.params: CheckerParams = parameters
-        self.max_score = max_score
-
     @override
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
         AbstractQuizChecker.all_checkers[cls.name] = cls
+
+    def __init__(self, max_score: int, parameters: CheckerParams) -> None:
+        self.params: CheckerParams = parameters
+        self.max_score = max_score
 
     @abstractmethod
     def check(
@@ -70,10 +70,11 @@ class SubmissionType(Enum):
     ZIP = "zip"
 
 
+type GroupName = str
+
+
 @dataclass
 class CodeSolution(GenericSolution):
-    type GroupName = str
-
     task_type = TaskType.CODE
     submission_url: str = ""
     submission_type: SubmissionType = SubmissionType.STR

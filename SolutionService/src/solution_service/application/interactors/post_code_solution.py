@@ -9,7 +9,11 @@ from solution_service.application.exceptions import (
     MayNotSubmitSolution,
     NotFound,
 )
-from solution_service.application.interfaces.contest import ContestService
+from solution_service.application.interfaces.account import User
+from solution_service.application.interfaces.contest import (
+    CodeTaskDTO,
+    ContestService,
+)
 from solution_service.application.interfaces.publisher import SolutionPublisher
 from solution_service.application.interfaces.solutions import (
     SolutionRepository,
@@ -46,16 +50,8 @@ class PostCodeSolution:
     ) -> CodeSolution:
         user = await self.user_idp.require_user()
         logger.info("Getting code task %s", solution.task_id)
-        task = await self.contest_service.get_code_task(solution.task_id)
-        if not task:
-            logger.warning("No task %s", solution.task_id)
-            raise NotFound
-        can_submit = await self.contest_service.can_submit(
-            user.id, TaskType.CODE, task.id,
-        )
-        if not can_submit:
-            logger.info("Rejecting submit request")
-            raise MayNotSubmitSolution
+        task = await self._retrieve_task(solution)
+        await self._ensure_can_submit(task, user)
         logger.info("Saving file")
         solution_file = self._prepare_file(solution)
         solution_url = await self.object_storage.save_file(solution_file)
@@ -79,6 +75,21 @@ class PostCodeSolution:
         await self.session.commit()
         return solution_entity
 
+    async def _ensure_can_submit(self, task: CodeTaskDTO, user: User) -> None:
+        can_submit = await self.contest_service.can_submit(
+            user.id, TaskType.CODE, task.id,
+        )
+        if not can_submit:
+            logger.info("Rejecting submit request")
+            raise MayNotSubmitSolution
+
+    async def _retrieve_task(self, solution: NewCodeSolution) -> CodeTaskDTO:
+        task = await self.contest_service.get_code_task(solution.task_id)
+        if not task:
+            logger.warning("No task %s", solution.task_id)
+            raise NotFound
+        return task
+
     def _prepare_file(self, solution: NewCodeSolution) -> File:
         match solution.submission_type.value:
             case "str":
@@ -89,7 +100,7 @@ class PostCodeSolution:
                 )
             case "zip":
                 return File(
-                    name=_DEFAULT_FILENAME.format(str(uuid.uuid4()) + ".zip"),
+                    name=_DEFAULT_FILENAME.format(f"{uuid.uuid4()}.zip"),
                     contents=base64.b64decode(solution.text),
                     encoding=self.config.encoding,
                 )
