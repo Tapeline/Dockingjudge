@@ -37,7 +37,7 @@ class OuterServicesConfig:
 @dataclass(frozen=True)
 class LoggingConfig:
     level: str = "INFO"
-    json: bool = True
+    json: bool = False
 
 
 @dataclass(frozen=True)

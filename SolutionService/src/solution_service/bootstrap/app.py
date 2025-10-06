@@ -1,9 +1,8 @@
 import asyncio
-import logging
 import pprint
 import sys
 
-from asgi_monitor.logging.uvicorn import build_uvicorn_log_config
+import structlog
 from dishka import AsyncContainer, make_async_container
 from dishka.integrations import faststream as faststream_integration
 from dishka.integrations import litestar as litestar_integration
@@ -11,13 +10,11 @@ from dishka.integrations.litestar import LitestarProvider
 from faststream import FastStream
 from faststream.rabbit import RabbitBroker
 from litestar import Litestar
-from litestar.logging import LoggingConfig
 from litestar.middleware.base import DefineMiddleware
 from litestar.openapi import OpenAPIConfig
 from litestar.openapi.plugins import SwaggerRenderPlugin
 from litestar.openapi.spec import Components
 from litestar.plugins.prometheus import PrometheusConfig, PrometheusController
-from asgi_monitor.logging import configure_logging
 
 from solution_service.bootstrap.config import service_config_loader
 from solution_service.bootstrap.di.auth import AuthProvider
@@ -26,6 +23,7 @@ from solution_service.bootstrap.di.interactors import InteractorProvider
 from solution_service.bootstrap.di.mq import MessageQueueProvider
 from solution_service.bootstrap.di.persistence import PersistenceProvider
 from solution_service.bootstrap.di.services import OuterServicesProvider
+from solution_service.bootstrap.logging import configure_app_logging
 from solution_service.config import Config
 from solution_service.controllers import http
 from solution_service.controllers.mq import mq_controller
@@ -59,7 +57,9 @@ def _create_container(config: Config, broker: RabbitBroker) -> AsyncContainer:
 def _get_faststream_app(
     broker: RabbitBroker, container: AsyncContainer,
 ) -> FastStream:
-    faststream_app = FastStream(broker)
+    faststream_app = FastStream(
+        broker, logger=structlog.get_logger("faststream")
+    )
     faststream_integration.setup_dishka(
         container, faststream_app, auto_inject=True,
     )
@@ -70,7 +70,6 @@ def _get_faststream_app(
 def _get_litestar_app(
     config: Config,
     container: AsyncContainer,
-    logging_config: LoggingConfig | None,
 ) -> Litestar:
     prometheus_config = PrometheusConfig(
         app_name="solution_service",
@@ -104,7 +103,7 @@ def _get_litestar_app(
                 },
             ),
         ),
-        logging_config=logging_config,
+        logging_config=None,
         middleware=[
             prometheus_config.middleware,
             auth_mw,
@@ -115,28 +114,11 @@ def _get_litestar_app(
 
 
 def _print_config(config: Config) -> None:
-    logging.getLogger("config dump").info(
-        "Config loaded: %s", pprint.pformat(config, indent=2),
-    )
-
-
-def _configure_logging(config: Config) -> LoggingConfig | None:
-    configure_logging(
-        level=config.logging.level,
-        json_format=config.logging.json,
-        include_trace=True,
-    )
-    return LoggingConfig(
-        root={"level": "INFO", "handlers": ["queue_listener"]},
-        formatters={
-            "standard": {
-                "format": (
-                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-                ),
-            },
-        },
-        log_exceptions="always",
-    )
+    logger = structlog.get_logger("config loader")
+    if config.logging.json:
+        logger.info("Config loaded", config=config)
+    else:
+        logger.info("Config loaded %s", pprint.pformat(config, indent=2))
 
 
 def get_app() -> Litestar:
@@ -145,11 +127,11 @@ def get_app() -> Litestar:
             asyncio.WindowsSelectorEventLoopPolicy(),
         )
     config = service_config_loader.load()
+    configure_app_logging(config)
     broker = _create_broker(config)
     container = _create_container(config, broker)
-    _configure_logging(config)
     faststream_app = _get_faststream_app(broker, container)
-    litestar_app = _get_litestar_app(config, container, None)
+    litestar_app = _get_litestar_app(config, container)
     litestar_app.on_startup.append(
         faststream_app.broker.start,  # type: ignore[union-attr]
     )

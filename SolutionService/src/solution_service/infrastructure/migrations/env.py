@@ -4,20 +4,23 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from solution_service.bootstrap.config import service_config_loader
 from solution_service.infrastructure.persistence.models import Base
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
+service_config = service_config_loader.load()
+
 config.set_main_option(
     "sqlalchemy.url",
     "postgresql+psycopg://{user}:{password}@{host}:{port}/{db}".format(
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASS"),
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        db=os.getenv("DB_NAME"),
+        user=service_config.postgres.username,
+        password=service_config.postgres.password,
+        host=service_config.postgres.host,
+        port=service_config.postgres.port,
+        db=service_config.postgres.database,
     ),
 )
 
