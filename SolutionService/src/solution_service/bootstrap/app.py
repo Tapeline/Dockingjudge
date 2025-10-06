@@ -3,6 +3,7 @@ import logging
 import pprint
 import sys
 
+from asgi_monitor.logging.uvicorn import build_uvicorn_log_config
 from dishka import AsyncContainer, make_async_container
 from dishka.integrations import faststream as faststream_integration
 from dishka.integrations import litestar as litestar_integration
@@ -16,6 +17,7 @@ from litestar.openapi import OpenAPIConfig
 from litestar.openapi.plugins import SwaggerRenderPlugin
 from litestar.openapi.spec import Components
 from litestar.plugins.prometheus import PrometheusConfig, PrometheusController
+from asgi_monitor.logging import configure_logging
 
 from solution_service.bootstrap.config import service_config_loader
 from solution_service.bootstrap.di.auth import AuthProvider
@@ -65,22 +67,15 @@ def _get_faststream_app(
     return faststream_app
 
 
-def _get_litestar_app(config: Config, container: AsyncContainer) -> Litestar:
+def _get_litestar_app(
+    config: Config,
+    container: AsyncContainer,
+    logging_config: LoggingConfig | None,
+) -> Litestar:
     prometheus_config = PrometheusConfig(
         app_name="solution_service",
         group_path=True,
         exclude=["/metrics"],
-    )
-    logging_config = LoggingConfig(
-        root={"level": "INFO", "handlers": ["queue_listener"]},
-        formatters={
-            "standard": {
-                "format": (
-                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-                ),
-            },
-        },
-        log_exceptions="always",
     )
     auth_mw = DefineMiddleware(
         ServiceAuthenticationMiddleware,
@@ -125,6 +120,25 @@ def _print_config(config: Config) -> None:
     )
 
 
+def _configure_logging(config: Config) -> LoggingConfig | None:
+    configure_logging(
+        level=config.logging.level,
+        json_format=config.logging.json,
+        include_trace=True,
+    )
+    return LoggingConfig(
+        root={"level": "INFO", "handlers": ["queue_listener"]},
+        formatters={
+            "standard": {
+                "format": (
+                    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+                ),
+            },
+        },
+        log_exceptions="always",
+    )
+
+
 def get_app() -> Litestar:
     if sys.platform == "win32":
         asyncio.set_event_loop_policy(
@@ -133,8 +147,9 @@ def get_app() -> Litestar:
     config = service_config_loader.load()
     broker = _create_broker(config)
     container = _create_container(config, broker)
+    _configure_logging(config)
     faststream_app = _get_faststream_app(broker, container)
-    litestar_app = _get_litestar_app(config, container)
+    litestar_app = _get_litestar_app(config, container, None)
     litestar_app.on_startup.append(
         faststream_app.broker.start,  # type: ignore[union-attr]
     )

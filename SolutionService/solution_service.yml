@@ -1,6 +1,10 @@
 encoding: utf-8
 debug_mode: true
 
+logging:
+  level: INFO
+  json: true
+
 rabbitmq:
   host: localhost
   port: 5672

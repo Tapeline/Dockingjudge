@@ -35,10 +35,17 @@ class OuterServicesConfig:
 
 
 @dataclass(frozen=True)
+class LoggingConfig:
+    level: str = "INFO"
+    json: bool = True
+
+
+@dataclass(frozen=True)
 class Config:
     rabbitmq: RabbitMQConfig
     postgres: PostgresConfig
     s3: MinioConfig
     services: OuterServicesConfig
+    logging: LoggingConfig
     debug_mode: bool = True
     encoding: str = "UTF-8"
