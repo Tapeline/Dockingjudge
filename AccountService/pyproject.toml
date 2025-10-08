@@ -15,7 +15,8 @@ dependencies = [
     "psycopg2-binary==2.9.9",
     "pytz>=2025.2",
     "uvicorn>=0.37.0",
-    "fuente"
+    "fuente",
+    "django-prometheus>=2.4.1",
 ]
 
 [tool.uv.sources]

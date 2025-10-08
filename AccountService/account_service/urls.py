@@ -1,6 +1,7 @@
 from typing import Final
 
 from django.urls import path
+from django_prometheus.exports import ExportToDjangoView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from api.views.ping import PingView
@@ -59,5 +60,10 @@ urlpatterns: Final = [
         "api/v1/accounts/docs/",
         SpectacularSwaggerView.as_view(url_name="schema"),
         name="swagger-ui",
+    ),
+    path(
+        "metrics",
+        ExportToDjangoView,
+        name="metrics",
     ),
 ]
