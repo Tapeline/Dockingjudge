@@ -2,9 +2,15 @@ from collections.abc import Callable
 from typing import Any, cast, override
 
 from django.db.models.query import QuerySet
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework import status
 from rest_framework.generics import (
     ListAPIView,
+    RetrieveAPIView,
     RetrieveUpdateDestroyAPIView,
     UpdateAPIView,
     get_object_or_404,
@@ -43,6 +49,32 @@ class ProfileView(RetrieveUpdateDestroyAPIView[User]):
         return response
 
 
+@extend_schema_view(
+    get=extend_schema(
+        responses={
+            200: serializers.MyProfileSerializer,
+            401: {},
+        },
+    ),
+)
+class AuthorizeView(RetrieveAPIView[User]):
+    """Check for authorization."""
+
+    permission_classes = (IsAuthenticated,)
+    serializer_class = serializers.MyProfileSerializer
+
+    @override
+    def get_object(self) -> User:
+        """Link object to request user."""
+        # IsAuthenticated is provided, so no AnonymousUser:
+        return cast(User, self.request.user)
+
+
+@extend_schema_view(
+    get=extend_schema(
+        responses=serializers.UserSerializer,
+    ),
+)
 class GetUserByNameView(APIView):
     """Get user's profile."""
 
@@ -72,6 +104,22 @@ class SetProfilePictureView(UpdateAPIView[User]):
         return cast(User, self.request.user)
 
 
+@extend_schema_view(
+    get=extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="id",
+                description="User ID list",
+                type={
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                    },
+                },
+            ),
+        ],
+    ),
+)
 class GetAllUsersView(ListAPIView[User]):
     """Get all users (filtered)."""
 

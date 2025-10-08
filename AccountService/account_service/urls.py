@@ -1,9 +1,11 @@
 from typing import Final
 
 from django.urls import path
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from api.views.ping import PingView
 from api.views.profiles import (
+    AuthorizeView,
     GetAllUsersView,
     GetUserByNameView,
     ProfileView,
@@ -34,7 +36,7 @@ urlpatterns: Final = [
     ),
     path(
         "api/v1/accounts/authorize/",
-        ProfileView.as_view(),
+        AuthorizeView.as_view(),
     ),
     path(
         "api/v1/accounts/user/<str:username>/",
@@ -47,5 +49,15 @@ urlpatterns: Final = [
     path(
         "api/v1/accounts/user/<str:username>/",
         GetUserByNameView.as_view(),
+    ),
+    path(
+        "api/v1/accounts/schema/",
+        SpectacularAPIView.as_view(),
+        name="schema",
+    ),
+    path(
+        "api/v1/accounts/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
     ),
 ]

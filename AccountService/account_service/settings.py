@@ -27,6 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "drf_spectacular",
     "rest_framework",
     "api",
 ]
@@ -135,6 +136,7 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": (
         "rest_framework.renderers.JSONRenderer",
     ),
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
 SIMPLE_JWT = {
@@ -149,3 +151,11 @@ RMQ_PASS = config.rabbit.password
 ENCODING = "utf-8"
 
 ALLOW_REGISTRATION = config.app.allow_registration
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Account Service API",
+    "DESCRIPTION": "Account Service of Dockingjudge",
+    "VERSION": "0.1.0",
+    "SERVE_INCLUDE_SCHEMA": False,
+    # OTHER SETTINGS
+}
