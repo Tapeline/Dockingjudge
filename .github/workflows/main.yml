@@ -11,3 +11,5 @@ jobs:
     uses: ./.github/workflows/judgelet.yml
   solution_svc_tests:
     uses: ./.github/workflows/solution_svc.yml
+  account_svc_tests:
+    uses: ./.github/workflows/account_svc.yml

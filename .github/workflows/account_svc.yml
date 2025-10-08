@@ -1,0 +1,85 @@
+name: Account service lint and test
+
+on:
+  workflow_call:
+    outputs:
+      unit_status:
+        description: "Unit tests passed"
+        value: ${{ jobs.tests.outputs.unit_status }}
+      mypy_status:
+        description: "Mypy status"
+        value: ${{ jobs.analysis.outputs.mypy_status }}
+      lint_status:
+        description: "Lint status"
+        value: ${{ jobs.analysis.outputs.lint_status }}
+
+
+jobs:
+  analysis:
+    runs-on: ubuntu-latest
+    outputs:
+      mypy_status: ${{ steps.mypy.outcome }}
+      lint_status: ${{ steps.lint.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - uses: extractions/setup-just@v3
+
+      - name: Sync
+        working-directory: ./AccountService
+        run: uv sync --group lint
+
+      - id: mypy
+        working-directory: ./AccountService
+        continue-on-error: true
+        run: just check types
+
+      - id: lint
+        working-directory: ./AccountService
+        continue-on-error: true
+        run: just check style
+
+      - name: Check test status
+        if: always()
+        run: |
+          if [[ "${{ steps.mypy.outcome }}" == "failure" || \
+                "${{ steps.lint.outcome }}" == "failure" ]]; then
+            echo "One or more tests failed."
+            exit 1
+          else
+            echo "All tests passed successfully."
+          fi
+
+
+  tests:
+    runs-on: ubuntu-latest
+    needs: [analysis]
+    outputs:
+      unit_status: ${{ steps.unit_test.outcome }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+
+      - uses: extractions/setup-just@v3
+
+      - name: Sync
+        working-directory: ./AccountService
+        run: uv sync --group test
+
+      - id: unit_test
+        working-directory: ./AccountService
+        continue-on-error: true
+        run: just test
+
+      - name: Check test status
+        if: always()
+        run: |
+          if [[ "${{ steps.unit_test.outcome }}" == "failure" ]]; then
+            echo "One or more tests failed."
+            exit 1
+          else
+            echo "All tests passed successfully."
+          fi
