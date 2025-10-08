@@ -1,5 +1,3 @@
-version: "3.7"
-
 #
 # --- common sections declaration ---
 #
@@ -89,24 +87,24 @@ services:
     build: AccountService
     hostname: account.service
     environment:
-      SECRET_KEY: ${SECRET_KEY}
-      PG_USER: ${DB_USER}
-      PG_PASS: ${DB_PASS}
-      PG_HOST: account_db
-      PG_PORT: 5432
-      MODE: production
-      RMQ_ADDRESS: rabbitmq
-      RMQ_USER: ${RMQ_USER}
-      RMQ_PASS: ${RMQ_PASSWORD}
-      ENCODING: ${GLOBAL_ENCODING}
-      ALLOWED_HOSTS: "*"
-      ALLOW_REGISTRATION: True
+      ACCOUNT_SVC_SECURITY__SECRET_KEY: ${SECRET_KEY}
+      ACCOUNT_SVC_POSTGRES__USERNAME: ${DB_USER}
+      ACCOUNT_SVC_POSTGRES__PASSWORD: ${DB_PASS}
+      ACCOUNT_SVC_POSTGRES__HOST: account_db
+      ACCOUNT_SVC_POSTGRES__PORT: 5432
+      ACCOUNT_SVC_MODE: production
+      ACCOUNT_SVC_RABBIT__HOST: rabbitmq
+      ACCOUNT_SVC_RABBIT__USERNAME: ${RMQ_USER}
+      ACCOUNT_SVC_RABBIT__PASSWORD: ${RMQ_PASSWORD}
     ports:
       - "8001:8000"
     expose:
       - 8000
     networks:
       - main_network
+    configs:
+      - source: account_service_cfg
+        target: /app/account_service.yml
     depends_on:
       account_db:
         condition: service_healthy
@@ -479,5 +477,7 @@ volumes:
 
 
 configs:
+  account_service_cfg:
+    file: AccountService/account_service.yml
   solution_service_cfg:
     file: SolutionService/solution_service.yml

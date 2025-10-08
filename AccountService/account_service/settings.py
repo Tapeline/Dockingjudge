@@ -1,9 +1,14 @@
+import logging
+import pprint
 from datetime import timedelta
 from pathlib import Path
 
 from account_service.config import service_config_loader
 
+logger = logging.getLogger(__name__)
+
 config = service_config_loader.load()
+logger.info("Config loaded %s", pprint.pformat(config))
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

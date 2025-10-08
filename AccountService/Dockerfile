@@ -1,6 +1,6 @@
 ARG build_variant=full
 
-FROM python:3.12.1-alpine3.19 AS base
+FROM python:3.12-alpine3.21 AS base
 
 WORKDIR /app
 
