@@ -11,6 +11,7 @@
     <orderEntry type="library" name="bootstrap-icons" level="application" />
     <orderEntry type="module" module-name="JudgeUnit" />
     <orderEntry type="module" module-name="SolutionService" />
+    <orderEntry type="module" module-name="AccountService" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />

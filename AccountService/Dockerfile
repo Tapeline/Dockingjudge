@@ -1,12 +1,19 @@
-FROM python:3.12.1-alpine3.19
+ARG build_variant=full
+
+FROM python:3.12.1-alpine3.19 AS base
 
 WORKDIR /app
 
-COPY requirements.txt requirements.txt
-COPY start.sh start.sh
-RUN pip3 install -r requirements.txt
+RUN apk add uv git
+COPY . .
 RUN chmod +x ./start.sh
 
-COPY . .
+FROM base AS sync_full
+RUN uv sync --all-groups
 
-CMD chmod +x ./start.sh ; ./start.sh
+FROM base AS sync_min
+RUN uv sync
+
+FROM sync_${build_variant} AS final
+
+CMD ./start.sh
