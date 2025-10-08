@@ -6,7 +6,7 @@ authors = [
     {name = "Tapeline", email = "mail@tapeline.dev"}
 ]
 license = {text = "GNU GPL v3.0"}
-requires-python = ">=3.13,<4.0"
+requires-python = ">=3.13,<3.14"
 dependencies = [
     "litestar[pydantic,standard] (>=2.15.1,<3.0.0)",
     "psutil (>=7.0.0,<8.0.0)",
