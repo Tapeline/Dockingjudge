@@ -25,9 +25,9 @@ class CanCreateContest(BasePermission):
     def has_permission(self, request, view):
         if request.method in ("GET", "HEAD", "OPTIONS"):
             return True
-        if settings.ALLOW_CONTEST_CREATION_TO == "*":
+        if "*" in settings.ALLOW_CONTEST_CREATION_TO:
             return True
-        return request.user.username in settings.ALLOW_CONTEST_CREATION_TO.split(";")
+        return request.user.username in settings.ALLOW_CONTEST_CREATION_TO
 
 
 class IsContestAdminOrReadOnly(BasePermission):

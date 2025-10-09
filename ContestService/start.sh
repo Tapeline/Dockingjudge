@@ -1,4 +1,3 @@
-python manage.py makemigrations
 python manage.py migrate
 python manage.py rmq_init &
 python manage.py rmq_worker &

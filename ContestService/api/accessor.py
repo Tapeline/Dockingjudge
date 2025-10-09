@@ -42,7 +42,7 @@ def user_get_time_left(user: int, contest) -> timedelta | None:
 def user_has_time_left(user: int, contest) -> bool:
     return (
         contest.time_limit_seconds < 0 or
-        user_get_time_left(user, contest).seconds > 0
+        user_get_time_left(user, contest).total_seconds() > 0
     )
 
 
