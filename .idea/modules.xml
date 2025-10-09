@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/Dockingjudge.iml" filepath="$PROJECT_DIR$/.idea/Dockingjudge.iml" />
       <module fileurl="file://$PROJECT_DIR$/JudgeUnit/.idea/JudgeUnit.iml" filepath="$PROJECT_DIR$/JudgeUnit/.idea/JudgeUnit.iml" />
       <module fileurl="file://$PROJECT_DIR$/SolutionService/.idea/SolutionService.iml" filepath="$PROJECT_DIR$/SolutionService/.idea/SolutionService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/.idea/docs.iml" filepath="$PROJECT_DIR$/docs/.idea/docs.iml" />
     </modules>
   </component>
 </project>
