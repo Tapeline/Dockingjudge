@@ -1,5 +1,9 @@
-from typing import Any
+from typing import Any, Final
 
+from drf_spectacular.utils import (
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -11,6 +15,12 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from api import accessor, models, permissions, rmq, serializers
+from api.openapi import (
+    CanSubmitTaskSerializer,
+    CodeTaskCreationSerializer,
+    QuizTaskCreationSerializer,
+    TextPageCreationSerializer,
+)
 from api.views.mixins import (
     ContestFieldInjectorOnCreation,
     ContestMixin,
@@ -20,7 +30,20 @@ from api.views.mixins import (
     SerializerSwitchingMixin,
 )
 
+_PAGE_MGMT_TAGS: Final = ("Page & task management",)
 
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        responses=serializers.TextPageSerializer(many=True),
+    ),
+    post=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        request=TextPageCreationSerializer,
+        responses=serializers.TextPageSerializer,
+    ),
+)
 class ListCreateTextPageView(
     EnsureContestStructureIntegrityOnCreateMixin,
     ContestFieldInjectorOnCreation,
@@ -37,6 +60,21 @@ class ListCreateTextPageView(
     creating_page_type = "text"
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        responses=serializers.TextPageSerializer,
+    ),
+    patch=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        request=TextPageCreationSerializer,
+        responses=serializers.TextPageSerializer,
+    ),
+    put=extend_schema(exclude=True),
+    delete=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+    ),
+)
 class RetrieveUpdateDestroyTextPageView(
     EnsureContestStructureIntegrityOnDeleteMixin,
     NotifyOnDeleteMixin[models.TextPage],
@@ -55,6 +93,17 @@ class RetrieveUpdateDestroyTextPageView(
     )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        responses=serializers.UserQuizTaskSerializer(many=True),
+    ),
+    post=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        request=QuizTaskCreationSerializer,
+        responses=serializers.FullQuizTaskSerializer,
+    ),
+)
 class ListCreateQuizTaskView(
     EnsureContestStructureIntegrityOnCreateMixin,
     ContestFieldInjectorOnCreation,
@@ -62,7 +111,12 @@ class ListCreateQuizTaskView(
     ListCreateAPIView[models.QuizTask],
     ContestMixin,
 ):
-    """List or create quiz tasks."""
+    """
+    List or create quiz tasks.
+
+    If you are a contest manager, additional info is exposed.
+
+    """
 
     serializer_class = serializers.UserQuizTaskSerializer
     full_serializer_class = serializers.FullQuizTaskSerializer
@@ -74,6 +128,21 @@ class ListCreateQuizTaskView(
     creating_page_type = "quiz"
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        responses=serializers.UserQuizTaskSerializer,
+    ),
+    patch=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        request=QuizTaskCreationSerializer,
+        responses=serializers.FullQuizTaskSerializer,
+    ),
+    put=extend_schema(exclude=True),
+    delete=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+    ),
+)
 class RetrieveUpdateDestroyQuizTaskView(
     EnsureContestStructureIntegrityOnDeleteMixin,
     NotifyOnDeleteMixin[models.QuizTask],
@@ -82,7 +151,12 @@ class RetrieveUpdateDestroyQuizTaskView(
     RetrieveUpdateDestroyAPIView[models.QuizTask],
     ContestMixin,
 ):
-    """Get, update or delete a single quiz task."""
+    """
+    Get, update or delete a single quiz task.
+
+    If you are a contest manager, additional info is exposed.
+
+    """
 
     serializer_class = serializers.UserQuizTaskSerializer
     full_serializer_class = serializers.FullQuizTaskSerializer
@@ -95,6 +169,17 @@ class RetrieveUpdateDestroyQuizTaskView(
     notify_function = rmq.notify_quiz_task_deleted  # type: ignore[assignment]
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        responses=serializers.UserCodeTaskSerializer(many=True),
+    ),
+    post=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        request=CodeTaskCreationSerializer,
+        responses=serializers.FullCodeTaskSerializer,
+    ),
+)
 class ListCreateCodeTaskView(
     EnsureContestStructureIntegrityOnCreateMixin,
     ContestFieldInjectorOnCreation,
@@ -102,7 +187,12 @@ class ListCreateCodeTaskView(
     ListCreateAPIView[models.CodeTask],
     ContestMixin,
 ):
-    """List or create code tasks."""
+    """
+    List or create code tasks.
+
+    If you are a contest manager, additional info is exposed.
+
+    """
 
     serializer_class = serializers.UserCodeTaskSerializer
     full_serializer_class = serializers.FullCodeTaskSerializer
@@ -114,6 +204,21 @@ class ListCreateCodeTaskView(
     creating_page_type = "code"
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        responses=serializers.UserCodeTaskSerializer,
+    ),
+    patch=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+        request=CodeTaskCreationSerializer,
+        responses=serializers.FullCodeTaskSerializer,
+    ),
+    put=extend_schema(exclude=True),
+    delete=extend_schema(
+        tags=_PAGE_MGMT_TAGS,
+    ),
+)
 class RetrieveUpdateDestroyCodeTaskView(
     EnsureContestStructureIntegrityOnDeleteMixin,
     NotifyOnDeleteMixin[models.CodeTask],
@@ -122,7 +227,12 @@ class RetrieveUpdateDestroyCodeTaskView(
     RetrieveUpdateDestroyAPIView[models.CodeTask],
     ContestMixin,
 ):
-    """Get, update or delete a single code task."""
+    """
+    Get, update or delete a single code task.
+
+    If you are a contest manager, additional info is exposed.
+
+    """
 
     serializer_class = serializers.UserCodeTaskSerializer
     full_serializer_class = serializers.FullCodeTaskSerializer
@@ -135,8 +245,16 @@ class RetrieveUpdateDestroyCodeTaskView(
     notify_function = rmq.notify_code_task_deleted  # type: ignore[assignment]
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Permissions"],
+        responses=CanSubmitTaskSerializer,
+    ),
+)
 class CanSubmitSolutionToTask(APIView):
     """Check if a user can submit solution to specific task."""
+
+    serializer_class = CanSubmitTaskSerializer
 
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Check if a user can submit solution to specific task."""

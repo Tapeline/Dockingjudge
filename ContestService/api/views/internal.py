@@ -1,5 +1,10 @@
 from typing import Any
 
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework.generics import (
     RetrieveAPIView,
     get_object_or_404,
@@ -11,6 +16,12 @@ from rest_framework.views import APIView
 from api import models, serializers
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Internal"],
+        responses=serializers.FullQuizTaskSerializer,
+    ),
+)
 class InternalRetrieveQuizTaskView(RetrieveAPIView[models.QuizTask]):
     """Get quiz task (with all sensitive data). Should not be exposed."""
 
@@ -18,6 +29,12 @@ class InternalRetrieveQuizTaskView(RetrieveAPIView[models.QuizTask]):
     queryset = models.QuizTask.objects.all()
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Internal"],
+        responses=serializers.FullCodeTaskSerializer,
+    ),
+)
 class InternalRetrieveCodeTaskView(RetrieveAPIView[models.CodeTask]):
     """Get code task (with all sensitive data). Should not be exposed."""
 
@@ -25,6 +42,20 @@ class InternalRetrieveCodeTaskView(RetrieveAPIView[models.CodeTask]):
     queryset = models.CodeTask.objects.all()
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Internal"],
+        responses={
+            200: OpenApiResponse(
+                description=(
+                    "List of code and quiz tasks (order is preserved). "
+                    "For response spec see other internal endpoints."
+                ),
+                response=serializers.FullQuizTaskSerializer(many=True),
+            ),
+        },
+    ),
+)
 class InternalGetAllTasksView(APIView):
     """Get list of all tasks (with sensitive data). Should not be exposed."""
 

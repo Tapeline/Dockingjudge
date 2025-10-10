@@ -1,4 +1,6 @@
 from django.urls import path
+from django_prometheus.exports import ExportToDjangoView
+from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from api.views.contests import (
     ApplyForContestView,
@@ -94,5 +96,19 @@ urlpatterns = [
         "internal/contests/<int:contest_id>/tasks/",
         InternalGetAllTasksView.as_view(),
     ),
-
+    path(
+        "api/v1/accounts/schema/",
+        SpectacularAPIView.as_view(),
+        name="schema",
+    ),
+    path(
+        "api/v1/accounts/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path(
+        "metrics",
+        ExportToDjangoView,
+        name="metrics",
+    ),
 ]

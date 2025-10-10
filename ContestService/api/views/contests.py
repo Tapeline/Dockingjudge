@@ -1,6 +1,11 @@
 from http import HTTPStatus
-from typing import Any, cast, override
+from typing import Any, Final, cast, override
 
+from drf_spectacular.utils import (
+    OpenApiResponse,
+    extend_schema,
+    extend_schema_view,
+)
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -15,9 +20,31 @@ from rest_framework.views import APIView
 
 from api import accessor, models, permissions, rmq, serializers
 from api.auth import User
+from api.openapi import (
+    COMPILER_LIST_RESPONSE,
+    PARTICIPANT_LIST_RESPONSE,
+    CanIManageContestSerializer,
+    ContestCreationSerializer,
+    ContestPatchSerializer,
+    ErrorSerializer,
+    GetTimeSerializer,
+)
 from contest_service import settings
 
+_CONTEST_MGMT_TAGS: Final = ("Contest management",)
 
+
+@extend_schema_view(
+    get=extend_schema(
+        tags=_CONTEST_MGMT_TAGS,
+        responses=serializers.ContestSerializer(many=True),
+    ),
+    post=extend_schema(
+        tags=_CONTEST_MGMT_TAGS,
+        request=ContestCreationSerializer,
+        responses=serializers.ContestSerializer(),
+    ),
+)
 class ListCreateContestView(ListCreateAPIView[models.Contest]):
     """Get all contests or create new one."""
 
@@ -32,6 +59,21 @@ class ListCreateContestView(ListCreateAPIView[models.Contest]):
         return super().create(request, *args, **kwargs)
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=_CONTEST_MGMT_TAGS,
+        responses=serializers.ContestSerializer,
+    ),
+    patch=extend_schema(
+        tags=_CONTEST_MGMT_TAGS,
+        request=ContestPatchSerializer,
+        responses=serializers.ContestSerializer,
+    ),
+    put=extend_schema(exclude=True),
+    delete=extend_schema(
+        tags=_CONTEST_MGMT_TAGS,
+    ),
+)
 class RetrieveUpdateDestroyContestView(
     RetrieveUpdateDestroyAPIView[models.Contest],
 ):
@@ -73,8 +115,23 @@ class RetrieveUpdateDestroyContestView(
         return response
 
 
+@extend_schema_view(
+    post=extend_schema(
+        tags=["Contest session"],
+        responses={
+            204: OpenApiResponse(
+                description="Applied for contest",
+            ),
+            403: OpenApiResponse(
+                description="Not allowed to apply, see error code",
+                response=ErrorSerializer,
+            ),
+        },
+    ),
+)
 class ApplyForContestView(APIView):
     """Make an application for contest."""
+    serializer_class = None
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Make an application for contest."""
@@ -103,9 +160,21 @@ class ApplyForContestView(APIView):
         return Response(status=HTTPStatus.NO_CONTENT)
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Contest session"],
+        responses={
+            200: GetTimeSerializer,
+            404: OpenApiResponse(
+                description="Not found",
+            ),
+        },
+    ),
+)
 class GetTimeLeft(APIView):
     """Get time user has to solve other tasks."""
 
+    serializer_class = GetTimeSerializer
     permission_classes = (IsAuthenticated,)
 
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
@@ -122,6 +191,17 @@ class GetTimeLeft(APIView):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=_CONTEST_MGMT_TAGS,
+        responses={
+            200: OpenApiResponse(
+                description="List of (compiler id, syntax highlighting)",
+                response=COMPILER_LIST_RESPONSE,
+            ),
+        },
+    ),
+)
 class GetAvailableCompilersView(APIView):
     """List available compilers."""
 
@@ -130,8 +210,18 @@ class GetAvailableCompilersView(APIView):
         return Response(settings.AVAILABLE_COMPILERS)
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Permissions"],
+        responses={
+            200: CanIManageContestSerializer,
+        },
+    ),
+)
 class CanIManageContestView(APIView):
     """Check if authenticated user can manage contest."""
+
+    serializer_class = CanIManageContestSerializer
 
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Check if authenticated user can manage contest."""
@@ -144,6 +234,20 @@ class CanIManageContestView(APIView):
         )
 
 
+@extend_schema_view(
+    get=extend_schema(
+        tags=["Contest session"],
+        responses={
+            200: OpenApiResponse(
+                description="List of participant ids",
+                response=PARTICIPANT_LIST_RESPONSE,
+            ),
+            404: OpenApiResponse(
+                description="Not found",
+            ),
+        },
+    ),
+)
 class GetContestParticipants(APIView):
     """Get list of users participating in contest."""
 

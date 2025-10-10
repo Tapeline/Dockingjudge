@@ -24,7 +24,8 @@ per-file-ignores =
   api/views/tasks.py: WPS215
   # TODO: this needs to be refactored (remove mixins)
   api/serializers.py: WPS226
-  # i won't place "__all__" to a constant :/
+  api/openapi.py: WPS226
+  # i won't place model field to constants :/
 
 
 inline-quotes = "
