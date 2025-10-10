@@ -36,7 +36,8 @@ def can_manage_contest(user: int, contest: models.Contest) -> bool:
 class CanCreateContest(BasePermission):
     """Grant contest creation rights if user is allowed to create contest."""
 
-    def has_permission(self, request, view):
+    @override
+    def has_permission(self, request: Request, view: APIView) -> bool:
         if request.method in ("GET", "HEAD", "OPTIONS"):
             return True
         if "*" in settings.ALLOW_CONTEST_CREATION_TO:

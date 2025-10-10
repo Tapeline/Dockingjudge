@@ -16,11 +16,12 @@ class ContestSerializer(serializers.ModelSerializer[models.Contest]):
     def __init__(
         self,
         instance: Any = None,
-        data=empty,
+        data: Any = empty,
+        *,
         display_only_enter_pages: bool = False,
         display_sensitive_info: bool = False,
-        **kwargs,
-    ):
+        **kwargs: Any,
+    ) -> None:
         super().__init__(instance, data, **kwargs)
         self.display_only_enter_pages = display_only_enter_pages
         self.display_sensitive_info = display_sensitive_info
@@ -75,7 +76,7 @@ class UserQuizTaskSerializer(serializers.ModelSerializer[models.QuizTask]):
 
     class Meta:
         model = models.QuizTask
-        fields = ["contest", "title", "description", "points"]
+        fields = ("contest", "title", "description", "points")
 
 
 class FullCodeTaskSerializer(serializers.ModelSerializer[models.CodeTask]):
@@ -91,7 +92,7 @@ class UserCodeTaskSerializer(serializers.ModelSerializer[models.CodeTask]):
 
     class Meta:
         model = models.CodeTask
-        fields = ["contest", "title", "description", "test_suite"]
+        fields = ("contest", "title", "description", "test_suite")
 
     @override
     def to_representation(self, instance: models.CodeTask) -> Any:

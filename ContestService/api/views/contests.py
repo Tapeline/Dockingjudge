@@ -1,0 +1,149 @@
+from typing import Any
+
+from rest_framework.exceptions import PermissionDenied
+from rest_framework.generics import (
+    ListCreateAPIView,
+    RetrieveUpdateDestroyAPIView,
+    get_object_or_404,
+)
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework.serializers import BaseSerializer
+from rest_framework.views import APIView
+
+from api import accessor, models, permissions, rmq, serializers
+from contest_service import settings
+
+
+class ListCreateContestView(ListCreateAPIView[models.Contest]):
+    """Get all contests or create new one."""
+
+    serializer_class = serializers.ContestSerializer
+    queryset = models.Contest.objects.all()
+    permission_classes = (IsAuthenticated, permissions.CanCreateContest)
+
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Create contest, author field is injected automatically."""
+        request.data["author"] = request.user.id
+        return super().create(request, *args, **kwargs)
+
+
+class RetrieveUpdateDestroyContestView(
+    RetrieveUpdateDestroyAPIView[models.Contest],
+):
+    """Get, update or delete a contest."""
+
+    serializer_class = serializers.ContestSerializer
+    queryset = models.Contest.objects.all()
+    permission_classes = (
+        IsAuthenticated,
+        permissions.IsContestAdminOrReadOnly,
+    )
+
+    def get_serializer(
+        self, *args: Any, **kwargs: Any,
+    ) -> BaseSerializer[models.Contest]:
+        """Adjust serializer settings."""
+        return super().get_serializer(
+            *args,
+            **kwargs,
+            display_only_enter_pages=not permissions.can_view_all_pages(
+                self.request.user.id, self.get_object(),
+            ),
+            display_sensitive_info=permissions.can_manage_contest(
+                self.request.user.id, self.get_object(),
+            ),
+        )
+
+    def delete(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Delete contest and notify other services."""
+        contest = self.get_object()
+        response = super().delete(request, *args, **kwargs)
+        rmq.notify_contest_deleted(
+            serializers.ContestSerializer(
+                contest, display_sensitive_info=True,
+            ).data,
+        )
+        return response
+
+
+class ApplyForContestView(APIView):
+    """Make an application for contest."""
+
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Make an application for contest."""
+        contest_id = kwargs.get("contest_id")
+        contest = models.Contest.objects.get(id=contest_id)
+        if not accessor.user_can_apply_for_contest(request.user, contest):
+            raise PermissionDenied(
+                detail="You cannot apply for this contest",
+                code="CANNOT_APPLY",
+            )
+        if accessor.user_applied_for_contest(request.user.id, contest):
+            raise PermissionDenied(
+                detail="You have already applied for this contest",
+                code="ALREADY_APPLIED",
+            )
+        models.ContestSession.objects.create(
+            user=request.user.id, contest=contest,
+        )
+        return Response(status=204)
+
+
+class GetTimeLeft(APIView):
+    """Get time user has to solve other tasks."""
+
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Get time user has to solve other tasks."""
+        contest = get_object_or_404(models.Contest, id=kwargs["contest_id"])
+        return Response(
+            {
+                "time_left": int(
+                    accessor.user_get_time_left(
+                        request.user.id, contest,
+                    ).total_seconds(),
+                ),
+                "is_unlimited": contest.time_limit_seconds < 0,
+            },
+        )
+
+
+class GetAvailableCompilersView(APIView):
+    """List available compilers."""
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """List available compilers."""
+        return Response(settings.AVAILABLE_COMPILERS)
+
+
+class CanIManageContestView(APIView):
+    """Check if authenticated user can manage contest."""
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Check if authenticated user can manage contest."""
+        return Response(
+            {
+                "can_manage": models.Contest.objects.get(
+                    id=kwargs["pk"],
+                ).author == request.user.id,
+            },
+        )
+
+
+class GetContestParticipants(APIView):
+    """Get list of users participating in contest."""
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Get list of users participating in contest."""
+        sessions = models.ContestSession.objects.filter(
+            contest__id=kwargs["contest_id"],
+        )
+        return Response(
+            [
+                session.user
+                for session in sessions
+            ],
+        )

@@ -37,6 +37,7 @@ class RemoteAuthentication(authentication.BaseAuthentication):
             headers={
                 "Authorization": bearer_string,
             },
+            timeout=5,
         )
         if response.status_code == 200:
             data = response.json()

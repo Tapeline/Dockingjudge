@@ -10,9 +10,9 @@ from . import models
 from .auth import User
 
 
-def get_object_or_null(
-    model: type[Model], *args: Any, **kwargs: Any,
-) -> Model | None:
+def get_object_or_null[Model_T: Model](
+    model: type[Model_T], *args: Any, **kwargs: Any,
+) -> Model_T | None:
     """Try to get object with given filters or return None."""
     try:
         return get_object_or_404(model, *args, **kwargs)

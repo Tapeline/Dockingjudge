@@ -24,7 +24,7 @@ __check_ruff:
   uv run ruff check
 
 __check_wps:
-  uv run flake8 api account_service
+  uv run flake8 api contest_service
 
 __check_types:
-  uv run mypy api account_service
+  uv run mypy api contest_service
