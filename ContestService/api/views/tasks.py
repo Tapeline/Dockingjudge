@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, reveal_type
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
@@ -39,7 +39,7 @@ class ListCreateTextPageView(
 
 class RetrieveUpdateDestroyTextPageView(
     EnsureContestStructureIntegrityOnDeleteMixin,
-    NotifyOnDeleteMixin,
+    NotifyOnDeleteMixin[models.TextPage],
     ContestFieldInjectorOnCreation,
     RetrieveUpdateDestroyAPIView[models.TextPage],
 ):
@@ -47,7 +47,7 @@ class RetrieveUpdateDestroyTextPageView(
 
     serializer_class = serializers.TextPageSerializer
     notification_serializer = serializer_class
-    notify_function = rmq.notify_text_page_deleted
+    notify_function = rmq.notify_text_page_deleted  # type: ignore[assignment]
     queryset = models.TextPage.objects.all()
     permission_classes = (
         IsAuthenticated,
@@ -74,7 +74,7 @@ class ListCreateQuizTaskView(
 
 class RetrieveUpdateDestroyQuizTaskView(
     EnsureContestStructureIntegrityOnDeleteMixin,
-    NotifyOnDeleteMixin,
+    NotifyOnDeleteMixin[models.QuizTask],
     ContestFieldInjectorOnCreation,
     SerializerSwitchingMixin,
     RetrieveUpdateDestroyAPIView[models.QuizTask],
@@ -88,7 +88,7 @@ class RetrieveUpdateDestroyQuizTaskView(
     permission_classes = (IsAuthenticated,
     permissions.IsContestAdminOrReadOnlyForParticipants)
     notification_serializer = full_serializer_class
-    notify_function = rmq.notify_quiz_task_deleted
+    notify_function = rmq.notify_quiz_task_deleted  # type: ignore[assignment]
 
 
 class ListCreateCodeTaskView(
@@ -110,7 +110,7 @@ class ListCreateCodeTaskView(
 
 class RetrieveUpdateDestroyCodeTaskView(
     EnsureContestStructureIntegrityOnDeleteMixin,
-    NotifyOnDeleteMixin,
+    NotifyOnDeleteMixin[models.CodeTask],
     ContestFieldInjectorOnCreation,
     SerializerSwitchingMixin,
     RetrieveUpdateDestroyAPIView[models.CodeTask],
@@ -126,7 +126,7 @@ class RetrieveUpdateDestroyCodeTaskView(
         permissions.IsContestAdminOrReadOnlyForParticipants,
     )
     notification_serializer = full_serializer_class
-    notify_function = rmq.notify_code_task_deleted
+    notify_function = rmq.notify_code_task_deleted  # type: ignore[assignment]
 
 
 class CanSubmitSolutionToTask(APIView):
@@ -134,9 +134,9 @@ class CanSubmitSolutionToTask(APIView):
 
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Check if a user can submit solution to specific task."""
-        user = kwargs.get("user_id")
-        task_type = kwargs.get("task_type")
-        task_id = kwargs.get("task_id")
+        user = kwargs["user"]
+        task_type = kwargs["task_type"]
+        task_id = kwargs["task_id"]
         task = validate_task_id_and_get(task_type, task_id)
         if not accessor.user_applied_for_contest(user, task.contest):
             return Response(
@@ -175,8 +175,8 @@ def validate_task_id_and_get(
         "quiz": models.QuizTask,
         "code": models.CodeTask,
     }[task_type]
-    if not model.objects.filter(id=task_id).exists():
+    if not model.objects.filter(id=task_id).exists():  # type: ignore[attr-defined]
         raise ValidationError(
             f"No task of type {task_type} with id {task_id}", "NOT_FOUND",
         )
-    return model.objects.get(id=task_id)
+    return model.objects.get(id=task_id)  # type: ignore[attr-defined,no-any-return]

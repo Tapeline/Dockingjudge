@@ -11,14 +11,14 @@ from rest_framework.views import APIView
 from api import models, serializers
 
 
-class InternalRetrieveQuizTaskView(RetrieveAPIView):
+class InternalRetrieveQuizTaskView(RetrieveAPIView[models.QuizTask]):
     """Get quiz task (with all sensitive data). Should not be exposed."""
 
     serializer_class = serializers.FullQuizTaskSerializer
     queryset = models.QuizTask.objects.all()
 
 
-class InternalRetrieveCodeTaskView(RetrieveAPIView):
+class InternalRetrieveCodeTaskView(RetrieveAPIView[models.CodeTask]):
     """Get code task (with all sensitive data). Should not be exposed."""
 
     serializer_class = serializers.FullCodeTaskSerializer

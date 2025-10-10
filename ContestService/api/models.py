@@ -1,4 +1,6 @@
-from typing import Any
+from typing import Any, override
+
+from django.db.models.query import QuerySet
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -23,6 +25,7 @@ class Contest(models.Model):
     time_limit_seconds = models.IntegerField(default=-1)
     pages = models.JSONField(default=list)
 
+    @override
     def save(self, **kwargs: Any) -> None:
         """Validate and save."""
         validate_pages_list(self.pages)
@@ -54,6 +57,7 @@ class CodeTask(models.Model):
     description = models.TextField()
     test_suite = models.JSONField()
 
+    @override
     def save(self, **kwargs: Any) -> None:
         """Validate and save."""
         validation.validate_test_suite(self.test_suite)
@@ -69,6 +73,7 @@ class QuizTask(models.Model):
     validator = models.JSONField(default=dict)
     points = models.IntegerField()
 
+    @override
     def save(self, **kwargs: Any) -> None:
         """Validate and save."""
         validation.validate_quiz_validator(self.validator)
@@ -93,12 +98,16 @@ def validate_page_in_list(page: dict[str, Any]) -> None:
             "Invalid page: no id",
             "INVALID_PAGE_NO_ID",
         )
-    model = {
-        "text": TextPage,
-        "code": CodeTask,
-        "quiz": QuizTask,
-    }[page["type"]]
-    if not model.objects.filter(id=page["id"]).exists():
+    query: QuerySet[Any, Any]
+    if page["type"] == "text":
+        query = TextPage.objects.filter(id=page["id"])
+    elif page["type"] == "code":
+        query = CodeTask.objects.filter(id=page["id"])
+    elif page["type"] == "quiz":
+        query = QuizTask.objects.filter(id=page["id"])
+    else:
+        raise ValidationError("Invalid page type")
+    if not query.exists():
         raise ValidationError(
             "Invalid page: id does not exist",
             "INVALID_PAGE_ID_NOT_EXISTS",

@@ -53,7 +53,7 @@ def publish_message(
     connection.close()
 
 
-def notify_contest_deleted(data: dict[str, None]) -> None:
+def notify_contest_deleted(data: dict[str, Any]) -> None:
     """Notify a contest was deleted."""
     # TODO: maybe refactor to transactional outbox
     publish_message(
@@ -64,7 +64,7 @@ def notify_contest_deleted(data: dict[str, None]) -> None:
     )
 
 
-def notify_text_page_deleted(data: dict[str, None]) -> None:
+def notify_text_page_deleted(data: dict[str, Any]) -> None:
     """Notify a text page was deleted."""
     # TODO: maybe refactor to transactional outbox
     publish_message(
@@ -75,7 +75,7 @@ def notify_text_page_deleted(data: dict[str, None]) -> None:
     )
 
 
-def notify_quiz_task_deleted(data: dict[str, None]) -> None:
+def notify_quiz_task_deleted(data: dict[str, Any]) -> None:
     """Notify a quiz task was deleted."""
     # TODO: maybe refactor to transactional outbox
     publish_message(
@@ -86,7 +86,7 @@ def notify_quiz_task_deleted(data: dict[str, None]) -> None:
     )
 
 
-def notify_code_task_deleted(data: dict[str, None]) -> None:
+def notify_code_task_deleted(data: dict[str, Any]) -> None:
     """Notify a code task was deleted."""
     # TODO: maybe refactor to transactional outbox
     publish_message(

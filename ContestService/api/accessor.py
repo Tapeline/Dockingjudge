@@ -27,19 +27,25 @@ def user_can_apply_for_contest(
     return is_contest_open(contest)
 
 
-def user_applied_for_contest(user: int, contest: models.Contest) -> bool:
+def user_applied_for_contest(
+    user: int | None, contest: models.Contest
+) -> bool:
     """Check if user has applied for a contest."""
+    if not user:
+        return False
     return models.ContestSession.objects.filter(
         user=user, contest=contest,
     ).exists()
 
 
-def user_get_time_left(user: int, contest: models.Contest) -> timedelta | None:
+def user_get_time_left(user: int | None, contest: models.Contest) -> timedelta | None:
     """Get timedelta of time left to solve the contest."""
     session: models.ContestSession | None = get_object_or_null(
         models.ContestSession,
         user=user, contest=contest,
     )
+    if not user:
+        return None
     if session is None:
         return None
     time_passed = timezone.now() - session.started_at
@@ -48,9 +54,10 @@ def user_get_time_left(user: int, contest: models.Contest) -> timedelta | None:
 
 def user_has_time_left(user: int, contest: models.Contest) -> bool:
     """Check if user has any time left to solve the contest."""
+    user_time_left = user_get_time_left(user, contest)
     return (
         contest.time_limit_seconds < 0 or
-        user_get_time_left(user, contest).total_seconds() > 0
+        user_time_left is not None and user_time_left.total_seconds() > 0
     )
 
 

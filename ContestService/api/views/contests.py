@@ -1,5 +1,6 @@
-from typing import Any
+from typing import Any, override, cast
 
+from api.auth import User
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -23,6 +24,7 @@ class ListCreateContestView(ListCreateAPIView[models.Contest]):
     queryset = models.Contest.objects.all()
     permission_classes = (IsAuthenticated, permissions.CanCreateContest)
 
+    @override
     def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Create contest, author field is injected automatically."""
         request.data["author"] = request.user.id
@@ -41,6 +43,7 @@ class RetrieveUpdateDestroyContestView(
         permissions.IsContestAdminOrReadOnly,
     )
 
+    @override
     def get_serializer(
         self, *args: Any, **kwargs: Any,
     ) -> BaseSerializer[models.Contest]:
@@ -56,6 +59,7 @@ class RetrieveUpdateDestroyContestView(
             ),
         )
 
+    @override
     def delete(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Delete contest and notify other services."""
         contest = self.get_object()
@@ -73,9 +77,16 @@ class ApplyForContestView(APIView):
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Make an application for contest."""
-        contest_id = kwargs.get("contest_id")
+        contest_id = kwargs["contest_id"]
         contest = models.Contest.objects.get(id=contest_id)
-        if not accessor.user_can_apply_for_contest(request.user, contest):
+        if not request.user.id:
+            raise PermissionDenied(
+                detail="You are not authorized to apply for contest",
+                code="NOT_LOGGED_IN"
+            )
+        if not accessor.user_can_apply_for_contest(
+            cast(User, request.user), contest
+        ):
             raise PermissionDenied(
                 detail="You cannot apply for this contest",
                 code="CANNOT_APPLY",
@@ -99,13 +110,12 @@ class GetTimeLeft(APIView):
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Get time user has to solve other tasks."""
         contest = get_object_or_404(models.Contest, id=kwargs["contest_id"])
+        time_left = accessor.user_get_time_left(request.user.id, contest)
         return Response(
             {
                 "time_left": int(
-                    accessor.user_get_time_left(
-                        request.user.id, contest,
-                    ).total_seconds(),
-                ),
+                    time_left.total_seconds(),
+                ) if time_left else -1,
                 "is_unlimited": contest.time_limit_seconds < 0,
             },
         )

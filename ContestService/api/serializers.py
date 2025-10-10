@@ -40,7 +40,9 @@ class ContestSerializer(serializers.ModelSerializer[models.Contest]):
             "code": UserCodeTaskSerializer if not self.display_sensitive_info
             else FullCodeTaskSerializer,
         }[page_type]
-        return serializer(model.objects.get(id=page_id)).data
+        return serializer(
+            model.objects.get(id=page_id)  # type: ignore[attr-defined]
+        ).data
 
     @override
     def to_representation(self, instance: models.Contest) -> Any:

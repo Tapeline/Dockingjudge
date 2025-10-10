@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any
+from typing import Any, override
 
 import pika
 from django.core.management import BaseCommand
@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     """Consume rmq messages."""
 
+    @override
     def handle(self, *args: Any, **options: Any) -> None:
         """Start consumer."""
         connection: pika.BlockingConnection = rmq.connect()

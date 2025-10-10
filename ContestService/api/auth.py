@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, override
 
 import requests
 from rest_framework import authentication
@@ -17,20 +17,21 @@ class User:
         usettings: dict[str, Any],
         pfp: str | None = None,
     ) -> None:
-        self.settings: dict = usettings
-        self.id: int = uid
-        self.username: str = username
-        self.pfp: str = pfp
+        self.settings = usettings
+        self.id = uid
+        self.username = username
+        self.pfp = pfp
         self.is_authenticated = True
 
 
 class RemoteAuthentication(authentication.BaseAuthentication):
     """Authenticate user using account service."""
 
+    @override
     def authenticate(self, request: Request) -> tuple[User, Any] | None:
         """Perform authentication and return user object."""
-        bearer_string: str = request.META.get("HTTP_AUTHORIZATION")
-        if bearer_string is None:
+        bearer_string = request.META.get("HTTP_AUTHORIZATION")
+        if not isinstance(bearer_string, str):
             return None
         response = requests.get(
             f"{settings.ACCOUNT_SERVICE}/authorize",

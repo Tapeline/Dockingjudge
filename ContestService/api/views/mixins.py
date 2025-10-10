@@ -1,5 +1,7 @@
 import logging
-from typing import Any
+from typing import Any, Callable
+
+from django.db.models.base import Model
 
 from rest_framework.generics import (
     CreateAPIView,
@@ -15,23 +17,28 @@ from api import accessor, models, permissions
 # TODO: refactor to minimize mixin usage
 
 
-class NotifyOnDeleteMixin:
+class NotifyOnDeleteMixin[Model_T: Model]:
     """Sends a RMQ notification when object is deleted."""
 
-    notification_serializer = None
-    notify_function = None
+    notification_serializer: type[BaseSerializer[Model_T]] | None = None
+    notify_function: Callable[[dict[str, Any]], None] | None = None
 
     def delete(
-        self: DestroyAPIView,
+        self: Any,
         request: Request,
         *args: Any,
         **kwargs: Any,
     ) -> Response:
         """Call to delete and send notification."""
+        if not self.notification_serializer or not self.notify_function:
+            raise AssertionError(
+                f"NotifyDeleteMixin misconfiguration: "
+                f"{self.notification_serializer=}, {self.notify_function=}"
+            )
         logger = logging.getLogger(self.__class__.__name__)
         obj = self.get_object()
         data = self.notification_serializer(obj).data
-        response = super().delete(request, *args, **kwargs)
+        response: Response = super().delete(request, *args, **kwargs)
         try:
             self.notify_function(data)
         except Exception:
@@ -112,7 +119,7 @@ class SerializerSwitchingMixin:
 
     full_serializer_class = None
 
-    def get_serializer_class(self: Any) -> type[BaseSerializer]:
+    def get_serializer_class(self: Any) -> type[BaseSerializer[Any]]:
         """Get serializer based on user permissions."""
         cls = super().get_serializer_class()
         if permissions.can_manage_contest(

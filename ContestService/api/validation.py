@@ -17,7 +17,7 @@ class Validator(BaseModel):
     """Test case validator."""
 
     type: str
-    args: dict
+    args: dict[str, Any]
 
 
 class TestCase(BaseModel):
@@ -25,8 +25,8 @@ class TestCase(BaseModel):
 
     validators: list[Validator]
     stdin: str
-    files_in: dict = {}
-    files_out: list = []
+    files_in: dict[str, Any] = {}
+    files_out: list[str] = []
     time_limit: float | None = None
     mem_limit_mb: float | None = None
 
@@ -45,7 +45,7 @@ class PrecompileCheckerModel(BaseModel):
     """Precompile checker model."""
 
     type: str
-    args: dict
+    args: dict[str, Any]
 
 
 class TestSuite(BaseModel):
@@ -64,7 +64,7 @@ class QuizValidator(BaseModel):
     """Quiz task validator."""
 
     type: str
-    args: dict
+    args: dict[str, Any]
 
 
 def validate_test_suite(test_suite: dict[str, Any]) -> None:
