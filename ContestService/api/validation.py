@@ -1,12 +1,9 @@
 from enum import Enum
 from typing import Any
 
-from django.db.models import Model
 from pydantic import BaseModel
 from pydantic import ValidationError as PydanticValidationError
 from rest_framework.exceptions import ValidationError
-
-from . import models
 
 
 class ScoringRuleEnum(str, Enum):
@@ -70,36 +67,6 @@ class QuizValidator(BaseModel):
     args: dict
 
 
-def validate_pages_list(pages: list[dict[str, Any]]) -> None:
-    """Ensure pages are defined correctly."""
-    for page in pages:
-        validate_page_in_list(page)
-
-
-def validate_page_in_list(page: dict[str, Any]) -> None:
-    """Ensure page is defined correctly."""
-    if page.get("type") not in ("text", "code", "quiz"):
-        raise ValidationError(
-            "Invalid page: bad type parameter",
-            "INVALID_PAGE_BAD_TYPE_PARAMETER",
-        )
-    if "id" not in page:
-        raise ValidationError(
-            "Invalid page: no id",
-            "INVALID_PAGE_NO_ID",
-        )
-    model = {
-        "text": models.TextPage,
-        "code": models.CodeTask,
-        "quiz": models.QuizTask,
-    }[page["type"]]
-    if not model.objects.filter(id=page["id"]).exists():
-        raise ValidationError(
-            "Invalid page: id does not exist",
-            "INVALID_PAGE_ID_NOT_EXISTS",
-        )
-
-
 def validate_test_suite(test_suite: dict[str, Any]) -> None:
     """Validate a code task test suite schema."""
     try:
@@ -116,19 +83,3 @@ def validate_quiz_validator(validator: dict[str, Any]) -> None:
         raise ValidationError from e
 
 
-def validate_task_id_and_get(task_type: str, task_id: int) -> Model:
-    """Try to get task of given type and id."""
-    if task_type not in ("quiz", "code"):
-        raise ValidationError(
-            f"Bad task type {task_type}",
-            "BAD_TASK_TYPE",
-        )
-    model = {
-        "quiz": models.QuizTask,
-        "code": models.CodeTask,
-    }[task_type]
-    if not model.objects.filter(id=task_id).exists():
-        raise ValidationError(
-            f"No task of type {task_type} with id {task_id}", "NOT_FOUND",
-        )
-    return model.objects.get(id=task_id)

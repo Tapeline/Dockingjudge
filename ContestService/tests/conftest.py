@@ -1,7 +1,7 @@
 import pytest
 
 from api.validation import TestSuite
-from tests.common import api, create_client, create_contest
+from tests.common import UserHelper, api, create_client, create_contest
 
 
 @pytest.fixture
@@ -62,3 +62,19 @@ def client(author):
 def contest(author):
     """A contest created by the author."""
     return create_contest(author.id)
+
+
+@pytest.fixture
+def author(request):
+    user = UserHelper("author")
+    user.create()
+    yield user
+    user.cleanup()
+
+
+@pytest.fixture
+def participant(request):
+    user = UserHelper("participant")
+    user.create()
+    yield user
+    user.cleanup()

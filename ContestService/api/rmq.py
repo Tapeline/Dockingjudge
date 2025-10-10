@@ -55,6 +55,7 @@ def publish_message(
 
 def notify_contest_deleted(data: dict[str, None]) -> None:
     """Notify a contest was deleted."""
+    # TODO: maybe refactor to transactional outbox
     publish_message(
         CONTEST_OBJECT_EXCHANGE, "contest_event", {
             "event": "DELETED",
@@ -65,6 +66,7 @@ def notify_contest_deleted(data: dict[str, None]) -> None:
 
 def notify_text_page_deleted(data: dict[str, None]) -> None:
     """Notify a text page was deleted."""
+    # TODO: maybe refactor to transactional outbox
     publish_message(
         CONTEST_OBJECT_EXCHANGE, "text_page_event", {
             "event": "DELETED",
@@ -75,6 +77,7 @@ def notify_text_page_deleted(data: dict[str, None]) -> None:
 
 def notify_quiz_task_deleted(data: dict[str, None]) -> None:
     """Notify a quiz task was deleted."""
+    # TODO: maybe refactor to transactional outbox
     publish_message(
         CONTEST_OBJECT_EXCHANGE, "quiz_task_event", {
             "event": "DELETED",
@@ -85,6 +88,7 @@ def notify_quiz_task_deleted(data: dict[str, None]) -> None:
 
 def notify_code_task_deleted(data: dict[str, None]) -> None:
     """Notify a code task was deleted."""
+    # TODO: maybe refactor to transactional outbox
     publish_message(
         CONTEST_OBJECT_EXCHANGE, "code_task_event", {
             "event": "DELETED",

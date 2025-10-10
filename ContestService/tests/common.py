@@ -1,6 +1,5 @@
 import os
 
-import pytest
 import requests
 from rest_framework.test import APIClient
 
@@ -20,6 +19,8 @@ def api(*url: str) -> str:
 
 
 class UserHelper:
+    # I hope this AI slop thing of a test works properly
+
     def __init__(self, username):
         self.username = username
         self.password = "1037Abcd!"
@@ -40,7 +41,8 @@ class UserHelper:
                 timeout=5,
             ).raise_for_status()
         except requests.HTTPError as e:
-            # Suppress 400 errors which likely mean user already exists from a previous failed run
+            # Suppress 400 errors which likely mean
+            # user already exists from a previous failed run
             if e.response.status_code != 400:
                 raise
 
@@ -67,22 +69,6 @@ class UserHelper:
             )
         except requests.RequestException as e:
             print(f"Warning: Failed to clean up user {self.username}: {e}")
-
-
-@pytest.fixture
-def author(request):
-    user = UserHelper("author")
-    user.create()
-    request.addfinalizer(user.cleanup)
-    return user
-
-
-@pytest.fixture
-def participant(request):
-    user = UserHelper("participant")
-    user.create()
-    request.addfinalizer(user.cleanup)
-    return user
 
 
 def create_client(token=None):

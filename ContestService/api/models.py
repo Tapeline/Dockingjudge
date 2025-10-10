@@ -1,5 +1,6 @@
 from typing import Any
 
+from django.core.exceptions import ValidationError
 from django.db import models
 
 from . import validation
@@ -24,7 +25,7 @@ class Contest(models.Model):
 
     def save(self, **kwargs: Any) -> None:
         """Validate and save."""
-        validation.validate_pages_list(self.pages)
+        validate_pages_list(self.pages)
         super().save(**kwargs)
 
 
@@ -72,3 +73,33 @@ class QuizTask(models.Model):
         """Validate and save."""
         validation.validate_quiz_validator(self.validator)
         super().save(**kwargs)
+
+
+def validate_pages_list(pages: list[dict[str, Any]]) -> None:
+    """Ensure pages are defined correctly."""
+    for page in pages:
+        validate_page_in_list(page)
+
+
+def validate_page_in_list(page: dict[str, Any]) -> None:
+    """Ensure page is defined correctly."""
+    if page.get("type") not in ("text", "code", "quiz"):
+        raise ValidationError(
+            "Invalid page: bad type parameter",
+            "INVALID_PAGE_BAD_TYPE_PARAMETER",
+        )
+    if "id" not in page:
+        raise ValidationError(
+            "Invalid page: no id",
+            "INVALID_PAGE_NO_ID",
+        )
+    model = {
+        "text": TextPage,
+        "code": CodeTask,
+        "quiz": QuizTask,
+    }[page["type"]]
+    if not model.objects.filter(id=page["id"]).exists():
+        raise ValidationError(
+            "Invalid page: id does not exist",
+            "INVALID_PAGE_ID_NOT_EXISTS",
+        )

@@ -2,7 +2,7 @@ import logging
 from typing import Any
 
 from django.db.models import Model
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveAPIView,
@@ -12,11 +12,11 @@ from rest_framework.generics import (
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.serializers import BaseSerializer
 from rest_framework.views import APIView
 
+from api import accessor, models, permissions, rmq, serializers, validation
 from contest_service import settings
-
-from . import accessor, models, permissions, rmq, serializers, validation
 
 
 class NotifyOnDeleteMixin:
@@ -98,25 +98,38 @@ class ContestFieldInjectorOnCreation:
         return super().create(request, *args, **kwargs)
 
 
-class ListCreateContestView(ListCreateAPIView):
+class ListCreateContestView(ListCreateAPIView[models.Contest]):
+    """Get all contests or create new one."""
+
     serializer_class = serializers.ContestSerializer
     queryset = models.Contest.objects.all()
     permission_classes = (IsAuthenticated, permissions.CanCreateContest)
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Create contest, author field is injected automatically."""
         request.data["author"] = request.user.id
         return super().create(request, *args, **kwargs)
 
 
-class RetrieveUpdateDestroyContestView(RetrieveUpdateDestroyAPIView):
+class RetrieveUpdateDestroyContestView(
+    RetrieveUpdateDestroyAPIView[models.Contest],
+):
+    """Get, update or delete a contest."""
+
     serializer_class = serializers.ContestSerializer
     queryset = models.Contest.objects.all()
-    permission_classes = (IsAuthenticated,
-    permissions.IsContestAdminOrReadOnly)
+    permission_classes = (
+        IsAuthenticated,
+        permissions.IsContestAdminOrReadOnly,
+    )
 
-    def get_serializer(self, *args, **kwargs):
+    def get_serializer(
+        self, *args: Any, **kwargs: Any,
+    ) -> BaseSerializer[models.Contest]:
+        """Adjust serializer settings."""
         return super().get_serializer(
-            *args, **kwargs,
+            *args,
+            **kwargs,
             display_only_enter_pages=not permissions.can_view_all_pages(
                 self.request.user.id, self.get_object(),
             ),
@@ -125,12 +138,13 @@ class RetrieveUpdateDestroyContestView(RetrieveUpdateDestroyAPIView):
             ),
         )
 
-    def delete(self, request, *args, **kwargs):
-        obj = self.get_object()
+    def delete(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Delete contest and notify other services."""
+        contest = self.get_object()
         response = super().delete(request, *args, **kwargs)
         rmq.notify_contest_deleted(
             serializers.ContestSerializer(
-                obj, display_sensitive_info=True,
+                contest, display_sensitive_info=True,
             ).data,
         )
         return response
@@ -139,12 +153,16 @@ class RetrieveUpdateDestroyContestView(RetrieveUpdateDestroyAPIView):
 class ListCreateTextPageView(
     EnsureContestStructureIntegrityOnCreateMixin,
     ContestFieldInjectorOnCreation,
-    ListCreateAPIView,
+    ListCreateAPIView[models.TextPage],
 ):
+    """List or create text pages."""
+
     serializer_class = serializers.TextPageSerializer
     queryset = models.TextPage.objects.all()
-    permission_classes = (IsAuthenticated,
-    permissions.IsContestAdminOrReadOnlyForParticipants)
+    permission_classes = (
+        IsAuthenticated,
+        permissions.IsContestAdminOrReadOnlyForParticipants,
+    )
     creating_page_type = "text"
 
 
@@ -152,23 +170,29 @@ class RetrieveUpdateDestroyTextPageView(
     EnsureContestStructureIntegrityOnDeleteMixin,
     NotifyOnDeleteMixin,
     ContestFieldInjectorOnCreation,
-    RetrieveUpdateDestroyAPIView,
+    RetrieveUpdateDestroyAPIView[models.TextPage],
 ):
+    """Get, update or delete a single text page."""
+
     serializer_class = serializers.TextPageSerializer
     notification_serializer = serializer_class
     notify_function = rmq.notify_text_page_deleted
     queryset = models.TextPage.objects.all()
-    permission_classes = (IsAuthenticated,
-    permissions.IsContestAdminOrReadOnlyForParticipants)
+    permission_classes = (
+        IsAuthenticated,
+        permissions.IsContestAdminOrReadOnlyForParticipants,
+    )
 
 
 class ListCreateQuizTaskView(
     EnsureContestStructureIntegrityOnCreateMixin,
     ContestFieldInjectorOnCreation,
     SerializerSwitchingMixin,
-    ListCreateAPIView,
+    ListCreateAPIView[models.QuizTask],
     ContestMixin,
 ):
+    """List or create quiz tasks."""
+
     serializer_class = serializers.UserQuizTaskSerializer
     full_serializer_class = serializers.FullQuizTaskSerializer
     queryset = models.QuizTask.objects.all()
@@ -182,9 +206,11 @@ class RetrieveUpdateDestroyQuizTaskView(
     NotifyOnDeleteMixin,
     ContestFieldInjectorOnCreation,
     SerializerSwitchingMixin,
-    RetrieveUpdateDestroyAPIView,
+    RetrieveUpdateDestroyAPIView[models.QuizTask],
     ContestMixin,
 ):
+    """Get, update or delete a single quiz task."""
+
     serializer_class = serializers.UserQuizTaskSerializer
     full_serializer_class = serializers.FullQuizTaskSerializer
     queryset = models.QuizTask.objects.all()
@@ -198,9 +224,11 @@ class ListCreateCodeTaskView(
     EnsureContestStructureIntegrityOnCreateMixin,
     ContestFieldInjectorOnCreation,
     SerializerSwitchingMixin,
-    ListCreateAPIView,
+    ListCreateAPIView[models.CodeTask],
     ContestMixin,
 ):
+    """List or create code tasks."""
+
     serializer_class = serializers.UserCodeTaskSerializer
     full_serializer_class = serializers.FullCodeTaskSerializer
     queryset = models.CodeTask.objects.all()
@@ -214,9 +242,11 @@ class RetrieveUpdateDestroyCodeTaskView(
     NotifyOnDeleteMixin,
     ContestFieldInjectorOnCreation,
     SerializerSwitchingMixin,
-    RetrieveUpdateDestroyAPIView,
+    RetrieveUpdateDestroyAPIView[models.CodeTask],
     ContestMixin,
 ):
+    """Get, update or delete a single code task."""
+
     serializer_class = serializers.UserCodeTaskSerializer
     full_serializer_class = serializers.FullCodeTaskSerializer
     queryset = models.CodeTask.objects.all()
@@ -229,12 +259,14 @@ class RetrieveUpdateDestroyCodeTaskView(
 
 
 class CanSubmitSolutionToTask(APIView):
-    def get(self, request, *args, **kwargs):
+    """Check if a user can submit solution to specific task."""
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Check if a user can submit solution to specific task."""
         user = kwargs.get("user_id")
         task_type = kwargs.get("task_type")
         task_id = kwargs.get("task_id")
         task = validation.validate_task_id_and_get(task_type, task_id)
-        task: models.CodeTask | models.QuizTask
         if not accessor.user_applied_for_contest(user, task.contest):
             return Response(
                 {
@@ -242,14 +274,10 @@ class CanSubmitSolutionToTask(APIView):
                     "reason": "NOT_REGISTERED",
                 },
             )
-        if not accessor.user_has_time_left(user, task.contest):
-            return Response(
-                {
-                    "can_submit": False,
-                    "reason": "CONTEST_ENDED",
-                },
-            )
-        if not accessor.is_contest_open(task.contest):
+        if (
+            not accessor.user_has_time_left(user, task.contest)
+            or not accessor.is_contest_open(task.contest)
+        ):
             return Response(
                 {
                     "can_submit": False,
@@ -264,7 +292,10 @@ class CanSubmitSolutionToTask(APIView):
 
 
 class ApplyForContestView(APIView):
-    def post(self, request, *args, **kwargs):
+    """Make an application for contest."""
+
+    def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Make an application for contest."""
         contest_id = kwargs.get("contest_id")
         contest = models.Contest.objects.get(id=contest_id)
         if not accessor.user_can_apply_for_contest(request.user, contest):
@@ -284,15 +315,18 @@ class ApplyForContestView(APIView):
 
 
 class GetTimeLeft(APIView):
+    """Get time user has to solve other tasks."""
+
     permission_classes = (IsAuthenticated,)
 
-    def get(self, request, *args, **kwargs):
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Get time user has to solve other tasks."""
         contest = get_object_or_404(models.Contest, id=kwargs["contest_id"])
         return Response(
             {
                 "time_left": int(
-                    (
-                        accessor.user_get_time_left(request.user.id, contest)
+                    accessor.user_get_time_left(
+                        request.user.id, contest,
                     ).total_seconds(),
                 ),
                 "is_unlimited": contest.time_limit_seconds < 0,
@@ -301,12 +335,18 @@ class GetTimeLeft(APIView):
 
 
 class GetAvailableCompilersView(APIView):
-    def get(self, request, *args, **kwargs):
+    """List available compilers."""
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """List available compilers."""
         return Response(settings.AVAILABLE_COMPILERS)
 
 
 class CanIManageContestView(APIView):
-    def get(self, request, *args, **kwargs):
+    """Check if authenticated user can manage contest."""
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Check if authenticated user can manage contest."""
         return Response(
             {
                 "can_manage": models.Contest.objects.get(
@@ -317,7 +357,10 @@ class CanIManageContestView(APIView):
 
 
 class GetContestParticipants(APIView):
-    def get(self, request, *args, **kwargs):
+    """Get list of users participating in contest."""
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Get list of users participating in contest."""
         sessions = models.ContestSession.objects.filter(
             contest__id=kwargs["contest_id"],
         )
@@ -330,29 +373,60 @@ class GetContestParticipants(APIView):
 
 
 class InternalRetrieveQuizTaskView(RetrieveAPIView):
+    """Get quiz task (with all sensitive data). Should not be exposed."""
+
     serializer_class = serializers.FullQuizTaskSerializer
     queryset = models.QuizTask.objects.all()
 
 
 class InternalRetrieveCodeTaskView(RetrieveAPIView):
+    """Get code task (with all sensitive data). Should not be exposed."""
+
     serializer_class = serializers.FullCodeTaskSerializer
     queryset = models.CodeTask.objects.all()
 
 
 class InternalGetAllTasksView(APIView):
-    def get(self, request, *args, **kwargs):
-        quiz_tasks = models.QuizTask.objects.filter(
-            contest__id=kwargs["contest_id"],
+    """Get list of all tasks (with sensitive data). Should not be exposed."""
+
+    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        """Get list of all tasks (with sensitive data). Do not expose."""
+        contest = get_object_or_404(models.Contest, id=kwargs["contest_id"])
+        quiz_tasks = {
+            task.pk: serializers.FullQuizTaskSerializer(task).data
+            for task in models.QuizTask.objects.filter(
+                contest__id=kwargs["contest_id"],
+            )
+        }
+        code_tasks = {
+            task.pk: serializers.FullCodeTaskSerializer(task).data
+            for task in models.CodeTask.objects.filter(
+                contest__id=kwargs["contest_id"],
+            )
+        }
+        all_tasks = {"quiz": quiz_tasks, "code": code_tasks}
+        return Response([
+            {"type": page["type"], **all_tasks[page["type"]][page["id"]]}
+            for page in contest.pages
+            if page["type"] in {"quiz", "code"}
+        ])
+
+
+def validate_task_id_and_get(
+    task_type: str, task_id: int,
+) -> models.QuizTask | models.CodeTask:
+    """Try to get task of given type and id."""
+    if task_type not in ("quiz", "code"):
+        raise ValidationError(
+            f"Bad task type {task_type}",
+            "BAD_TASK_TYPE",
         )
-        code_tasks = models.CodeTask.objects.filter(
-            contest__id=kwargs["contest_id"],
+    model = {
+        "quiz": models.QuizTask,
+        "code": models.CodeTask,
+    }[task_type]
+    if not model.objects.filter(id=task_id).exists():
+        raise ValidationError(
+            f"No task of type {task_type} with id {task_id}", "NOT_FOUND",
         )
-        quiz_tasks = [
-            {"type": "quiz", **serializers.FullQuizTaskSerializer(t).data}
-            for t in quiz_tasks
-        ]
-        code_tasks = [
-            {"type": "code", **serializers.FullCodeTaskSerializer(t).data}
-            for t in code_tasks
-        ]
-        return Response(quiz_tasks + code_tasks)
+    return model.objects.get(id=task_id)
