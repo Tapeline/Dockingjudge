@@ -2,7 +2,11 @@ import pytest
 
 from api.models import Contest
 from contest_service import settings
-from tests.common import api, create_client, create_contest, author, participant
+from tests.common import (
+    api,
+    create_client,
+    create_contest,
+)
 
 
 @pytest.mark.django_db

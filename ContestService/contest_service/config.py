@@ -28,6 +28,8 @@ class RabbitMQConfig:
 
 @dataclass(frozen=True)
 class AvailableCompiler:
+    """A compiler definition available to use."""
+
     id: str
     syntax_highlighting: str
 
@@ -48,7 +50,7 @@ class SecurityConfig:
         default_factory=lambda: ["*"],
     )
     secret_key: str = (
-        'django-insecure-3&uwud=s#&0(uz**lf5$fi+m#)gf40l+s!v84l&afvi5bxqjr!'  # noqa: S105
+        "django-insecure-3&uwud=s#&0(uz**lf5$fi+m#)gf40l+s!v84l&afvi5bxqjr!"  # noqa: S105
     )
 
 

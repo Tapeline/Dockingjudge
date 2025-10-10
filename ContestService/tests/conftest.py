@@ -1,4 +1,5 @@
 import pytest
+
 from api.validation import TestSuite
 from tests.common import api, create_client, create_contest
 

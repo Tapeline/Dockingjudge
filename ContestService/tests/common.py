@@ -1,15 +1,13 @@
 import os
-from datetime import timedelta
 
 import pytest
 import requests
-from django.utils import timezone
 from rest_framework.test import APIClient
 
 from api.models import Contest, QuizTask
 
 ACCOUNT_SERVICE_URL = os.environ.get(
-    "ACCOUNT_SERVICE_URL", "http://localhost:8001/api/v1/accounts"
+    "ACCOUNT_SERVICE_URL", "http://localhost:8001/api/v1/accounts",
 )
 
 
@@ -65,7 +63,7 @@ class UserHelper:
         try:
             headers = {"Authorization": f"Bearer {self.token}"}
             requests.delete(
-                f"{ACCOUNT_SERVICE_URL}/profile/", headers=headers, timeout=5
+                f"{ACCOUNT_SERVICE_URL}/profile/", headers=headers, timeout=5,
             )
         except requests.RequestException as e:
             print(f"Warning: Failed to clean up user {self.username}: {e}")

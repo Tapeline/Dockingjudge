@@ -19,7 +19,7 @@ def init() -> None:
 def _init_exchange(
     channel: pika.adapters.blocking_connection.BlockingChannel,
 ) -> None:
-    """Initialize exchange we're responsible fBlockingChannelor."""
+    """Initialize exchange we're responsible for."""
     channel.exchange_declare(exchange=USER_OBJECT_EXCHANGE, durable=True)
 
 

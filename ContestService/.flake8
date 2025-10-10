@@ -1,0 +1,26 @@
+[flake8]
+allowed-domain-names =
+  data
+  file
+  handle
+  i
+
+exclude =
+  api/migrations/**
+
+ignore =
+  E501
+  # covered by ruff
+  W503
+  # wtf
+
+per-file-ignores =
+  contest_service/settings.py: WPS407, WPS226, E501
+  # kinda ok in django settings paradigm
+  api/views/**.py: WPS201, WPS615
+  # kinda ok in drf paradigm
+
+inline-quotes = "
+
+# Pydocstyle
+ignore-decorators = override

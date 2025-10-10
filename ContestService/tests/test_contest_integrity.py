@@ -1,5 +1,6 @@
 import pytest
-from tests.common import api, create_client, create_contest, author
+
+from tests.common import api
 
 
 @pytest.mark.django_db
@@ -64,7 +65,7 @@ def test_delete_quiz_task_removes_from_contest_pages(client, contest):
 
 @pytest.mark.django_db
 def test_create_code_task_adds_to_contest_pages(
-    client, contest, dummy_test_suite
+    client, contest, dummy_test_suite,
 ):
     response = client.post(
         api(f"{contest.id}/tasks/code/"),
@@ -82,7 +83,7 @@ def test_create_code_task_adds_to_contest_pages(
 
 @pytest.mark.django_db
 def test_delete_code_task_removes_from_contest_pages(
-    client, contest, dummy_test_suite
+    client, contest, dummy_test_suite,
 ):
     response = client.post(
         api(f"{contest.id}/tasks/code/"),
@@ -112,7 +113,7 @@ def test_creating_multiple_pages_updates_contest_pages(populated_contest):
 
 @pytest.mark.django_db
 def test_deleting_one_of_multiple_pages_updates_contest_pages(
-    client, populated_contest
+    client, populated_contest,
 ):
     contest = populated_contest["contest"]
     quiz_id = populated_contest["quiz_id"]

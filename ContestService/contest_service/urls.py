@@ -1,59 +1,42 @@
-"""
-URL configuration for contest_service project.
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/5.0/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
 from django.urls import path
 
 from api import views
 
 urlpatterns = [
-    path('api/v1/contests/',
+    path("api/v1/contests/",
          views.ListCreateContestView.as_view()),
-    path('api/v1/contests/<int:pk>/',
+    path("api/v1/contests/<int:pk>/",
          views.RetrieveUpdateDestroyContestView.as_view()),
-    path('api/v1/contests/<int:contest_id>/tasks/text/',
+    path("api/v1/contests/<int:contest_id>/tasks/text/",
          views.ListCreateTextPageView.as_view()),
-    path('api/v1/contests/<int:contest_id>/tasks/text/<int:pk>/',
+    path("api/v1/contests/<int:contest_id>/tasks/text/<int:pk>/",
          views.RetrieveUpdateDestroyTextPageView.as_view()),
-    path('api/v1/contests/<int:contest_id>/tasks/quiz/',
+    path("api/v1/contests/<int:contest_id>/tasks/quiz/",
          views.ListCreateQuizTaskView.as_view()),
-    path('api/v1/contests/<int:contest_id>/tasks/quiz/<int:pk>/',
+    path("api/v1/contests/<int:contest_id>/tasks/quiz/<int:pk>/",
          views.RetrieveUpdateDestroyQuizTaskView.as_view()),
-    path('api/v1/contests/<int:contest_id>/tasks/code/',
+    path("api/v1/contests/<int:contest_id>/tasks/code/",
          views.ListCreateCodeTaskView.as_view()),
-    path('api/v1/contests/<int:contest_id>/tasks/code/<int:pk>/',
+    path("api/v1/contests/<int:contest_id>/tasks/code/<int:pk>/",
          views.RetrieveUpdateDestroyCodeTaskView.as_view()),
-    path('api/v1/contests/tasks/<str:task_type>/<int:task_id>/can-submit/<int:user_id>/',
+    path("api/v1/contests/tasks/<str:task_type>/<int:task_id>/can-submit/<int:user_id>/",
          views.CanSubmitSolutionToTask.as_view()),
-    path('api/v1/contests/<int:contest_id>/time-left/',
+    path("api/v1/contests/<int:contest_id>/time-left/",
          views.GetTimeLeft.as_view()),
-    path('api/v1/contests/<int:contest_id>/apply/',
+    path("api/v1/contests/<int:contest_id>/apply/",
          views.ApplyForContestView.as_view()),
-    path('api/v1/contests/compilers/',
+    path("api/v1/contests/compilers/",
          views.GetAvailableCompilersView.as_view()),
-    path('api/v1/contests/<int:pk>/can-manage/',
+    path("api/v1/contests/<int:pk>/can-manage/",
          views.CanIManageContestView.as_view()),
-    path('api/v1/contests/<int:contest_id>/participants/',
+    path("api/v1/contests/<int:contest_id>/participants/",
          views.GetContestParticipants.as_view()),
 
-    path('internal/contests/tasks/quiz/<int:pk>/',
+    path("internal/contests/tasks/quiz/<int:pk>/",
          views.InternalRetrieveQuizTaskView.as_view()),
-    path('internal/contests/tasks/code/<int:pk>/',
+    path("internal/contests/tasks/code/<int:pk>/",
          views.InternalRetrieveCodeTaskView.as_view()),
-    path('internal/contests/<int:contest_id>/tasks/',
+    path("internal/contests/<int:contest_id>/tasks/",
          views.InternalGetAllTasksView.as_view()),
 
 ]
