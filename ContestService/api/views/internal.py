@@ -28,7 +28,9 @@ class InternalRetrieveCodeTaskView(RetrieveAPIView[models.CodeTask]):
 class InternalGetAllTasksView(APIView):
     """Get list of all tasks (with sensitive data). Should not be exposed."""
 
-    def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+    def get(  # noqa: WPS210
+        self, request: Request, *args: Any, **kwargs: Any,
+    ) -> Response:
         """Get list of all tasks (with sensitive data). Do not expose."""
         contest = get_object_or_404(models.Contest, id=kwargs["contest_id"])
         quiz_tasks = {
@@ -43,9 +45,12 @@ class InternalGetAllTasksView(APIView):
                 contest__id=kwargs["contest_id"],
             )
         }
+        contest_pages = (
+            (page["type"], page["id"]) for page in contest.pages
+        )
         all_tasks = {"quiz": quiz_tasks, "code": code_tasks}
         return Response([
-            {"type": page["type"], **all_tasks[page["type"]][page["id"]]}
-            for page in contest.pages
-            if page["type"] in {"quiz", "code"}
+            {"type": page_type, **all_tasks[page_type][page_id]}
+            for page_type, page_id in contest_pages
+            if page_type in {"quiz", "code"}
         ])

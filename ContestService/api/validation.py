@@ -71,15 +71,13 @@ def validate_test_suite(test_suite: dict[str, Any]) -> None:
     """Validate a code task test suite schema."""
     try:
         TestSuite(**test_suite)
-    except PydanticValidationError as e:
-        raise ValidationError(detail=e.json()) from e
+    except PydanticValidationError as exc:
+        raise ValidationError(detail=exc.json()) from exc
 
 
 def validate_quiz_validator(validator: dict[str, Any]) -> None:
     """Validate a quiz task validator schema."""
     try:
         QuizValidator(**validator)
-    except PydanticValidationError as e:
-        raise ValidationError from e
-
-
+    except PydanticValidationError as exc:
+        raise ValidationError from exc

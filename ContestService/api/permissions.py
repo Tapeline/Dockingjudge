@@ -1,14 +1,15 @@
-from typing import override
+from typing import Final, override
 
 from rest_framework.permissions import BasePermission
 from rest_framework.request import Request
 from rest_framework.views import APIView
 
+from api import accessor, models
 from contest_service import settings
 
-from . import accessor, models
-
 type AnyPage = models.TextPage | models.QuizTask | models.CodeTask
+
+_SAFE_METHODS: Final = frozenset(("GET", "HEAD", "OPTIONS"))
 
 
 def can_view_all_pages(user: int | None, contest: models.Contest) -> bool:
@@ -38,7 +39,7 @@ class CanCreateContest(BasePermission):
 
     @override
     def has_permission(self, request: Request, view: APIView) -> bool:
-        if request.method in ("GET", "HEAD", "OPTIONS"):
+        if request.method in _SAFE_METHODS:
             return True
         if "*" in settings.ALLOW_CONTEST_CREATION_TO:
             return True
@@ -51,20 +52,21 @@ class IsContestAdminOrReadOnly(BasePermission):
     @override
     def has_object_permission(
         self, request: Request, view: APIView,
-        obj: AnyPage | models.Contest,
+        page_or_contest: AnyPage | models.Contest,
     ) -> bool:
-        if isinstance(obj, models.Contest):
-            target = obj
+        if isinstance(page_or_contest, models.Contest):
+            target = page_or_contest
         elif isinstance(
-            obj, (models.TextPage, models.QuizTask, models.CodeTask),
+            page_or_contest,
+            (models.TextPage, models.QuizTask, models.CodeTask),
         ):
-            target = obj.contest
+            target = page_or_contest.contest
         else:
-            raise AssertionError(
-                "Invalid obj type for IsContestAdminOrReadOnly"
+            raise TypeError(
+                "Invalid obj type for IsContestAdminOrReadOnly",
             )
         return (
-            request.method in ("GET", "HEAD", "OPTIONS")
+            request.method in _SAFE_METHODS
             or target.author == request.user.id
         )
 
@@ -75,25 +77,25 @@ class IsContestAdminOrReadOnlyForParticipants(BasePermission):
     @override
     def has_object_permission(
         self, request: Request, view: APIView,
-        obj: AnyPage | models.Contest,
+        page_or_contest: AnyPage | models.Contest,
     ) -> bool:
-        if isinstance(obj, models.Contest):
-            target = obj
+        if isinstance(page_or_contest, models.Contest):
+            target = page_or_contest
         elif isinstance(
-            obj, (models.TextPage, models.QuizTask, models.CodeTask),
+            page_or_contest,
+            (models.TextPage, models.QuizTask, models.CodeTask),
         ):
-            target = obj.contest
+            target = page_or_contest.contest
         else:
-            raise AssertionError(
-                "Invalid obj type for IsContestAdminOrReadOnly"
+            raise TypeError(
+                "Invalid obj type for IsContestAdminOrReadOnly",
             )
-        if request.user.id and not isinstance(obj, models.Contest):
+        if request.user.id and not isinstance(page_or_contest, models.Contest):
             return (
-                request.method in ("GET", "HEAD", "OPTIONS")
-                and can_view_this_page(request.user.id, obj)
+                request.method in _SAFE_METHODS
+                and can_view_this_page(request.user.id, page_or_contest)
             ) or target.author == request.user.id
-        else:
-            return (
-                request.method in ("GET", "HEAD", "OPTIONS")
-                or target.author == request.user.id
-            )
+        return (
+            request.method in _SAFE_METHODS
+            or target.author == request.user.id
+        )

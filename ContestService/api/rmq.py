@@ -28,7 +28,7 @@ def connect() -> pika.BlockingConnection:
     return pika.BlockingConnection(
         pika.ConnectionParameters(
             host=settings.RMQ_ADDRESS,
-            port=5672,
+            port=settings.RMQ_PORT,
             credentials=pika.PlainCredentials(
                 username=settings.RMQ_USER,
                 password=settings.RMQ_PASS,
@@ -57,10 +57,9 @@ def notify_contest_deleted(data: dict[str, Any]) -> None:
     """Notify a contest was deleted."""
     # TODO: maybe refactor to transactional outbox
     publish_message(
-        CONTEST_OBJECT_EXCHANGE, "contest_event", {
-            "event": "DELETED",
-            "object": data,
-        },
+        CONTEST_OBJECT_EXCHANGE,
+        "contest_event",
+        _deleted_event(data),
     )
 
 
@@ -68,10 +67,9 @@ def notify_text_page_deleted(data: dict[str, Any]) -> None:
     """Notify a text page was deleted."""
     # TODO: maybe refactor to transactional outbox
     publish_message(
-        CONTEST_OBJECT_EXCHANGE, "text_page_event", {
-            "event": "DELETED",
-            "object": data,
-        },
+        CONTEST_OBJECT_EXCHANGE,
+        "text_page_event",
+        _deleted_event(data),
     )
 
 
@@ -79,10 +77,9 @@ def notify_quiz_task_deleted(data: dict[str, Any]) -> None:
     """Notify a quiz task was deleted."""
     # TODO: maybe refactor to transactional outbox
     publish_message(
-        CONTEST_OBJECT_EXCHANGE, "quiz_task_event", {
-            "event": "DELETED",
-            "object": data,
-        },
+        CONTEST_OBJECT_EXCHANGE,
+        "quiz_task_event",
+        _deleted_event(data),
     )
 
 
@@ -90,8 +87,14 @@ def notify_code_task_deleted(data: dict[str, Any]) -> None:
     """Notify a code task was deleted."""
     # TODO: maybe refactor to transactional outbox
     publish_message(
-        CONTEST_OBJECT_EXCHANGE, "code_task_event", {
-            "event": "DELETED",
-            "object": data,
-        },
+        CONTEST_OBJECT_EXCHANGE,
+        "code_task_event",
+        _deleted_event(data),
     )
+
+
+def _deleted_event(data: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "event": "DELETED",
+        "object": data,
+    }

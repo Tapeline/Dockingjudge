@@ -3,7 +3,7 @@ from typing import Any, override
 from rest_framework import serializers
 from rest_framework.fields import empty
 
-from . import models
+from api import models
 
 
 class ContestSerializer(serializers.ModelSerializer[models.Contest]):
@@ -26,6 +26,20 @@ class ContestSerializer(serializers.ModelSerializer[models.Contest]):
         self.display_only_enter_pages = display_only_enter_pages
         self.display_sensitive_info = display_sensitive_info
 
+    @override
+    def to_representation(self, instance: models.Contest) -> Any:
+        data = super().to_representation(instance)
+        for content_page in data["pages"]:
+            content_page["content"] = self._get_page_repr(
+                content_page["type"], content_page["id"],
+            )
+        if self.display_only_enter_pages:
+            data["pages"] = [
+                page for page in data["pages"]
+                if page["content"].get("is_enter_page") is True
+            ]
+        return data
+
     def _get_page_repr(self, page_type: str, page_id: int) -> Any:
         """Serialize a single page."""
         model = {
@@ -35,26 +49,14 @@ class ContestSerializer(serializers.ModelSerializer[models.Contest]):
         }[page_type]
         serializer = {
             "text": TextPageSerializer,
-            "quiz": UserQuizTaskSerializer if not self.display_sensitive_info
-            else FullQuizTaskSerializer,
-            "code": UserCodeTaskSerializer if not self.display_sensitive_info
-            else FullCodeTaskSerializer,
+            "quiz": FullQuizTaskSerializer if self.display_sensitive_info
+            else UserQuizTaskSerializer,
+            "code": FullCodeTaskSerializer if self.display_sensitive_info
+            else UserCodeTaskSerializer,
         }[page_type]
         return serializer(
-            model.objects.get(id=page_id)  # type: ignore[attr-defined]
+            model.objects.get(id=page_id),  # type: ignore[attr-defined]
         ).data
-
-    @override
-    def to_representation(self, instance: models.Contest) -> Any:
-        data = super().to_representation(instance)
-        for page in data["pages"]:
-            page["content"] = self._get_page_repr(page["type"], page["id"])
-        if self.display_only_enter_pages:
-            data["pages"] = [
-                page for page in data["pages"]
-                if page["content"].get("is_enter_page") is True
-            ]
-        return data
 
 
 class TextPageSerializer(serializers.ModelSerializer[models.TextPage]):
@@ -101,9 +103,9 @@ class UserCodeTaskSerializer(serializers.ModelSerializer[models.CodeTask]):
         data = super().to_representation(instance)
         suite = data["test_suite"]
         if "precompile" in suite:
-            del suite["precompile"]
+            suite.pop("precompile")
         if "place_files" in suite:
-            del suite["place_files"]
+            suite.pop("place_files")
         data["max_points"] = sum(group["points"] for group in suite["groups"])
         for group in suite["groups"]:
             group["cases"] = len(group["cases"])

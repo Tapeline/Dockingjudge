@@ -1,17 +1,10 @@
 from typing import Any, override
 
-from django.db.models.query import QuerySet
-
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models.query import QuerySet
 
-from . import validation
-
-
-def purge_objects_of_user(user: int) -> None:
-    """Delete all objects belonging to this user."""
-    Contest.objects.filter(author=user).delete()
-    ContestSession.objects.filter(user=user).delete()
+from api import validation
 
 
 class Contest(models.Model):
@@ -88,6 +81,24 @@ def validate_pages_list(pages: list[dict[str, Any]]) -> None:
 
 def validate_page_in_list(page: dict[str, Any]) -> None:
     """Ensure page is defined correctly."""
+    _validate_page_essential_fields(page)
+    page_type = page["type"]
+    page_id = page["id"]
+    query: QuerySet[Any, Any]
+    if page_type == "text":
+        query = TextPage.objects.filter(id=page_id)
+    elif page_type == "code":
+        query = CodeTask.objects.filter(id=page_id)
+    elif page_type == "quiz":
+        query = QuizTask.objects.filter(id=page_id)
+    if not query.exists():
+        raise ValidationError(
+            "Invalid page: id does not exist",
+            "INVALID_PAGE_ID_NOT_EXISTS",
+        )
+
+
+def _validate_page_essential_fields(page: dict[str, Any]) -> None:
     if page.get("type") not in ("text", "code", "quiz"):
         raise ValidationError(
             "Invalid page: bad type parameter",
@@ -97,18 +108,4 @@ def validate_page_in_list(page: dict[str, Any]) -> None:
         raise ValidationError(
             "Invalid page: no id",
             "INVALID_PAGE_NO_ID",
-        )
-    query: QuerySet[Any, Any]
-    if page["type"] == "text":
-        query = TextPage.objects.filter(id=page["id"])
-    elif page["type"] == "code":
-        query = CodeTask.objects.filter(id=page["id"])
-    elif page["type"] == "quiz":
-        query = QuizTask.objects.filter(id=page["id"])
-    else:
-        raise ValidationError("Invalid page type")
-    if not query.exists():
-        raise ValidationError(
-            "Invalid page: id does not exist",
-            "INVALID_PAGE_ID_NOT_EXISTS",
         )

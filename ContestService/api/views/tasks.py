@@ -1,4 +1,4 @@
-from typing import Any, reveal_type
+from typing import Any
 
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import (
@@ -67,8 +67,10 @@ class ListCreateQuizTaskView(
     serializer_class = serializers.UserQuizTaskSerializer
     full_serializer_class = serializers.FullQuizTaskSerializer
     queryset = models.QuizTask.objects.all()
-    permission_classes = (IsAuthenticated,
-    permissions.IsContestAdminOrReadOnlyForParticipants)
+    permission_classes = (
+        IsAuthenticated,
+        permissions.IsContestAdminOrReadOnlyForParticipants,
+    )
     creating_page_type = "quiz"
 
 
@@ -85,8 +87,10 @@ class RetrieveUpdateDestroyQuizTaskView(
     serializer_class = serializers.UserQuizTaskSerializer
     full_serializer_class = serializers.FullQuizTaskSerializer
     queryset = models.QuizTask.objects.all()
-    permission_classes = (IsAuthenticated,
-    permissions.IsContestAdminOrReadOnlyForParticipants)
+    permission_classes = (
+        IsAuthenticated,
+        permissions.IsContestAdminOrReadOnlyForParticipants,
+    )
     notification_serializer = full_serializer_class
     notify_function = rmq.notify_quiz_task_deleted  # type: ignore[assignment]
 
@@ -103,8 +107,10 @@ class ListCreateCodeTaskView(
     serializer_class = serializers.UserCodeTaskSerializer
     full_serializer_class = serializers.FullCodeTaskSerializer
     queryset = models.CodeTask.objects.all()
-    permission_classes = (IsAuthenticated,
-    permissions.IsContestAdminOrReadOnlyForParticipants)
+    permission_classes = (
+        IsAuthenticated,
+        permissions.IsContestAdminOrReadOnlyForParticipants,
+    )
     creating_page_type = "code"
 
 
@@ -134,7 +140,7 @@ class CanSubmitSolutionToTask(APIView):
 
     def get(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Check if a user can submit solution to specific task."""
-        user = kwargs["user"]
+        user = kwargs["user_id"]
         task_type = kwargs["task_type"]
         task_id = kwargs["task_id"]
         task = validate_task_id_and_get(task_type, task_id)
@@ -175,8 +181,12 @@ def validate_task_id_and_get(
         "quiz": models.QuizTask,
         "code": models.CodeTask,
     }[task_type]
-    if not model.objects.filter(id=task_id).exists():  # type: ignore[attr-defined]
+    if not model.objects.filter(  # type: ignore[attr-defined]
+        id=task_id,
+    ).exists():
         raise ValidationError(
             f"No task of type {task_type} with id {task_id}", "NOT_FOUND",
         )
-    return model.objects.get(id=task_id)  # type: ignore[attr-defined,no-any-return]
+    return model.objects.get(  # type: ignore[attr-defined,no-any-return]
+        id=task_id,
+    )

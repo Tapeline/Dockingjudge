@@ -1,3 +1,4 @@
+from http import HTTPStatus
 from typing import Any, override
 
 import requests
@@ -40,7 +41,7 @@ class RemoteAuthentication(authentication.BaseAuthentication):
             },
             timeout=5,
         )
-        if response.status_code == 200:
+        if response.status_code == HTTPStatus.OK:
             data = response.json()
             return User(
                 data["id"],

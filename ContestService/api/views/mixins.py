@@ -1,8 +1,9 @@
 import logging
-from typing import Any, Callable
+from collections.abc import Callable
+from http import HTTPStatus
+from typing import Any
 
 from django.db.models.base import Model
-
 from rest_framework.generics import (
     CreateAPIView,
     DestroyAPIView,
@@ -33,17 +34,17 @@ class NotifyOnDeleteMixin[Model_T: Model]:
         if not self.notification_serializer or not self.notify_function:
             raise AssertionError(
                 f"NotifyDeleteMixin misconfiguration: "
-                f"{self.notification_serializer=}, {self.notify_function=}"
+                f"{self.notification_serializer=}, {self.notify_function=}",
             )
         logger = logging.getLogger(self.__class__.__name__)
-        obj = self.get_object()
-        data = self.notification_serializer(obj).data
+        deleting_obj = self.get_object()
+        data = self.notification_serializer(deleting_obj).data
         response: Response = super().delete(request, *args, **kwargs)
         try:
             self.notify_function(data)
         except Exception:
             logger.exception(
-                "Failed to notify deletion of %s", obj,
+                "Failed to notify deletion of %s", deleting_obj,
             )
         return response
 
@@ -93,7 +94,7 @@ class EnsureContestStructureIntegrityOnCreateMixin:
     ) -> Response:
         """Create page and update contest."""
         response = super().create(request, *args, **kwargs)
-        if response.status_code != 201:
+        if response.status_code != HTTPStatus.CREATED:
             return response
         contest = models.Contest.objects.get(id=self.contest_id_getter())
         contest.pages = [
@@ -121,12 +122,12 @@ class SerializerSwitchingMixin:
 
     def get_serializer_class(self: Any) -> type[BaseSerializer[Any]]:
         """Get serializer based on user permissions."""
-        cls = super().get_serializer_class()
+        serializer_cls = super().get_serializer_class()
         if permissions.can_manage_contest(
             self.request.user.id, self.get_contest(),
         ):
-            cls = self.full_serializer_class
-        return cls
+            serializer_cls = self.full_serializer_class
+        return serializer_cls
 
 
 class ContestFieldInjectorOnCreation:

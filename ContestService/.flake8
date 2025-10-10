@@ -19,8 +19,17 @@ per-file-ignores =
   # kinda ok in django settings paradigm
   api/views/**.py: WPS201, WPS615
   # kinda ok in drf paradigm
+  api/models.py: WPS432
+  # magic numbers are labeled there, so it's ok
+  api/views/tasks.py: WPS215
+  # TODO: this needs to be refactored (remove mixins)
+  api/serializers.py: WPS226
+  # i won't place "__all__" to a constant :/
+
 
 inline-quotes = "
+
+max-module-members = 9
 
 # Pydocstyle
 ignore-decorators = override

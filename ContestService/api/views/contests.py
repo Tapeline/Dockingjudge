@@ -1,6 +1,6 @@
-from typing import Any, override, cast
+from http import HTTPStatus
+from typing import Any, cast, override
 
-from api.auth import User
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.generics import (
     ListCreateAPIView,
@@ -14,6 +14,7 @@ from rest_framework.serializers import BaseSerializer
 from rest_framework.views import APIView
 
 from api import accessor, models, permissions, rmq, serializers
+from api.auth import User
 from contest_service import settings
 
 
@@ -82,10 +83,10 @@ class ApplyForContestView(APIView):
         if not request.user.id:
             raise PermissionDenied(
                 detail="You are not authorized to apply for contest",
-                code="NOT_LOGGED_IN"
+                code="NOT_LOGGED_IN",
             )
         if not accessor.user_can_apply_for_contest(
-            cast(User, request.user), contest
+            cast(User, request.user), contest,
         ):
             raise PermissionDenied(
                 detail="You cannot apply for this contest",
@@ -99,7 +100,7 @@ class ApplyForContestView(APIView):
         models.ContestSession.objects.create(
             user=request.user.id, contest=contest,
         )
-        return Response(status=204)
+        return Response(status=HTTPStatus.NO_CONTENT)
 
 
 class GetTimeLeft(APIView):

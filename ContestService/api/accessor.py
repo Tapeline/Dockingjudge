@@ -6,8 +6,8 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 
-from . import models
-from .auth import User
+from api import models
+from api.auth import User
 
 
 def get_object_or_null[Model_T: Model](
@@ -28,7 +28,7 @@ def user_can_apply_for_contest(
 
 
 def user_applied_for_contest(
-    user: int | None, contest: models.Contest
+    user: int | None, contest: models.Contest,
 ) -> bool:
     """Check if user has applied for a contest."""
     if not user:
@@ -38,7 +38,9 @@ def user_applied_for_contest(
     ).exists()
 
 
-def user_get_time_left(user: int | None, contest: models.Contest) -> timedelta | None:
+def user_get_time_left(
+    user: int | None, contest: models.Contest,
+) -> timedelta | None:
     """Get timedelta of time left to solve the contest."""
     session: models.ContestSession | None = get_object_or_null(
         models.ContestSession,
@@ -56,11 +58,17 @@ def user_has_time_left(user: int, contest: models.Contest) -> bool:
     """Check if user has any time left to solve the contest."""
     user_time_left = user_get_time_left(user, contest)
     return (
-        contest.time_limit_seconds < 0 or
-        user_time_left is not None and user_time_left.total_seconds() > 0
+        contest.time_limit_seconds < 0
+        or (user_time_left is not None and user_time_left.total_seconds() > 0)
     )
 
 
 def is_contest_open(contest: models.Contest) -> bool:
     """Check if contest is open to submissions and applications."""
     return contest.is_started and not contest.is_ended
+
+
+def purge_objects_of_user(user: int) -> None:
+    """Delete all objects belonging to this user."""
+    models.Contest.objects.filter(author=user).delete()
+    models.ContestSession.objects.filter(user=user).delete()
