@@ -5,6 +5,16 @@ set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
 set shell := ["sh", "-c"]
 
 
+test-dep $action:
+    just __test_dep_{{action}}
+
+__test_dep_up:
+    docker compose -f tests/docker-compose.yml up -d
+
+__test_dep_down:
+    docker compose -f tests/docker-compose.yml down
+
+
 test:
     uv run pytest
 
