@@ -18,4 +18,4 @@ To start the contest -- toggle "Is started?" in contest's settings.
 To move pages around, use JSON tab under "Pages" section. Beware not to mess
 the contest up!
 
-![](../img/ui-contest-settings.png)
+![](../../img/ui-contest-settings.png)

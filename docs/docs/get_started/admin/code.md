@@ -1,6 +1,6 @@
 # Code tasks
 
-![](../img/ui-edit-code.png)
+![](../../img/ui-edit-code.png)
 
 ## Checker declaration
 
