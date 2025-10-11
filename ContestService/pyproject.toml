@@ -42,5 +42,6 @@ test = [
     "pytest-cov>=7.0.0",
     "pytest-django>=4.11.1",
     "pytest-freezegun>=0.4.2",
+    "setuptools>=80.9.0",
     "smart-covdefaults>=0.1.0",
 ]

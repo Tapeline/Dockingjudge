@@ -141,6 +141,7 @@ test = [
     { name = "pytest-cov" },
     { name = "pytest-django" },
     { name = "pytest-freezegun" },
+    { name = "setuptools" },
     { name = "smart-covdefaults" },
 ]
 
@@ -181,6 +182,7 @@ test = [
     { name = "pytest-cov", specifier = ">=7.0.0" },
     { name = "pytest-django", specifier = ">=4.11.1" },
     { name = "pytest-freezegun", specifier = ">=0.4.2" },
+    { name = "setuptools", specifier = ">=80.9.0" },
     { name = "smart-covdefaults", specifier = ">=0.1.0" },
 ]
 
