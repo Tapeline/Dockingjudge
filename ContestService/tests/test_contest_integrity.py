@@ -133,3 +133,6 @@ def test_deleting_all_pages_empties_contest_pages(client, populated_contest):
     client.delete(api(f"/{contest.id}/tasks/code/{populated_contest['code_id']}/"))
     contest.refresh_from_db()
     assert contest.pages == []
+
+
+# TODO: test that editing contest.pages does not disrupt integrity
