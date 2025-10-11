@@ -1,6 +1,6 @@
 mode: local
 
-rabbitmq:
+rabbit:
   host: localhost
   username: rm_user
   password: rm_password
@@ -12,7 +12,7 @@ postgres:
   password: pgpass
 
 security:
-  allowed_hosts: ["dockingjudge.tapeline.dev", "localhost", "127.0.0.1"]
+  allowed_hosts: ["*"]
 
 services:
   account_service: "http://localhost:8001/api/v1/accounts"
