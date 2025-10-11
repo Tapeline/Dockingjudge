@@ -1,0 +1,6 @@
+.venv
+.idea
+solutions
+htmlcov/
+.git/
+*.egg-info

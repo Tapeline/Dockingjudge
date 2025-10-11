@@ -1,0 +1,53 @@
+# Cross-platform shell configuration
+# Use PowerShell on Windows (higher precedence than shell setting)
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
+# Use sh on Unix-like systems
+set shell := ["sh", "-c"]
+
+
+test $what="all":
+  just __test_{{what}}
+
+__test_all:
+  just __test_unit
+  just __test_integration
+  just __test_container
+
+__test_unit:
+  uv run pytest tests/unit
+
+__test_integration:
+  docker run --name judgelet-integration-testing dockingjudge-unit uv run pytest tests/integration
+  docker rm -f judgelet-integration-testing
+
+__test_container:
+  docker run -d --name judgelet-container-testing -p 9090:8000 dockingjudge-unit
+  sleep 5
+  uv run pytest tests/container
+  docker rm -f judgelet-container-testing
+
+__test_cleanup:
+  docker rm -f judgelet-integration-testing
+  docker rm -f judgelet-container-testing
+  rm .coverage
+
+
+check $what="all":
+  just __check_{{what}}
+
+__check_all:
+  just __check_types
+  just __check_style
+
+__check_style:
+  just __check_ruff
+  just __check_wps
+
+__check_ruff:
+  uv run ruff check
+
+__check_wps:
+  uv run flake8 src
+
+__check_types:
+  uv run mypy src

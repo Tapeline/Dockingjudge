@@ -3,7 +3,7 @@ name = "judgeservice"
 version = "0.1.0"
 description = "Dockingjudge Judge Service"
 authors = [
-    {name = "Tapeline", email = "yt.redstone.mail@gmail.com"}
+    {name = "Tapeline", email = "mail@tapeline.dev"}
 ]
 license = {text = "GNU GPL v3.0"}
 requires-python = ">=3.12,<4.0"
@@ -16,7 +16,27 @@ dependencies = [
     "aio-pika (>=9.5.4,<10.0.0)"
 ]
 
-
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools >= 80.0.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.uv.sources]
+fuente = { git = "https://github.com/Tishka17/fuente.git" }
+
+[dependency-groups]
+lint = [
+    "import-linter>=2.5",
+    "mypy>=1.18.2",
+    "ruff>=0.13.1",
+    "wemake-python-styleguide>=1.4.0",
+]
+test = [
+    "pytest>=8.4.2",
+    "pytest-asyncio>=1.2.0",
+    "pytest-cov>=7.0.0",
+    "requests>=2.32.5",
+    "smart-covdefaults>=0.1.0",
+]

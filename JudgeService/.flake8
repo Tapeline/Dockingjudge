@@ -1,0 +1,14 @@
+[flake8]
+allowed-domain-names =
+
+ignore =
+
+per-file-ignores =
+  src/judgeservice/bootstrap/app.py: WPS201
+  src/judgelet/bootstrap/di.py: WPS347
+  src/judgelet/bootstrap/config.py: WPS347
+
+inline-quotes = "
+
+# Pydocstyle
+ignore-decorators = override
