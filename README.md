@@ -100,35 +100,41 @@ Dockingjudge consists of several services:
     - [x] solution svc
     - [ ] contest svc
     - [ ] account svc
+    - [ ] judge svc
 - [x] Add metrics
     - [x] contest svc
     - [x] account svc
+- [ ] tidy up in docker-compose.yml
 
 ### Second round
 
-- [ ] Load testing
 - [ ] Make frontend locally deployable in container
 - [ ] Massive frontend rework
+- [ ] Add contest timer
+- [ ] Add profile pictures
 - [ ] Get rid of pydantic in application layer (bruh)
-- [ ] Migrate from RMQ to NATS/Kafka
 
 ### Third round
 
-- [ ] Add contest timer
-- [ ] Add messages
-- [ ] Add profile pictures
-- [ ] add DL (disk limit) verdict
-      returned when sandbox occupies too much disk space
-- [ ] Public/private contests
+- [ ] Migrate from RMQ to NATS
 - [ ] Add tracing
+    - [ ] judge svc
     - [ ] solution svc
     - [ ] contest svc
     - [ ] account svc
+- [ ] Load testing
+
+### Fourth round
+
+- [ ] Add messages
+- [ ] add DL (disk limit) verdict
+      returned when sandbox occupies too much disk space
+- [ ] Public/private contests
 
 ### Bugs
 
-- [ ] registration 400 "a server error occurred". Add more informative error message.
-- [ ] standings are messed up
+- [x] registration 400 "a server error occurred". Add more informative error message.
+- [x] standings are messed up
 
 ### Docs
 
