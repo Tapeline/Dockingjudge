@@ -70,39 +70,39 @@ Dockingjudge consists of several services:
 
 ### First round
 
-- [x] More security on judgelet
+- [ ] More security on judgelet
+    - [x] run judgelet as non-root
+    - [ ] run solutions as different users
+    - [ ] utilize chown and chmod to protect non-solution files
+    - [ ] (maybe) introduce bubblewrap
 - [x] Add more compilers (at least cpp)
 - [ ] deploy from ghcr.io
 - [ ] Add tests
     - [x] judgelet
     - [ ] judge svc
     - [x] solution svc
-    - [ ] contest svc
-    - [ ] account svc
+    - [x] contest svc
+    - [x] account svc
     - [ ] e2e
 - [ ] Lint and test in CI
     - [x] judgelet
     - [ ] judge svc
     - [x] solution svc
-    - [ ] contest svc
-    - [ ] account svc
+    - [x] contest svc
+    - [x] account svc
     - [ ] e2e
-- [ ] Move config to config files
+- [x] Move config to config files
     - [x] judgelet
+    - [x] solution svc
+    - [x] contest svc
+    - [x] account svc
+- [ ] Add struct logging
     - [x] solution svc
     - [ ] contest svc
     - [ ] account svc
-- [ ] Add tracing
-    - [ ] solution svc
-    - [ ] contest svc
-    - [ ] account svc
-- [ ] Add struct logging
-    - [ ] solution svc
-    - [ ] contest svc
-    - [ ] account svc
-- [ ] Add metrics
-    - [ ] contest svc
-    - [ ] account svc
+- [x] Add metrics
+    - [x] contest svc
+    - [x] account svc
 
 ### Second round
 
@@ -120,6 +120,10 @@ Dockingjudge consists of several services:
 - [ ] add DL (disk limit) verdict
       returned when sandbox occupies too much disk space
 - [ ] Public/private contests
+- [ ] Add tracing
+    - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
 
 ### Bugs
 
