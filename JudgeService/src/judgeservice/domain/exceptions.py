@@ -1,6 +1,3 @@
-"""Contains domain exceptions."""
-
-
 class NoSuitableJudgeletFoundException(Exception):
     """Raised when no judgelet for a compiler found."""
 

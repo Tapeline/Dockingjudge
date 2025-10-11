@@ -1,3 +1,5 @@
+from typing import Any
+
 from pydantic import BaseModel
 
 from judgeservice.domain.entities import (
@@ -7,15 +9,19 @@ from judgeservice.domain.entities import (
 
 
 class MQSolutionCheckRequest(BaseModel):
+    """Request to check a solution."""
+
     id: str
     solution_url: str
     main_file: str | None
     submission_type: SubmissionType
     compiler: str
-    suite: dict
+    suite: dict[str, Any]
 
 
 class MQSolutionAnswer(BaseModel):
+    """Checked solution answer."""
+
     id: str
     score: int
     short_verdict: str

@@ -104,6 +104,6 @@ exclude = [
     "FBT",
     "D",
 ]
-"src/judgeunit/bootstrap/di.py" = [
+"src/judgeservice/bootstrap/di.py" = [
     "D"
 ]

@@ -1,31 +1,41 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel
 
 
 class SubmissionType(Enum):
+    """Code submission type."""
+
     STR = "str"
     ZIP = "zip"
 
 
 class VerdictSchema(BaseModel):
+    """Verdict."""
+
     codename: str
     is_successful: bool
     details: str
 
 
 class GroupProtocolSchema(BaseModel):
+    """Protocol of a group."""
+
     score: int
     verdicts: list[VerdictSchema]
     is_successful: bool
     verdict: VerdictSchema
 
 
+type GroupName = str
+
+
 @dataclass
 class Solution:
-    type GroupName = str
+    """Represents a solution."""
 
     id: str
     solution_data: bytes | None
@@ -33,7 +43,7 @@ class Solution:
     main_file: str | None
     submission_type: SubmissionType
     compiler: str
-    suite: dict
+    suite: dict[str, Any]
 
     short_verdict: str
     group_scores: dict[GroupName, int]
@@ -52,9 +62,10 @@ class JudgeletAnswer(BaseModel):
     compilation_error: str | None = None
 
 
-
 class Judgelet(ABC):
-    def __init__(self, address: str):
+    """Resembles a judgelet."""
+
+    def __init__(self, address: str) -> None:
         self.address = address
         self._opened_connections = 0
 
