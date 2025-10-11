@@ -1,4 +1,3 @@
-import sys
 from typing import Any
 
 import structlog
@@ -34,7 +33,7 @@ def configure_app_logging(config: Config) -> Any:
     else:
         processors.append(structlog.dev.ConsoleRenderer())
     structlog.configure(
-        processors=processors,
+        processors=processors,  # type: ignore[arg-type]
         logger_factory=structlog.PrintLoggerFactory(),
         cache_logger_on_first_use=False,
     )

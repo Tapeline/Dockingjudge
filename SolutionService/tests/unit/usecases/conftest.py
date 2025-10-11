@@ -13,7 +13,8 @@ from solution_service.application.interactors.post_quiz_solution import (
 )
 from solution_service.config import (
     Config,
-    LoggingConfig, MinioConfig,
+    LoggingConfig,
+    MinioConfig,
     OuterServicesConfig,
     PostgresConfig,
     RabbitMQConfig,

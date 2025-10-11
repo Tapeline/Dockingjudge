@@ -58,7 +58,7 @@ def _get_faststream_app(
     broker: RabbitBroker, container: AsyncContainer,
 ) -> FastStream:
     faststream_app = FastStream(
-        broker, logger=structlog.get_logger("faststream")
+        broker, logger=structlog.get_logger("faststream"),
     )
     faststream_integration.setup_dishka(
         container, faststream_app, auto_inject=True,
