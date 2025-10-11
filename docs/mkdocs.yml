@@ -66,7 +66,9 @@ nav:
       - Frontend:
           - Description: services/frontend/description.md
           - Configuration: services/frontend/config.md
-  - Contributing: contributing.md
+  - Contributing:
+      - Guidelines: contributing/guidelines.md
+      - Working on the codebase: contributing/working.md
 theme:
   name: material2014
   primary_color: "#2F24C1"
