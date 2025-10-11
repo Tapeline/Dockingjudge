@@ -19,6 +19,7 @@ per-file-ignores =
   # kinda ok in django settings paradigm
   api/views/**.py: WPS201, WPS615
   # kinda ok in drf paradigm
+  api/exceptions.py: WPS226
 
 inline-quotes = "
 

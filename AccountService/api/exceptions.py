@@ -1,15 +1,10 @@
-from typing import Any
 
-from django.http.response import Http404
 
 from rest_framework import status
 from rest_framework.exceptions import (
     APIException,
-    ErrorDetail,
-    PermissionDenied, NotFound,
+    PermissionDenied,
 )
-from rest_framework.views import set_rollback
-from django.core.exceptions import PermissionDenied as DjangoPermissionDenied
 
 
 class RegistrationDisabledException(PermissionDenied):
@@ -37,7 +32,7 @@ class PasswordTooShortException(APIException):
 
     default_detail = {
         "detail": "Password too short",
-        "code": "PASSWORD_TOO_SHORT"
+        "code": "PASSWORD_TOO_SHORT",
     }
     status_code = status.HTTP_400_BAD_REQUEST
 
@@ -47,6 +42,6 @@ class PasswordTooCommonException(APIException):
 
     default_detail = {
         "detail": "Password too common",
-        "code": "PASSWORD_TOO_COMMON"
+        "code": "PASSWORD_TOO_COMMON",
     }
     status_code = status.HTTP_400_BAD_REQUEST
