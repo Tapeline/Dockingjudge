@@ -131,7 +131,8 @@ class RetrieveUpdateDestroyContestView(
 )
 class ApplyForContestView(APIView):
     """Make an application for contest."""
-    serializer_class = None
+
+    serializer_class: BaseSerializer[Any] | None = None
 
     def post(self, request: Request, *args: Any, **kwargs: Any) -> Response:
         """Make an application for contest."""
