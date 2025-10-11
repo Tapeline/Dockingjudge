@@ -3,8 +3,8 @@ POST localhost:8001/api/v1/accounts/register/
 Content-Type: application/json
 
 {
-    "username": "Tapeline",
-    "password": "pass"
+    "username": "Tapeline1",
+    "password": "hgKpBv97eCEvaaN"
 }
 
 ###

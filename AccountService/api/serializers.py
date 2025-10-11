@@ -13,7 +13,7 @@ class RegistrationSerializer(serializers.ModelSerializer[models.User]):
     class Meta:
         model = models.User
         fields = ("username", "password")
-        extra_kwargs = {"password": {"write_only": True}}  # noqa: RUF012
+        extra_kwargs = {"password": {"write_only": True}}
 
     @override
     def create(self, validated_data: Mapping[str, Any]) -> models.User:

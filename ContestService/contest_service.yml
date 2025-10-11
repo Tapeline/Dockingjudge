@@ -1,0 +1,27 @@
+mode: local
+
+rabbit:
+  host: localhost
+  username: rm_user
+  password: rm_password
+
+postgres:
+  host: localhost
+  port: 5501
+  username: pguser
+  password: pgpass
+
+security:
+  allowed_hosts: ["*"]
+
+services:
+  account_service: "http://localhost:8001/api/v1/accounts"
+
+app:
+  available_compilers:
+    - id: python
+      syntax_highlighting: python
+    - id: cpp17
+      syntax_highlighting: cpp
+  allow_contest_creation_to:
+    - Tapeline

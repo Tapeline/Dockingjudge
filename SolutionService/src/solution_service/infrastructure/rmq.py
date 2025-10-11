@@ -1,3 +1,4 @@
+import structlog
 from faststream.rabbit import RabbitBroker
 from faststream.security import SASLPlaintext
 
@@ -13,4 +14,5 @@ def create_broker(rabbitmq_config: RabbitMQConfig) -> RabbitBroker:
             password=rabbitmq_config.password,
         ),
         virtualhost="/",
+        logger=structlog.get_logger("rabbit"),
     )

@@ -1,0 +1,7 @@
+.coverage
+.venv
+.idea
+htmlcov/
+.git/
+*.egg-info
+solution_service.yml
