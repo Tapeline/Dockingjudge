@@ -13,7 +13,7 @@ from solution_service.application.interactors.post_quiz_solution import (
 )
 from solution_service.config import (
     Config,
-    MinioConfig,
+    LoggingConfig, MinioConfig,
     OuterServicesConfig,
     PostgresConfig,
     RabbitMQConfig,
@@ -49,6 +49,7 @@ def test_config() -> Config:
         services=OuterServicesConfig(),
         debug_mode=True,
         s3=MinioConfig(),
+        logging=LoggingConfig(),
     )
 
 

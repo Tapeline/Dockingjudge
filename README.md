@@ -72,29 +72,35 @@ Dockingjudge consists of several services:
 
 - [x] More security on judgelet
 - [x] Add more compilers (at least cpp)
-- [ ] Migrate from RMQ to NATS/Kafka
 - [ ] deploy from ghcr.io
 - [ ] Add tests
     - [x] judgelet
     - [ ] judge svc
-    - [ ] solution svc
+    - [x] solution svc
     - [ ] contest svc
     - [ ] account svc
     - [ ] e2e
 - [ ] Lint and test in CI
     - [x] judgelet
     - [ ] judge svc
-    - [ ] solution svc
+    - [x] solution svc
     - [ ] contest svc
     - [ ] account svc
     - [ ] e2e
 - [ ] Move config to config files
     - [x] judgelet
-    - [ ] solution svc
+    - [x] solution svc
     - [ ] contest svc
     - [ ] account svc
 - [ ] Add tracing
     - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
+- [ ] Add struct logging
+    - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
+- [ ] Add metrics
     - [ ] contest svc
     - [ ] account svc
 
@@ -104,6 +110,7 @@ Dockingjudge consists of several services:
 - [ ] Make frontend locally deployable in container
 - [ ] Massive frontend rework
 - [ ] Get rid of pydantic in application layer (bruh)
+- [ ] Migrate from RMQ to NATS/Kafka
 
 ### Third round
 
