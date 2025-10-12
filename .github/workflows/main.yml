@@ -15,3 +15,5 @@ jobs:
     uses: ./.github/workflows/account_svc.yml
   contest_svc_tests:
     uses: ./.github/workflows/contest_svc.yml
+  judge_svc_tests:
+    uses: ./.github/workflows/judge_svc.yml

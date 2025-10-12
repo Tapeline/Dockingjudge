@@ -1,0 +1,6 @@
+.coverage
+.venv
+.idea
+htmlcov/
+.git/
+*.egg-info
