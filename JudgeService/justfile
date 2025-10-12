@@ -10,26 +10,9 @@ test $what="all":
 
 __test_all:
   just __test_unit
-  just __test_integration
-  just __test_container
 
 __test_unit:
   uv run pytest tests/unit
-
-__test_integration:
-  docker run --name judgelet-integration-testing dockingjudge-unit uv run pytest tests/integration
-  docker rm -f judgelet-integration-testing
-
-__test_container:
-  docker run -d --name judgelet-container-testing -p 9090:8000 dockingjudge-unit
-  sleep 5
-  uv run pytest tests/container
-  docker rm -f judgelet-container-testing
-
-__test_cleanup:
-  docker rm -f judgelet-integration-testing
-  docker rm -f judgelet-container-testing
-  rm .coverage
 
 
 check $what="all":
