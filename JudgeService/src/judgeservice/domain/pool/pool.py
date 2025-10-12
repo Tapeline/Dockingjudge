@@ -1,17 +1,15 @@
 import re
 from dataclasses import dataclass
-from typing import override
 
 import structlog
 
-from judgeservice.application.interfaces import JudgeletPool
 from judgeservice.domain.entities import (
     Judgelet,
 )
 from judgeservice.domain.exceptions import (
     NoSuitableJudgeletFoundException,
 )
-from judgeservice.infrastructure.pool.strategies import (
+from judgeservice.domain.pool.strategies import (
     AbstractBalancingStrategy,
 )
 
@@ -40,7 +38,7 @@ class JudgeletGroup:
     nodes: list[Judgelet]
 
 
-class JudgeletPoolImpl(JudgeletPool):
+class JudgeletPool:
     """HTTP judgelet pool."""
 
     def __init__(
@@ -51,8 +49,8 @@ class JudgeletPoolImpl(JudgeletPool):
         self.balance = balancing_strategy
         self.groups = groups
 
-    @override
     async def get_for_compiler(self, compiler_name: str) -> Judgelet:
+        """Get best judgelet for chosen compiler."""
         group = self._get_group_for_compiler(compiler_name)
         node = await self.balance.get_preferred_node(group.nodes)
         if node is None:

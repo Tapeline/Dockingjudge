@@ -1,5 +1,7 @@
 [run]
 plugins = smart_covdefaults
+omit =
+    src/judgeservice/bootstrap/**
 
 [smart_covdefaults]
 allow_defensive_code = True

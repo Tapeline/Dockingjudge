@@ -1,8 +1,9 @@
 from dishka import Provider, Scope, from_context, provide
 
 from judgeservice.application.interactors import ProcessSolutionInteractor
-from judgeservice.application.interfaces import JudgeletPool, SolutionGateway
+from judgeservice.application.interfaces import SolutionGateway
 from judgeservice.config import Config
+from judgeservice.domain.pool.pool import JudgeletPool
 from judgeservice.infrastructure.solutions import SolutionGatewayImpl
 
 

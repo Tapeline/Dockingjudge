@@ -4,11 +4,11 @@ from dishka import make_async_container
 from dishka.integrations import faststream as faststream_integration
 from faststream import FastStream
 
-from judgeservice.application.interfaces import JudgeletPool
 from judgeservice.bootstrap.config import load_pool_impl, service_config_loader
 from judgeservice.bootstrap.di import AppProvider
 from judgeservice.config import Config
 from judgeservice.controllers.mq import mq_controller
+from judgeservice.domain.pool.pool import JudgeletPool
 from judgeservice.infrastructure.rmq import create_broker
 
 logger = logging.getLogger(__name__)

@@ -2,12 +2,13 @@ from dataclasses import dataclass
 
 import structlog
 
-from judgeservice.application.interfaces import JudgeletPool, SolutionGateway
+from judgeservice.application.interfaces import SolutionGateway
 from judgeservice.domain.entities import (
     GroupProtocolSchema,
     JudgeletAnswer,
     Solution,
 )
+from judgeservice.domain.pool.pool import JudgeletPool
 
 logger = structlog.get_logger(__name__)
 

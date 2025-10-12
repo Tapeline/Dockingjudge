@@ -4,17 +4,17 @@ from fuente.sources.yaml import YamlSource
 
 from judgeservice.bootstrap.exceptions import BadBalancingStrategy
 from judgeservice.config import Config
-from judgeservice.infrastructure.pool.judgelet import JudgeletImpl
-from judgeservice.infrastructure.pool.pool import (
+from judgeservice.domain.pool.pool import (
     JudgeletGroup,
-    JudgeletPoolImpl,
+    JudgeletPool,
     Selector,
 )
-from judgeservice.infrastructure.pool.strategies import (
+from judgeservice.domain.pool.strategies import (
     STRATEGIES,
     AbstractBalancingStrategy,
     SingleBalancedStrategy,
 )
+from judgeservice.infrastructure.judgelet import JudgeletImpl
 
 service_config_loader = config_loader(
     EnvSource(prefix="JUDGE_SVC_"),
@@ -23,10 +23,10 @@ service_config_loader = config_loader(
 )
 
 
-def load_pool_impl(config: Config) -> JudgeletPoolImpl:
+def load_pool_impl(config: Config) -> JudgeletPool:
     """Load pool implementation from config."""
     strategy = _get_load_balancer(config.pool.load_balancing)
-    return JudgeletPoolImpl(
+    return JudgeletPool(
         balancing_strategy=strategy,
         groups=[
             JudgeletGroup(
