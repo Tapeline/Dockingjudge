@@ -65,10 +65,10 @@ services:
     hostname: judge_service
     build: JudgeService
     environment:
-      RMQ_HOST: rabbitmq
-      RMQ_USER: ${RMQ_USER}
-      RMQ_PASS: ${RMQ_PASSWORD}
-      S3_BASE_URL: http://minio:9000
+      JUDGE_SVC_RABBITMQ__HOST: rabbitmq
+      JUDGE_SVC_RABBITMQ__USERNAME: ${RMQ_USER}
+      JUDGE_SVC_RABBITMQ__PASSWORD: ${RMQ_PASSWORD}
+      JUDGE_SVC_S3__BASE_URL: http://minio:9000
     depends_on:
       rabbitmq:
         condition: service_healthy

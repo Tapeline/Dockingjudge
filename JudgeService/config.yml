@@ -1,8 +1,9 @@
-groups:
-  - name: General
-    selector: .*
-    nodes:
-      - http://judgelet_0:8000
-      - http://judgelet_1:8000
+pool:
+  groups:
+    - name: General
+      selector: .*
+      nodes:
+        - http://judgelet_0:8000
+        - http://judgelet_1:8000
 
-load_balancing: round-robin
+  load_balancing: round-robin
