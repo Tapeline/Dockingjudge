@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 def get_app() -> FastStream:
     """Bootstrap faststream app."""
     config = service_config_loader.load()
-    broker = create_broker(config.rabbitm)
+    broker = create_broker(config.rabbitmq)
     pool = load_pool_impl(config)
     container = make_async_container(
         AppProvider(),
