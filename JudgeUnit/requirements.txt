@@ -1,8 +1,0 @@
-contextlib2==21.6.0
-schema==0.7.5
-fastapi==0.111.1
-pylint
-mypy
-psutil
-requests
-pytest

@@ -1,1 +1,1 @@
-poetry run faststream run --factory judgeservice.main:get_app
+uv run faststream run --factory judgeservice.bootstrap.app:get_app

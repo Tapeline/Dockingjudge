@@ -1,3 +1,3 @@
-from solution_service.main import get_app
+from solution_service.bootstrap.app import get_app
 
 app = get_app()

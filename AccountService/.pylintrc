@@ -1,9 +1,0 @@
-[MASTER]
-ignore=
-    migrations,
-    urls
-
-[MESSAGES CONTROL]
-disable=
-    R0903,
-    W1309

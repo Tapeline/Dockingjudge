@@ -1,0 +1,45 @@
+[flake8]
+allowed-domain-names =
+  params
+  parameters
+  file
+  contents
+  data
+
+exclude =
+  src/solution_service/infrastructure/migrations/**
+
+ignore =
+  WPS237
+  # this metric is overly strict
+
+per-file-ignores =
+  src/solution_service/bootstrap/app.py: WPS201
+  src/solution_service/bootstrap/di/**: WPS347
+  src/solution_service/bootstrap/config.py: WPS347
+
+  src/solution_service/infrastructure/contest_service.py: WPS226
+  # refactor this
+
+  src/solution_service/controllers/http.py: WPS201
+
+  src/solution_service/application/interactors/post_code_solution.py: WPS201, WPS217
+  # idk how to refactor this
+
+
+
+
+inline-quotes = "
+
+max-local-variables = 8
+
+max-annotation-complexity = 5
+
+max-methods = 10
+
+max-module-members = 12
+
+max-arguments = 6
+
+# Pydocstyle
+ignore-decorators = override

@@ -10,22 +10,81 @@ nav:
       - Infrastructure: explore/infrastructure.md
       - Tech stack: explore/stack.md
       - C4: explore/c4.md
-  - Getting started for contestants:
-      - Sign up for a contest: get_started/sign_up.md
-      - Solve tasks: get_started/solve.md
-  - Getting started for admins:
-      - Install: admin/install.md
-      - Set up a contest: admin/contest.md
-      - Set up a quiz task: admin/quiz.md
-      - Set up a code task: admin/code.md
-
+  - Getting started:
+      - For contestants:
+          - Sign up for a contest: get_started/contestant/sign_up.md
+          - Solve tasks: get_started/contestant/solve.md
+      - For admins:
+          - Install: get_started/admin/install.md
+          - Set up a contest: get_started/admin/contest.md
+          - Set up a quiz task: get_started/admin/quiz.md
+          - Set up a code task: get_started/admin/code.md
+  - Reference:
+      - Contests:
+          - Structure: reference/contests/structure.md
+          - Session: reference/contests/session.md
+          - Permissions: reference/contests/permissions.md
+          - Scores & standings: reference/contests/scores.md
+      - Pages & tasks:
+          - Text pages: reference/pages/text.md
+          - Quiz tasks: reference/pages/quiz.md
+          - Code tasks: reference/pages/code.md
+      - Solutions:
+          - Quiz solutions: reference/solutions/quiz.md
+          - Code solutions: reference/solutions/code.md
+      - Checking:
+          - Quiz validators: reference/checking/quiz.md
+          - Code test suites: reference/checking/code.md
+      - Glossary: reference/glossary.md
+  - Services:
+      - Account service:
+          - Description: services/account/description.md
+          - Configuration: services/account/config.md
+          - OpenAPI: services/account/openapi.md
+      - Contest service:
+          - Description: services/contest/description.md
+          - Configuration: services/contest/config.md
+          - OpenAPI: services/contest/openapi.md
+      - Solution service:
+          - Description: services/solution/description.md
+          - Configuration: services/solution/config.md
+          - OpenAPI: services/solution/openapi.md
+      - Judge service:
+          - Description: services/judge/description.md
+          - Configuration: services/judge/config.md
+      - Judgelet:
+          - Description: services/judgelet/description.md
+          - Security: services/judgelet/security.md
+          - Configuration: services/judgelet/config.md
+          - OpenAPI: services/judgelet/openapi.md
+      - Monitoring:
+          - Overview: services/monitoring/overview.md
+          - Grafana: services/monitoring/grafana.md
+          - Loki: services/monitoring/loki.md
+          - Prometheus: services/monitoring/prometheus.md
+          - Promtail: services/monitoring/promtail.md
+      - Frontend:
+          - Description: services/frontend/description.md
+          - Configuration: services/frontend/config.md
+  - Contributing:
+      - Guidelines: contributing/guidelines.md
+      - Working on the codebase: contributing/working.md
 theme:
   name: material2014
   primary_color: "#2F24C1"
+  section_color:
+    Getting started: "#558B2F"
+    Reference: "#009688"
+    Services: "#9C27B0"
+    Contributing: "#E65100"
 
 plugins:
   - mermaid2
-  - ezglossary
+  - ezglossary:
+      ignore_case: true
+      tooltip: full
+  - search:
+      separator: '[\s\-,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
   - macros:
       module_name: macros
 

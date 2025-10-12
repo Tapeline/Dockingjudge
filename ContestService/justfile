@@ -1,0 +1,40 @@
+# Cross-platform shell configuration
+# Use PowerShell on Windows (higher precedence than shell setting)
+set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]
+# Use sh on Unix-like systems
+set shell := ["sh", "-c"]
+
+
+test-dep $action:
+    just __test_dep_{{action}}
+
+__test_dep_up:
+    docker compose -f tests/docker-compose.yml up -d
+
+__test_dep_down:
+    docker compose -f tests/docker-compose.yml down
+
+
+test:
+    uv run pytest
+
+
+check $what="all":
+  just __check_{{what}}
+
+__check_all:
+  just __check_types
+  just __check_style
+
+__check_style:
+  just __check_ruff
+  just __check_wps
+
+__check_ruff:
+  uv run ruff check
+
+__check_wps:
+  uv run flake8 api contest_service
+
+__check_types:
+  uv run mypy api contest_service

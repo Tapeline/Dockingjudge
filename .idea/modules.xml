@@ -2,7 +2,13 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/AccountService/.idea/AccountService.iml" filepath="$PROJECT_DIR$/AccountService/.idea/AccountService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ContestService/.idea/ContestService.iml" filepath="$PROJECT_DIR$/ContestService/.idea/ContestService.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/Dockingjudge.iml" filepath="$PROJECT_DIR$/.idea/Dockingjudge.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JudgeService/.idea/JudgeService.iml" filepath="$PROJECT_DIR$/JudgeService/.idea/JudgeService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/JudgeUnit/.idea/JudgeUnit.iml" filepath="$PROJECT_DIR$/JudgeUnit/.idea/JudgeUnit.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SolutionService/.idea/SolutionService.iml" filepath="$PROJECT_DIR$/SolutionService/.idea/SolutionService.iml" />
+      <module fileurl="file://$PROJECT_DIR$/docs/.idea/docs.iml" filepath="$PROJECT_DIR$/docs/.idea/docs.iml" />
     </modules>
   </component>
 </project>

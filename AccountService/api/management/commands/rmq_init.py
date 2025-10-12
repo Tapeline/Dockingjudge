@@ -1,14 +1,18 @@
-"""
-Command to initialize rabbitmq exchanges
-"""
+import logging
+from typing import Any, override
 
 from django.core.management import BaseCommand
 
 from api import rmq
 
+logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
-    """Command impl"""
-    def handle(self, *args, **options):
+    """Command impl."""
+
+    @override
+    def handle(self, *args: Any, **options: Any) -> None:
+        """Run rmq init."""
         rmq.init()
-        print("RMQ init.")
+        logger.info("RMQ init.")

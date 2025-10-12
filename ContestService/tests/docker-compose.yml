@@ -1,0 +1,76 @@
+services:
+  account_service:
+    build: ../../AccountService
+    environment:
+      ACCOUNT_SVC_POSTGRES__USERNAME: pguser
+      ACCOUNT_SVC_POSTGRES__PASSWORD: pgpass
+      ACCOUNT_SVC_POSTGRES__HOST: account_db
+      ACCOUNT_SVC_POSTGRES__PORT: 5432
+      ACCOUNT_SVC_MODE: production
+    ports:
+      - "8001:8000"
+    expose:
+      - 8000
+    networks:
+      - test_network
+    configs:
+      - source: account_service_cfg
+        target: /app/account_service.yml
+    depends_on:
+      account_db:
+        condition: service_healthy
+
+  account_db:
+    image: postgres:13.3
+    hostname: account_db
+    environment:
+      POSTGRES_DB: account_db
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpass
+    ports:
+      - "5500:5432"
+    expose:
+      - "5432"
+    networks:
+      - test_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pguser -d account_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+
+  contest_db:
+    image: postgres:17.4
+    hostname: contest_db
+    environment:
+      POSTGRES_DB: contest_db
+      POSTGRES_USER: pguser
+      POSTGRES_PASSWORD: pgpass
+    expose:
+      - "5432"
+    ports:
+      - "5501:5432"
+    networks:
+      - test_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U pguser -d contest_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+
+
+networks:
+  test_network:
+    driver: bridge
+
+
+
+configs:
+  account_service_cfg:
+    file: AccountService/account_service.yml

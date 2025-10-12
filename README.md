@@ -11,6 +11,10 @@
     * [Dev env](#dev-env)
   * [Structure](#structure)
   * [Planned](#planned)
+    * [First round](#first-round)
+    * [Second round](#second-round)
+    * [Third round](#third-round)
+    * [Bugs](#bugs)
 <!-- TOC -->
 
 ---
@@ -64,14 +68,80 @@ Dockingjudge consists of several services:
 
 ## Planned
 
-- [ ] Upload images to ghcr
-- [ ] Build and deploy only on tags
+### First round
+
 - [ ] More security on judgelet
-- [ ] Bug fixes
-- [ ] Public/private contests
-- [ ] Migrate from RMQ to NATS/Kafka
-- [ ] Make frontend locally deployable in container
-- [ ] Add more compilers (at least cpp)
+    - [x] run judgelet as non-root
+    - [ ] run solutions as different users
+    - [ ] utilize chown and chmod to protect non-solution files
+    - [ ] (maybe) introduce bubblewrap
+- [x] Add more compilers (at least cpp)
+- [ ] deploy from ghcr.io
 - [ ] Add tests
+    - [x] judgelet
+    - [ ] judge svc
+    - [x] solution svc
+    - [x] contest svc
+    - [x] account svc
+    - [ ] e2e
 - [ ] Lint and test in CI
-- [ ] Move config to config files
+    - [x] judgelet
+    - [ ] judge svc
+    - [x] solution svc
+    - [x] contest svc
+    - [x] account svc
+    - [ ] e2e
+- [x] Move config to config files
+    - [x] judgelet
+    - [x] solution svc
+    - [x] contest svc
+    - [x] account svc
+- [ ] Add struct logging
+    - [x] solution svc
+    - [ ] contest svc
+    - [ ] account svc
+    - [ ] judge svc
+- [x] Add metrics
+    - [x] contest svc
+    - [x] account svc
+- [ ] tidy up in docker-compose.yml
+
+### Second round
+
+- [ ] Make frontend locally deployable in container
+- [ ] Massive frontend rework
+- [ ] Add contest timer
+- [ ] Add profile pictures
+- [ ] Get rid of pydantic in application layer (bruh)
+
+### Third round
+
+- [ ] Migrate from RMQ to NATS
+- [ ] Add tracing
+    - [ ] judge svc
+    - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
+- [ ] Load testing
+
+### Fourth round
+
+- [ ] Add messages
+- [ ] add DL (disk limit) verdict
+      returned when sandbox occupies too much disk space
+- [ ] Public/private contests
+
+### Bugs
+
+- [x] registration 400 "a server error occurred". Add more informative error message.
+- [x] standings are messed up
+
+### Docs
+
+- [ ] Describe each service separately
+    - [ ] judgelet
+    - [ ] judge svc
+    - [ ] solution svc
+    - [ ] contest svc
+    - [ ] account svc
+- [ ] Add openapi to docs

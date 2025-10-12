@@ -1,0 +1,36 @@
+[flake8]
+allowed-domain-names =
+  data
+  file
+  handle
+  i
+
+exclude =
+  api/migrations/**
+
+ignore =
+  E501
+  # covered by ruff
+  W503
+  # wtf
+
+per-file-ignores =
+  contest_service/settings.py: WPS407, WPS226, E501
+  # kinda ok in django settings paradigm
+  api/views/**.py: WPS201, WPS615
+  # kinda ok in drf paradigm
+  api/models.py: WPS432
+  # magic numbers are labeled there, so it's ok
+  api/views/tasks.py: WPS215
+  # TODO: this needs to be refactored (remove mixins)
+  api/serializers.py: WPS226
+  api/openapi.py: WPS226
+  # i won't place model field to constants :/
+
+
+inline-quotes = "
+
+max-module-members = 9
+
+# Pydocstyle
+ignore-decorators = override

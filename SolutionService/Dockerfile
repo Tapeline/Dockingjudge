@@ -1,11 +1,24 @@
-FROM python:3.13.2-alpine3.21
+ARG build_variant=full
+
+FROM python:3.13.2-alpine3.21 AS base
 
 WORKDIR /app
 
-COPY . .
+RUN apk add uv git
+RUN addgroup -S limgroup
+RUN adduser -S limited -G limgroup
+RUN chown limited:limgroup /app
+
+COPY --chown=limited:limgroup . .
 RUN chmod +x ./start.sh
 
-RUN pip3 install poetry
-RUN poetry install
+USER limited
 
-CMD chmod +x ./start.sh ; ./start.sh
+FROM base AS sync_full
+RUN uv sync --all-groups
+
+FROM base AS sync_min
+RUN uv sync
+
+FROM sync_${build_variant} AS final
+CMD ./start.sh

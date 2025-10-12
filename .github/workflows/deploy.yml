@@ -1,23 +1,9 @@
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.x'
-      # TODO: add testing
-
   deploy:
     runs-on: ubuntu-latest
-    needs: [test]
     steps:
       - name: SSH Remote Action
         uses: appleboy/ssh-action@v1.0.3
