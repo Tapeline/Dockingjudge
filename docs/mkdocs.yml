@@ -73,7 +73,7 @@ theme:
   name: material2014
   primary_color: "#2F24C1"
   section_color:
-    Getting Started: "#558B2F"
+    Getting started: "#558B2F"
     Reference: "#009688"
     Services: "#9C27B0"
     Contributing: "#E65100"
