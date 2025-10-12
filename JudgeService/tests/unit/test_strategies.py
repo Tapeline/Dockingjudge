@@ -1,11 +1,11 @@
 import pytest
 
 from judgeservice.domain.pool.strategies import (
+    LeastConnectionsBalancingStrategy,
     RoundRobinBalancingStrategy,
-    SingleBalancedStrategy, LeastConnectionsBalancingStrategy,
+    SingleBalancedStrategy,
 )
-from tests.unit.factory import create_judgelets
-from tests.unit.factory import create_simple_pool
+from tests.unit.factory import create_judgelets, create_simple_pool
 
 
 @pytest.mark.parametrize(
@@ -18,8 +18,8 @@ from tests.unit.factory import create_simple_pool
             {"address": "a"},
             {"address": "b"},
             {"address": "c"},
-        ]
-    ]
+        ],
+    ],
 )
 @pytest.mark.asyncio
 async def test_single_node_strategy(judgelets):

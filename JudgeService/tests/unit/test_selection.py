@@ -2,11 +2,14 @@ import pytest
 
 from judgeservice.domain.exceptions import NoSuitableJudgeletFoundException
 from judgeservice.domain.pool.strategies import (
-    RoundRobinBalancingStrategy,
     LeastConnectionsBalancingStrategy,
+    RoundRobinBalancingStrategy,
 )
-from tests.unit.factory import create_judgelets
-from tests.unit.factory import create_simple_pool, create_multigroup_pool
+from tests.unit.factory import (
+    create_judgelets,
+    create_multigroup_pool,
+    create_simple_pool,
+)
 
 
 @pytest.mark.parametrize(
@@ -19,8 +22,8 @@ from tests.unit.factory import create_simple_pool, create_multigroup_pool
             {"address": "a"},
             {"address": "b"},
             {"address": "c"},
-        ]
-    ]
+        ],
+    ],
 )
 @pytest.mark.asyncio
 async def test_single_group_selected(judgelets):
@@ -35,8 +38,8 @@ async def test_single_group_selected(judgelets):
         [
             {"address": "a", "is_alive": False},
             {"address": "b"},
-        ]
-    ]
+        ],
+    ],
 )
 @pytest.mark.asyncio
 async def test_healthy_selected(judgelets):
@@ -51,15 +54,15 @@ async def test_healthy_selected(judgelets):
         [
             {"address": "a", "is_alive": False},
             {"address": "b", "is_alive": False},
-        ]
-    ]
+        ],
+    ],
 )
 @pytest.mark.parametrize(
     "strategy",
     [
         RoundRobinBalancingStrategy(),
         LeastConnectionsBalancingStrategy(),
-    ]
+    ],
 )
 @pytest.mark.asyncio
 async def test_no_healthy_found(judgelets, strategy):
@@ -82,8 +85,8 @@ async def test_no_healthy_found(judgelets, strategy):
         [
             ("*", {"address": "should be selected"}),
             ("compiler_b", {"address": "should not be selected"}),
-        ]
-    ]
+        ],
+    ],
 )
 @pytest.mark.asyncio
 async def test_multigroup_selected(groups):
@@ -98,8 +101,8 @@ async def test_multigroup_selected(groups):
         [
             ("compiler_a", {"address": "should not be selected"}),
             ("compiler_b", {"address": "should not be selected"}),
-        ]
-    ]
+        ],
+    ],
 )
 @pytest.mark.asyncio
 async def test_no_group_selected(groups):
@@ -113,7 +116,7 @@ async def test_no_group_selected(groups):
     [
         RoundRobinBalancingStrategy(),
         LeastConnectionsBalancingStrategy(),
-    ]
+    ],
 )
 @pytest.mark.asyncio
 async def test_no_groups_configured(strategy):
