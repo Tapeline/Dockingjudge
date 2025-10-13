@@ -2,4 +2,4 @@
 /sslcert/
 .coverage
 plantuml.jar
-__pycache__/
+.gemini/.env
