@@ -2,4 +2,4 @@
 toc-depth: 4
 ---
 
-{{ openapi_json("docs/openapi/contest.json") }}
+{{ openapi_yaml("docs/openapi/contest.yml") }}

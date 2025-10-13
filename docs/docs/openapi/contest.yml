@@ -1,0 +1,1088 @@
+openapi: 3.0.3
+info:
+  title: Contest Service API
+  version: 0.1.0
+  description: Contest Service of Dockingjudge
+paths:
+  /api/v1/contests/:
+    get:
+      operationId: api_v1_contests_list
+      description: Get all contests or create new one.
+      tags:
+      - Contest management
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Contest'
+          description: ''
+    post:
+      operationId: api_v1_contests_create
+      description: Get all contests or create new one.
+      tags:
+      - Contest management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ContestCreation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ContestCreation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ContestCreation'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contest'
+          description: ''
+  /api/v1/contests/{contest_id}/apply/:
+    post:
+      operationId: api_v1_contests_apply_create
+      description: Make an application for contest.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Contest session
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '204':
+          description: Applied for contest
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          description: Not allowed to apply, see error code
+  /api/v1/contests/{contest_id}/participants/:
+    get:
+      operationId: api_v1_contests_participants_retrieve
+      description: Get list of users participating in contest.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Contest session
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: integer
+          description: List of participant ids
+        '404':
+          description: Not found
+  /api/v1/contests/{contest_id}/tasks/code/:
+    get:
+      operationId: api_v1_contests_tasks_code_list
+      description: |-
+        List or create code tasks.
+
+        If you are a contest manager, additional info is exposed.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserCodeTask'
+          description: ''
+    post:
+      operationId: api_v1_contests_tasks_code_create
+      description: |-
+        List or create code tasks.
+
+        If you are a contest manager, additional info is exposed.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CodeTaskCreation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CodeTaskCreation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CodeTaskCreation'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullCodeTask'
+          description: ''
+  /api/v1/contests/{contest_id}/tasks/code/{id}/:
+    get:
+      operationId: api_v1_contests_tasks_code_retrieve
+      description: |-
+        Get, update or delete a single code task.
+
+        If you are a contest manager, additional info is exposed.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCodeTask'
+          description: ''
+    patch:
+      operationId: api_v1_contests_tasks_code_partial_update
+      description: |-
+        Get, update or delete a single code task.
+
+        If you are a contest manager, additional info is exposed.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedCodeTaskCreation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedCodeTaskCreation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedCodeTaskCreation'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullCodeTask'
+          description: ''
+    delete:
+      operationId: api_v1_contests_tasks_code_destroy
+      description: Delete page and update contest.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/contests/{contest_id}/tasks/quiz/:
+    get:
+      operationId: api_v1_contests_tasks_quiz_list
+      description: |-
+        List or create quiz tasks.
+
+        If you are a contest manager, additional info is exposed.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserQuizTask'
+          description: ''
+    post:
+      operationId: api_v1_contests_tasks_quiz_create
+      description: |-
+        List or create quiz tasks.
+
+        If you are a contest manager, additional info is exposed.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/QuizTaskCreation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/QuizTaskCreation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/QuizTaskCreation'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullQuizTask'
+          description: ''
+  /api/v1/contests/{contest_id}/tasks/quiz/{id}/:
+    get:
+      operationId: api_v1_contests_tasks_quiz_retrieve
+      description: |-
+        Get, update or delete a single quiz task.
+
+        If you are a contest manager, additional info is exposed.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserQuizTask'
+          description: ''
+    patch:
+      operationId: api_v1_contests_tasks_quiz_partial_update
+      description: |-
+        Get, update or delete a single quiz task.
+
+        If you are a contest manager, additional info is exposed.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedQuizTaskCreation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedQuizTaskCreation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedQuizTaskCreation'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullQuizTask'
+          description: ''
+    delete:
+      operationId: api_v1_contests_tasks_quiz_destroy
+      description: Delete page and update contest.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/contests/{contest_id}/tasks/text/:
+    get:
+      operationId: api_v1_contests_tasks_text_list
+      description: List or create text pages.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TextPage'
+          description: ''
+    post:
+      operationId: api_v1_contests_tasks_text_create
+      description: List or create text pages.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextPageCreation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TextPageCreation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/TextPageCreation'
+        required: true
+      security:
+      - tokenAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextPage'
+          description: ''
+  /api/v1/contests/{contest_id}/tasks/text/{id}/:
+    get:
+      operationId: api_v1_contests_tasks_text_retrieve
+      description: Get, update or delete a single text page.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextPage'
+          description: ''
+    patch:
+      operationId: api_v1_contests_tasks_text_partial_update
+      description: Get, update or delete a single text page.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedTextPageCreation'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedTextPageCreation'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedTextPageCreation'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextPage'
+          description: ''
+    delete:
+      operationId: api_v1_contests_tasks_text_destroy
+      description: Delete page and update contest.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Page & task management
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/contests/{contest_id}/time-left/:
+    get:
+      operationId: api_v1_contests_time_left_retrieve
+      description: Get time user has to solve other tasks.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Contest session
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTime'
+          description: ''
+        '404':
+          description: Not found
+  /api/v1/contests/{id}/:
+    get:
+      operationId: api_v1_contests_retrieve
+      description: Get, update or delete a contest.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Contest management
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contest'
+          description: ''
+    patch:
+      operationId: api_v1_contests_partial_update
+      description: Get, update or delete a contest.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Contest management
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedContestPatch'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedContestPatch'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedContestPatch'
+      security:
+      - tokenAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contest'
+          description: ''
+    delete:
+      operationId: api_v1_contests_destroy
+      description: Delete contest and notify other services.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Contest management
+      security:
+      - tokenAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/contests/{id}/can-manage/:
+    get:
+      operationId: api_v1_contests_can_manage_retrieve
+      description: Check if authenticated user can manage contest.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Permissions
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CanIManageContest'
+          description: ''
+  /api/v1/contests/compilers/:
+    get:
+      operationId: api_v1_contests_compilers_retrieve
+      description: List available compilers.
+      tags:
+      - Contest management
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: string
+                  minItems: 2
+                  maxItems: 2
+          description: List of (compiler id, syntax highlighting)
+  /api/v1/contests/tasks/{task_type}/{task_id}/can-submit/{user_id}/:
+    get:
+      operationId: api_v1_contests_tasks_can_submit_retrieve
+      description: Check if a user can submit solution to specific task.
+      parameters:
+      - in: path
+        name: task_id
+        schema:
+          type: integer
+        required: true
+      - in: path
+        name: task_type
+        schema:
+          type: string
+        required: true
+      - in: path
+        name: user_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Permissions
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CanSubmitTask'
+          description: ''
+  /internal/contests/{contest_id}/tasks/:
+    get:
+      operationId: internal_contests_tasks_retrieve
+      description: Get list of all tasks (with sensitive data). Do not expose.
+      parameters:
+      - in: path
+        name: contest_id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Internal
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FullQuizTask'
+          description: List of code and quiz tasks (order is preserved). For response
+            spec see other internal endpoints.
+  /internal/contests/tasks/code/{id}/:
+    get:
+      operationId: internal_contests_tasks_code_retrieve
+      description: Get code task (with all sensitive data). Should not be exposed.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Internal
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullCodeTask'
+          description: ''
+  /internal/contests/tasks/quiz/{id}/:
+    get:
+      operationId: internal_contests_tasks_quiz_retrieve
+      description: Get quiz task (with all sensitive data). Should not be exposed.
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        required: true
+      tags:
+      - Internal
+      security:
+      - tokenAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullQuizTask'
+          description: ''
+components:
+  schemas:
+    CanIManageContest:
+      type: object
+      description: Serializer for /can-manage.
+      properties:
+        can_manage:
+          type: boolean
+          description: Can I manage this contest.
+      required:
+      - can_manage
+    CanSubmitTask:
+      type: object
+      description: Serializer for /can-submit.
+      properties:
+        can_submit:
+          type: boolean
+          description: Can a user submit this task.
+        reason:
+          type: string
+          description: A reason for rejection.
+      required:
+      - can_submit
+    CodeTaskCreation:
+      type: object
+      description: Code task creation & patch serializer.
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        test_suite:
+          description: A test suite description. See solution service and judgelet
+            doc for more details.
+      required:
+      - description
+      - test_suite
+      - title
+    Contest:
+      type: object
+      description: Serializer for Contest objects.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        author:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        description:
+          type: string
+        is_started:
+          type: boolean
+        is_ended:
+          type: boolean
+        time_limit_seconds:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        pages: {}
+      required:
+      - author
+      - description
+      - id
+      - name
+    ContestCreation:
+      type: object
+      description: Contest creation serializer.
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        is_started:
+          type: boolean
+        is_ended:
+          type: boolean
+        time_limit_seconds:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - description
+      - name
+    Error:
+      type: object
+      description: Generic error serializer.
+      properties:
+        detail:
+          type: string
+          description: A message explaining the error.
+        code:
+          type: string
+          description: A machine-readable error code.
+      required:
+      - code
+      - detail
+    FullCodeTask:
+      type: object
+      description: Serializer for Code objects with sensitive info.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        test_suite: {}
+        contest:
+          type: integer
+      required:
+      - contest
+      - description
+      - id
+      - test_suite
+      - title
+    FullQuizTask:
+      type: object
+      description: Serializer for QuizTask objects with sensitive info.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        validator: {}
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        contest:
+          type: integer
+      required:
+      - contest
+      - description
+      - id
+      - points
+      - title
+    GetTime:
+      type: object
+      description: Serializer for /time-left.
+      properties:
+        time_left:
+          type: integer
+          description: The time left in seconds.
+        is_unlimited:
+          type: boolean
+          description: Is time unlimited.
+      required:
+      - is_unlimited
+      - time_left
+    PatchedCodeTaskCreation:
+      type: object
+      description: Code task creation & patch serializer.
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        test_suite:
+          description: A test suite description. See solution service and judgelet
+            doc for more details.
+    PatchedContestPatch:
+      type: object
+      description: Contest patch serializer.
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        is_started:
+          type: boolean
+        is_ended:
+          type: boolean
+        time_limit_seconds:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+        pages: {}
+    PatchedQuizTaskCreation:
+      type: object
+      description: Quiz task creation & patch serializer.
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        validator:
+          description: A validator description. See solution service doc for more
+            details.
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+    PatchedTextPageCreation:
+      type: object
+      description: Text page creation & patch serializer.
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        text:
+          type: string
+        is_enter_page:
+          type: boolean
+    QuizTaskCreation:
+      type: object
+      description: Quiz task creation & patch serializer.
+      properties:
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        validator:
+          description: A validator description. See solution service doc for more
+            details.
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - description
+      - points
+      - title
+      - validator
+    TextPage:
+      type: object
+      description: Serializer for TextPage objects.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          maxLength: 255
+        text:
+          type: string
+        is_enter_page:
+          type: boolean
+        contest:
+          type: integer
+      required:
+      - contest
+      - id
+      - name
+      - text
+    TextPageCreation:
+      type: object
+      description: Text page creation & patch serializer.
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        text:
+          type: string
+        is_enter_page:
+          type: boolean
+      required:
+      - name
+      - text
+    UserCodeTask:
+      type: object
+      description: Serializer for CodeTask objects that hides sensitive info.
+      properties:
+        contest:
+          type: integer
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        test_suite: {}
+      required:
+      - contest
+      - description
+      - test_suite
+      - title
+    UserQuizTask:
+      type: object
+      description: Serializer for QuizTask objects that hides sensitive info.
+      properties:
+        contest:
+          type: integer
+        title:
+          type: string
+          maxLength: 255
+        description:
+          type: string
+        points:
+          type: integer
+          maximum: 2147483647
+          minimum: -2147483648
+      required:
+      - contest
+      - description
+      - points
+      - title
+  securitySchemes:
+    tokenAuth:
+      type: http
+      scheme: bearer

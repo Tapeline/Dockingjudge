@@ -2,4 +2,4 @@
 toc-depth: 4
 ---
 
-{{ openapi_json("docs/openapi/account.json") }}
+{{ openapi_yaml("docs/openapi/account.yml") }}

@@ -1,0 +1,383 @@
+openapi: 3.0.3
+info:
+  title: Account Service API
+  version: 0.1.0
+  description: Account Service of Dockingjudge
+paths:
+  /api/v1/accounts/all/:
+    get:
+      operationId: all_list
+      description: Get all users (filtered).
+      parameters:
+      - in: query
+        name: id
+        schema:
+          type: array
+          items:
+            type: integer
+        description: User ID list
+      tags:
+      - all
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+          description: ''
+  /api/v1/accounts/authorize/:
+    get:
+      operationId: authorize_retrieve
+      description: Check for authorization.
+      tags:
+      - authorize
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyProfile'
+          description: ''
+        '401':
+          description: No response body
+  /api/v1/accounts/login/:
+    post:
+      operationId: login_create
+      description: Perform log in.
+      tags:
+      - login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CustomTokenObtainPair'
+        required: true
+      security:
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomTokenObtainPair'
+          description: ''
+  /api/v1/accounts/ping/:
+    get:
+      operationId: ping_retrieve
+      description: Ping.
+      tags:
+      - ping
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: Service alive.
+          description: ''
+  /api/v1/accounts/profile/:
+    get:
+      operationId: profile_retrieve
+      description: Get, update or delete my profile.
+      tags:
+      - profile
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyProfile'
+          description: ''
+    put:
+      operationId: profile_update
+      description: Get, update or delete my profile.
+      tags:
+      - profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MyProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MyProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MyProfile'
+        required: true
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyProfile'
+          description: ''
+    patch:
+      operationId: profile_partial_update
+      description: Get, update or delete my profile.
+      tags:
+      - profile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedMyProfile'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedMyProfile'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedMyProfile'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MyProfile'
+          description: ''
+    delete:
+      operationId: profile_destroy
+      description: Delete my profile.
+      tags:
+      - profile
+      security:
+      - jwtAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/v1/accounts/profile/pic/:
+    put:
+      operationId: profile_pic_update
+      description: Set my profile picture.
+      tags:
+      - profile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/UserProfilePic'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/UserProfilePic'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfilePic'
+          description: ''
+    patch:
+      operationId: profile_pic_partial_update
+      description: Set my profile picture.
+      tags:
+      - profile
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfilePic'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedUserProfilePic'
+      security:
+      - jwtAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfilePic'
+          description: ''
+  /api/v1/accounts/register/:
+    post:
+      operationId: register_create
+      description: Register a user.
+      tags:
+      - register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Registration'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Registration'
+        required: true
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+          description: ''
+  /api/v1/accounts/user/{username}/:
+    get:
+      operationId: user_retrieve
+      description: Get user's profile by its name.
+      parameters:
+      - in: path
+        name: username
+        schema:
+          type: string
+        required: true
+      tags:
+      - user
+      security:
+      - jwtAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+components:
+  schemas:
+    CustomTokenObtainPair:
+      type: object
+      description: Used for incoming login requests.
+      properties:
+        username:
+          type: string
+          writeOnly: true
+        password:
+          type: string
+          writeOnly: true
+      required:
+      - password
+      - username
+    MyProfile:
+      type: object
+      description: Used for trusted user responses.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        settings: {}
+        profile_pic:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - id
+      - username
+    PatchedMyProfile:
+      type: object
+      description: Used for trusted user responses.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        settings: {}
+        profile_pic:
+          type: string
+          format: uri
+          nullable: true
+    PatchedUserProfilePic:
+      type: object
+      description: Used for incoming user profile picture change requests.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        profile_pic:
+          type: string
+          format: uri
+          nullable: true
+    Registration:
+      type: object
+      description: Used for incoming registration requests.
+      properties:
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        password:
+          type: string
+          writeOnly: true
+          maxLength: 128
+      required:
+      - password
+      - username
+    User:
+      type: object
+      description: Used for untrusted user responses.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        profile_pic:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - id
+      - username
+    UserProfilePic:
+      type: object
+      description: Used for incoming user profile picture change requests.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        profile_pic:
+          type: string
+          format: uri
+          nullable: true
+      required:
+      - id
+  securitySchemes:
+    jwtAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

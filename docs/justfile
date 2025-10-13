@@ -9,11 +9,11 @@ __gen_oas_all:
 
 [working-directory: "../AccountService"]
 __gen_oas_account:
-  uv run python manage.py spectacular --file ../docs/docs/openapi/account.json
+  uv run python manage.py spectacular --file ../docs/docs/openapi/account.yml
 
 [working-directory: "../ContestService"]
 __gen_oas_contest:
-  uv run python manage.py spectacular --file ../docs/docs/openapi/contest.json
+  uv run python manage.py spectacular --file ../docs/docs/openapi/contest.yml
 
 [working-directory: "../SolutionService"]
 __gen_oas_solution:

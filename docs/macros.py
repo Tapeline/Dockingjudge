@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from typing import Final
 
+import yaml
 from openapidocs.mk.v3 import OpenAPIV3DocumentationHandler
 
 _GLOSSARY: Final = "docs/reference/glossary.md"
@@ -65,5 +66,12 @@ def define_env(env):
     def openapi_json(path):
         return OpenAPIV3DocumentationHandler(
             json.loads(Path(path).read_text()),
+            style="MKDOCS",
+        ).write()
+
+    @env.macro
+    def openapi_yaml(path):
+        return OpenAPIV3DocumentationHandler(
+            yaml.safe_load(Path(path).read_text()),
             style="MKDOCS",
         ).write()
