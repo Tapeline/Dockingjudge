@@ -3,3 +3,5 @@
 .coverage
 plantuml.jar
 .gemini/.env
+__pycache__/
+__pycache__
