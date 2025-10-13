@@ -2,3 +2,4 @@
 /sslcert/
 .coverage
 plantuml.jar
+__pycache__/
