@@ -6,7 +6,7 @@ These tasks only require you to input a single line of text as an answer.
 
 They can score only 0 (if wrong) or full score (100, if right).
 
-![](../img/ui-simple-task.png)
+![](../../img/ui-simple-task.png)
 
 ## Code tasks
 
@@ -27,4 +27,4 @@ Also, the contest creators might set up **precompile checks**. E.g. forbid you t
 import some modules. If your solution fails to comply, you'll receive `PCF`
 (precompile check failed).
 
-![](../img/ui-code-task.png)
+![](../../img/ui-code-task.png)

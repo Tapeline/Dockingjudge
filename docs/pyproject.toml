@@ -6,5 +6,8 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "mdx-include>=1.4.2",
-    "mkdocs-material2014[extras]>=0.3.0",
+    "mkdocs-material2014[extras,openapi]",
 ]
+
+[tool.uv.sources]
+mkdocs-material2014 = { git = "https://github.com/Tapeline/mkdocs-material2014.git" }

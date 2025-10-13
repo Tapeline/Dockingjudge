@@ -17,6 +17,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
+      - uses: extractions/setup-just@v3
       - name: Install dependencies
         run: |
           cd docs
@@ -24,6 +25,7 @@ jobs:
       - name: Build docs
         run: |
           cd docs
+          just gen-oas
           uv run mkdocs build
       - name: Save artifact with build results
         id: deployment

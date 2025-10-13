@@ -1,8 +1,8 @@
-# Code tasks
+---
+toc-depth: 4
+---
 
-![](../img/ui-edit-code.png)
-
-## Checker declaration
+# Checker declaration
 
 Checker declaration is described in JSON:
 
@@ -10,7 +10,7 @@ Checker declaration is described in JSON:
 
     Schema defined in pseudo-pydantic:
 
-    ```py
+    ``` python
     Checker:
         groups: list[TestGroup]
         precompile: list[PrecompileChecker]

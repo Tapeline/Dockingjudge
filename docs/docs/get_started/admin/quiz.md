@@ -1,6 +1,6 @@
 # Quiz tasks
 
-![](../img/ui-edit-quiz.png)
+![](../../img/ui-edit-quiz.png)
 
 ## Checker declaration
 

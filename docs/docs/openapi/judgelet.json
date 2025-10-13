@@ -1,0 +1,447 @@
+{
+    "info": {
+        "title": "Judgelet",
+        "version": "1.0.0",
+        "description": "Judgelet docs"
+    },
+    "openapi": "3.1.0",
+    "servers": [
+        {
+            "url": "/"
+        }
+    ],
+    "paths": {
+        "/ping": {
+            "get": {
+                "summary": "Ping",
+                "operationId": "PingPing",
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/run": {
+            "post": {
+                "summary": "RunSolution",
+                "operationId": "RunRunSolution",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/RunRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Document created, URL follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/RunResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "GroupProtocolSchema": {
+                "properties": {
+                    "score": {
+                        "type": "integer"
+                    },
+                    "verdicts": {
+                        "items": {
+                            "$ref": "#/components/schemas/VerdictSchema"
+                        },
+                        "type": "array"
+                    },
+                    "is_successful": {
+                        "type": "boolean"
+                    },
+                    "verdict": {
+                        "$ref": "#/components/schemas/VerdictSchema"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "is_successful",
+                    "score",
+                    "verdict",
+                    "verdicts"
+                ],
+                "title": "GroupProtocolSchema"
+            },
+            "PrecompileCheckerSchema": {
+                "properties": {
+                    "type": {
+                        "type": "string"
+                    },
+                    "args": {
+                        "additionalProperties": {},
+                        "type": "object",
+                        "default": {}
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "title": "PrecompileCheckerSchema"
+            },
+            "RunRequest": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "$ref": "#/components/schemas/SolutionSchema"
+                    },
+                    "compiler": {
+                        "type": "string"
+                    },
+                    "suite": {
+                        "$ref": "#/components/schemas/TestSuite"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "code",
+                    "compiler",
+                    "id",
+                    "suite"
+                ],
+                "title": "RunRequest"
+            },
+            "RunResponse": {
+                "properties": {
+                    "score": {
+                        "type": "integer"
+                    },
+                    "verdict": {
+                        "type": "string"
+                    },
+                    "group_scores": {
+                        "additionalProperties": {
+                            "type": "integer"
+                        },
+                        "type": "object"
+                    },
+                    "protocol": {
+                        "additionalProperties": {
+                            "$ref": "#/components/schemas/GroupProtocolSchema"
+                        },
+                        "type": "object"
+                    },
+                    "compilation_error": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "group_scores",
+                    "protocol",
+                    "score",
+                    "verdict"
+                ],
+                "title": "RunResponse"
+            },
+            "ScoringRuleEnum": {
+                "type": "string",
+                "enum": [
+                    "polar",
+                    "graded"
+                ],
+                "title": "ScoringRuleEnum",
+                "description": "Determines whether scoring is for a single test or a full group."
+            },
+            "SolutionSchema": {
+                "properties": {
+                    "type": {
+                        "type": "string"
+                    },
+                    "code": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "b64": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "main": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "type"
+                ],
+                "title": "SolutionSchema"
+            },
+            "TestCase": {
+                "properties": {
+                    "validators": {
+                        "items": {
+                            "$ref": "#/components/schemas/ValidatorSchema"
+                        },
+                        "type": "array"
+                    },
+                    "stdin": {
+                        "type": "string"
+                    },
+                    "files_in": {
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "type": "object",
+                        "default": {}
+                    },
+                    "files_out": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "default": []
+                    },
+                    "time_limit": {
+                        "oneOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "mem_limit_mb": {
+                        "oneOf": [
+                            {
+                                "type": "number"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "stdin",
+                    "validators"
+                ],
+                "title": "TestCase"
+            },
+            "TestGroupSchema": {
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "depends_on": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array",
+                        "default": []
+                    },
+                    "points": {
+                        "type": "integer"
+                    },
+                    "scoring_rule": {
+                        "$ref": "#/components/schemas/ScoringRuleEnum"
+                    },
+                    "cases": {
+                        "items": {
+                            "$ref": "#/components/schemas/TestCase"
+                        },
+                        "type": "array"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "cases",
+                    "name",
+                    "points"
+                ],
+                "title": "TestGroupSchema"
+            },
+            "TestSuite": {
+                "properties": {
+                    "groups": {
+                        "items": {
+                            "$ref": "#/components/schemas/TestGroupSchema"
+                        },
+                        "type": "array"
+                    },
+                    "precompile": {
+                        "items": {
+                            "$ref": "#/components/schemas/PrecompileCheckerSchema"
+                        },
+                        "type": "array"
+                    },
+                    "time_limit": {
+                        "type": "number"
+                    },
+                    "mem_limit_mb": {
+                        "type": "number"
+                    },
+                    "compile_timeout": {
+                        "type": "integer",
+                        "default": 5
+                    },
+                    "place_files": {
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "type": "object",
+                        "default": {}
+                    },
+                    "public_cases": {
+                        "items": {
+                            "additionalProperties": {
+                                "type": "string"
+                            },
+                            "type": "object"
+                        },
+                        "type": "array",
+                        "default": []
+                    },
+                    "envs": {
+                        "additionalProperties": {
+                            "type": "string"
+                        },
+                        "type": "object",
+                        "default": {}
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "groups",
+                    "mem_limit_mb",
+                    "precompile",
+                    "time_limit"
+                ],
+                "title": "TestSuite"
+            },
+            "ValidatorSchema": {
+                "properties": {
+                    "type": {
+                        "type": "string"
+                    },
+                    "args": {
+                        "additionalProperties": {},
+                        "type": "object"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "args",
+                    "type"
+                ],
+                "title": "ValidatorSchema"
+            },
+            "VerdictSchema": {
+                "properties": {
+                    "codename": {
+                        "type": "string"
+                    },
+                    "is_successful": {
+                        "type": "boolean"
+                    },
+                    "details": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "codename",
+                    "details",
+                    "is_successful"
+                ],
+                "title": "VerdictSchema"
+            }
+        }
+    }
+}

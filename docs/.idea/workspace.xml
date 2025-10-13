@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;settings.editor.selected.configurable&quot;: &quot;pyconsole&quot;
+  }
+}</component>
+  <component name="PyConsoleOptionsProvider">
+    <option name="myCodeCompletionOption" value="Runtime" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <created>1743329721725</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1743329721725</updated>
+      <workItem from="1743329722764" duration="102000" />
+    </task>
+    <servers />
+  </component>
+</project>
