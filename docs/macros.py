@@ -1,6 +1,9 @@
 import textwrap
+import json
 from pathlib import Path
 from typing import Final
+
+from openapidocs.mk.v3 import OpenAPIV3DocumentationHandler
 
 _GLOSSARY: Final = "docs/reference/glossary.md"
 
@@ -57,3 +60,10 @@ def define_env(env):
             "> "
         )
         return textwrap.indent(md, indent)
+
+    @env.macro
+    def openapi_json(path):
+        return OpenAPIV3DocumentationHandler(
+            json.loads(Path(path).read_text()),
+            style="MKDOCS",
+        ).write()

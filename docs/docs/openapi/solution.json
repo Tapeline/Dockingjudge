@@ -1,0 +1,866 @@
+{
+    "info": {
+        "title": "Solution service",
+        "version": "0.0.1",
+        "description": "Solution service docs"
+    },
+    "openapi": "3.1.0",
+    "servers": [
+        {
+            "url": "/"
+        }
+    ],
+    "paths": {
+        "/api/v1/solutions/my": {
+            "get": {
+                "summary": "GetMySolutions",
+                "operationId": "ApiV1SolutionsMyGetMySolutions",
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/SolutionSchema"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "jwt_auth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/solutions/my/{task_type}/{task_id}": {
+            "get": {
+                "summary": "GetMySolutionsForTask",
+                "operationId": "ApiV1SolutionsMyTaskTypeTaskIdGetMySolutionsForTask",
+                "parameters": [
+                    {
+                        "name": "task_type",
+                        "in": "path",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": true,
+                        "deprecated": false
+                    },
+                    {
+                        "name": "task_id",
+                        "in": "path",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true,
+                        "deprecated": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "$ref": "#/components/schemas/SolutionSchema"
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "jwt_auth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/solutions/score": {
+            "get": {
+                "summary": "GetScoreForTasks",
+                "operationId": "ApiV1SolutionsScoreGetScoreForTasks",
+                "parameters": [
+                    {
+                        "name": "tasks",
+                        "in": "query",
+                        "schema": {
+                            "items": {
+                                "type": "string"
+                            },
+                            "type": "array"
+                        },
+                        "required": true,
+                        "deprecated": false,
+                        "allowEmptyValue": false,
+                        "allowReserved": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "items": {
+                                        "oneOf": [
+                                            {
+                                                "$ref": "#/components/schemas/SolutionSchema"
+                                            },
+                                            {
+                                                "type": "null"
+                                            }
+                                        ]
+                                    },
+                                    "type": "array"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "jwt_auth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/solutions/{solution_uid}": {
+            "get": {
+                "summary": "GetSolution",
+                "operationId": "ApiV1SolutionsSolutionUidGetSolution",
+                "parameters": [
+                    {
+                        "name": "solution_uid",
+                        "in": "path",
+                        "schema": {
+                            "type": "string",
+                            "format": "uuid",
+                            "description": "Solution ID"
+                        },
+                        "description": "Solution ID",
+                        "required": true,
+                        "deprecated": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SolutionSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "jwt_auth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/solutions/standings/{contest_id}": {
+            "get": {
+                "summary": "GetStandings",
+                "operationId": "ApiV1SolutionsStandingsContestIdGetStandings",
+                "parameters": [
+                    {
+                        "name": "contest_id",
+                        "in": "path",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true,
+                        "deprecated": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/StandingsSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "jwt_auth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/solutions/post/code/{task_id}": {
+            "post": {
+                "summary": "PostCodeSolution",
+                "operationId": "ApiV1SolutionsPostCodeTaskIdPostCodeSolution",
+                "parameters": [
+                    {
+                        "name": "task_id",
+                        "in": "path",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true,
+                        "deprecated": false
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PostCodeSolutionSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Document created, URL follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SolutionSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "jwt_auth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/solutions/post/quiz/{task_id}": {
+            "post": {
+                "summary": "PostQuizSolution",
+                "operationId": "ApiV1SolutionsPostQuizTaskIdPostQuizSolution",
+                "parameters": [
+                    {
+                        "name": "task_id",
+                        "in": "path",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "required": true,
+                        "deprecated": false
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PostQuizSolutionSchema"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Document created, URL follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/SolutionSchema"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false,
+                "security": [
+                    {
+                        "jwt_auth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/solutions/ping": {
+            "get": {
+                "summary": "Ping",
+                "operationId": "ApiV1SolutionsPingPing",
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "text/plain": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/metrics": {
+            "get": {
+                "summary": "Get",
+                "operationId": "MetricsGet",
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "CodeSolutionExtraSchema": {
+                "properties": {
+                    "submission_url": {
+                        "type": "string"
+                    },
+                    "group_scores": {
+                        "additionalProperties": {
+                            "type": "integer"
+                        },
+                        "type": "object",
+                        "default": {}
+                    },
+                    "detailed_verdict": {
+                        "type": "string"
+                    },
+                    "compiler": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "compiler",
+                    "detailed_verdict",
+                    "submission_url"
+                ],
+                "title": "CodeSolutionExtraSchema"
+            },
+            "PostCodeSolutionSchema": {
+                "properties": {
+                    "compiler": {
+                        "type": "string"
+                    },
+                    "submission_type": {
+                        "$ref": "#/components/schemas/SubmissionType"
+                    },
+                    "text": {
+                        "type": "string"
+                    },
+                    "main_file": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "compiler",
+                    "submission_type",
+                    "text"
+                ],
+                "title": "PostCodeSolutionSchema"
+            },
+            "PostQuizSolutionSchema": {
+                "properties": {
+                    "text": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "text"
+                ],
+                "title": "PostQuizSolutionSchema"
+            },
+            "QuizSolutionExtraSchema": {
+                "properties": {
+                    "submitted_answer": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "submitted_answer"
+                ],
+                "title": "QuizSolutionExtraSchema"
+            },
+            "SolutionSchema": {
+                "properties": {
+                    "id": {
+                        "type": "string"
+                    },
+                    "task_id": {
+                        "type": "integer"
+                    },
+                    "task_type": {
+                        "$ref": "#/components/schemas/TaskType"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "score": {
+                        "type": "integer"
+                    },
+                    "short_verdict": {
+                        "type": "string"
+                    },
+                    "submitted_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "data": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/QuizSolutionExtraSchema"
+                            },
+                            {
+                                "$ref": "#/components/schemas/CodeSolutionExtraSchema"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "score",
+                    "short_verdict",
+                    "submitted_at",
+                    "task_id",
+                    "task_type",
+                    "user_id"
+                ],
+                "title": "SolutionSchema"
+            },
+            "StandingsSchema": {
+                "properties": {
+                    "tasks": {
+                        "items": {
+                            "prefixItems": [
+                                {
+                                    "$ref": "#/components/schemas/TaskType"
+                                },
+                                {
+                                    "type": "integer"
+                                },
+                                {
+                                    "type": "string"
+                                }
+                            ],
+                            "type": "array"
+                        },
+                        "type": "array"
+                    },
+                    "table": {
+                        "items": {
+                            "$ref": "#/components/schemas/UserStandingsRowSchema"
+                        },
+                        "type": "array"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "table",
+                    "tasks"
+                ],
+                "title": "StandingsSchema"
+            },
+            "SubmissionType": {
+                "type": "string",
+                "enum": [
+                    "str",
+                    "zip"
+                ],
+                "title": "SubmissionType"
+            },
+            "TaskType": {
+                "type": "string",
+                "enum": [
+                    "quiz",
+                    "code"
+                ],
+                "title": "TaskType"
+            },
+            "UserSchema": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "username": {
+                        "type": "string"
+                    },
+                    "profile_pic": {
+                        "oneOf": [
+                            {
+                                "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "roles": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "id",
+                    "roles",
+                    "username"
+                ],
+                "title": "UserSchema"
+            },
+            "UserSolutionScore": {
+                "properties": {
+                    "task_id": {
+                        "type": "integer"
+                    },
+                    "task_type": {
+                        "$ref": "#/components/schemas/TaskType"
+                    },
+                    "user_id": {
+                        "type": "integer"
+                    },
+                    "score": {
+                        "type": "integer"
+                    },
+                    "short_verdict": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "score",
+                    "short_verdict",
+                    "task_id",
+                    "task_type",
+                    "user_id"
+                ],
+                "title": "UserSolutionScore"
+            },
+            "UserStandingsRowSchema": {
+                "properties": {
+                    "user": {
+                        "$ref": "#/components/schemas/UserSchema"
+                    },
+                    "tasks_attempted": {
+                        "type": "integer"
+                    },
+                    "tasks_solved": {
+                        "type": "integer"
+                    },
+                    "solutions": {
+                        "items": {
+                            "oneOf": [
+                                {
+                                    "$ref": "#/components/schemas/UserSolutionScore"
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ]
+                        },
+                        "type": "array"
+                    },
+                    "total_score": {
+                        "type": "integer"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "solutions",
+                    "tasks_attempted",
+                    "tasks_solved",
+                    "total_score",
+                    "user"
+                ],
+                "title": "UserStandingsRowSchema"
+            }
+        },
+        "securitySchemes": {
+            "jwt_auth": {
+                "type": "apiKey",
+                "name": "Authorization",
+                "in": "header",
+                "bearerFormat": "jwt"
+            }
+        }
+    }
+}
