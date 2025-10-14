@@ -11,28 +11,41 @@ Checker declaration is described in JSON:
     Schema defined in pseudo-pydantic:
 
     ``` python
-    Checker:
-        groups: list[TestGroup]
-        precompile: list[PrecompileChecker]
-        time_limit: float
-        mem_limit_mb: float
-        compile_timeout: int = 5
-        place_files: dict[str, str] = {}  # list of files to supply to environment (path=content)
-        public_cases: list[PublicCase] = []  # test cases to display publicly
-        envs: dict[str, str] = {}  # additional environment vars
+    groups: list[TestGroup]
+    # List of groups to run
+    precompile: list[PrecompileChecker]
+    # List of precompile checkers to run
+    time_limit: float
+    # Default time limit for a test in seconds
+    mem_limit_mb: float
+    # Default memory limit for a test in MiB
+    compile_timeout: int = 5
+    # Compilation timeout threshold in seconds
+    place_files: dict[str, str] = {}  
+    # List of files to supply to environment (path=content)
+    public_cases: list[PublicCase] = []  
+    # Test cases to display publicly
+    envs: dict[str, str] = {}  
+    # Additional environment variables
 
     TestGroup:
         name: str
+        # Name of the test group
         depends_on: list[str] = []
         # List of group names on which this group depends.
         # If one of dependency fails, this group will not be run.
         points: int
+        # How many points you can get for this group
         scoring_rule: "polar" | "graded" = "graded"
+        # See "Scoring rules"
         cases: list[TestCase]
+        # List of test cases to run
 
     TestCase:
         validators: list[Validator]
+        # See "Avaliable validators"
         stdin: str
+        # Standard input
         files_in: dict = {}  # list of files to supply to environment (path=content)
         files_out: list = []  # list of files to require back from solution
         time_limit: Optional[float] = None
@@ -104,56 +117,90 @@ Checker declaration is described in JSON:
     }
     ```
 
-## Available validators
 
-### `stdout`
 
-Validator args:
+# Available validators
 
-```py
-expected: str
-strip: bool = True
-```
+## `stdout`
 
-### `file`
+Checks contents of standard output.
 
 Validator args:
 
-```py
-filename: str
-expected: str
-strip: bool = True
-```
+### `pattern`
 
-## Available precompile checkers
+> string, required
 
-### `has_pattern`
+Expected answer to match.
 
-Checker args:
+### `strip`
 
-```py
-patterns: dict[
-    str,  # compiler name
-    list[str],  # regex patterns
-]
-```
+> bool, optional
+> 
+> default: true
+
+Whether to ignore whitespace (` `, `\n`, `\t`, etc.) symbols.
+
+
+## `file`
+
+Checks contents of a specified file.
+
+Validator args:
+
+### `filename`
+
+> string, required
+
+File to validate.
+
+### `pattern`
+
+> string, required
+
+Expected answer to match.
+
+### `strip`
+
+> bool, optional
+> 
+> default: true
+
+Whether to ignore whitespace (` `, `\n`, `\t`, etc.) symbols.
+
+
+
+# Available precompile checkers
+
+## `has_pattern`
 
 Only pass if all patterns are present in solution.
 
-### `no_pattern`
+Checker args:
+
+### `patterns`
+
+> `dict[str, list[str]]`, i.e. mapping of string to a list of strings, required
+
+A mapping of file extension to a list of regex patterns that should be tested in
+files of this extension.
+
+
+## `no_pattern`
+
+Only pass if none of the patterns are present in solution.
 
 Checker args:
 
-```py
-patterns: dict[
-    str,  # compiler name
-    list[str],  # regex patterns
-]
-```
+### `patterns`
 
-Only pass if all patterns are not present in solution.
+> `dict[str, list[str]]`, i.e. mapping of string to a list of strings, required
 
-### `no_import`
+A mapping of file extension to a list of regex patterns that should be tested in
+files of this extension.
+
+
+## `no_import`
 
 No checker args.
 

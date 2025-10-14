@@ -17,6 +17,6 @@ Solution is represented as a Base64 string —
 encoded zip and a main file name. This way
 you can submit solutions that consist of
 many files. This zip gets extracted on
-Judgelet's behalf and specified main file
+<term:Judgelet>'s behalf and specified main file
 is executed.
 

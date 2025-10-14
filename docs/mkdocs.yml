@@ -20,6 +20,8 @@ nav:
           - Set up a quiz task: get_started/admin/quiz.md
           - Set up a code task: get_started/admin/code.md
   - Reference:
+      - Common: reference/common.md
+      - Glossary: reference/glossary.md
       - Contests:
           - Structure: reference/contests/structure.md
           - Session: reference/contests/session.md
@@ -33,9 +35,10 @@ nav:
           - Quiz solutions: reference/solutions/quiz.md
           - Code solutions: reference/solutions/code.md
       - Checking:
-          - Quiz validators: reference/checking/quiz.md
-          - Code test suites: reference/checking/code.md
-      - Glossary: reference/glossary.md
+          - Quiz validators declaration: reference/checking/quiz.md
+          - Code test suites declaration: reference/checking/code.md
+          - Running test suites: reference/checking/running_suites.md
+          - Verdicts: reference/verdicts.md
   - Services:
       - Account service:
           - Description: services/account/description.md
