@@ -83,7 +83,7 @@ hide-toc: true
 **term:Scoring policy**
 :   Describes how many points from maximum to score based on how successful test runs were.
 
-    See also: [Test suite declaration](checking/code.md)
+    See also: [Test suite declaration](./checking/code.md)
 
 
 **term:Test case**
