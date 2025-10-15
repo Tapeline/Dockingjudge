@@ -2,58 +2,34 @@
 
 ![](../../img/ui-edit-quiz.png)
 
-## Checker declaration
+## How to create a quiz task
 
-Checker declaration is described in JSON:
+1. Press a button for adding a quiz task in **Settings**
+2. Write a name and a statement
+3. Write a [checker declaration](../../reference/checking/quiz.md)
+4. Determine, how many points will user score for submitting a correct answer
 
-=== "Schema"
+## Example data
 
-    Schema defined in pseudo-pydantic:
+- Name: `Math test 1`
+- Statemtent:
+  ``` markdown
+  What's $2 + 2 * 2$?
+  ```
+- Checker:
+  ``` json
+  {
+    "args": {
+      "pattern": "6"
+    },
+    "type": "text"
+  }
+  ```
+- Points: `100`
 
-    ```py
-    Checker:
-        args: dict[str, Any]
-        type: str
-    ```
+> Learn more: 
+> 
+> - [Reference > Quiz page](../../reference/pages/quiz.md)
+> - [Reference > Quiz solutions](../../reference/solutions/quiz.md)
+> - [Reference > Quiz validators](../../reference/checking/quiz.md)
 
-=== "Example 1"
-
-    ```json
-    {
-      "args": {
-        "pattern": "123"
-      },
-      "type": "text"
-    }
-    ```
-
-=== "Example 2"
-
-    ```json
-    {
-      "args": {
-        "pattern": "print\\W*\\(\\W*a\\W*\\+\\W*b\\W*\\)"
-      },
-      "type": "regex"
-    }
-    ```
-
-## Available validators
-
-### `text`
-
-Validator args:
-
-```py
-pattern: str
-case_insensitive: bool = False
-strict_match: bool = True
-```
-
-### `regex`
-
-Validator args:
-
-```py
-pattern: str
-```

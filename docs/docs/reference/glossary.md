@@ -59,6 +59,8 @@ hide-toc: true
 **term:Verdict**
 :   A short code telling status of a <term:submission>.
 
+    See also: [List of verdicts](./checking/verdicts.md)
+
 
 **term:Points**
 :   An integer number, estimates how good a <term:solution> is and/or how did it

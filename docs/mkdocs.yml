@@ -38,7 +38,7 @@ nav:
           - Quiz validators declaration: reference/checking/quiz.md
           - Code test suites declaration: reference/checking/code.md
           - Running test suites: reference/checking/running_suites.md
-          - Verdicts: reference/verdicts.md
+          - Verdicts: reference/checking/verdicts.md
   - Services:
       - Account service:
           - Description: services/account/description.md

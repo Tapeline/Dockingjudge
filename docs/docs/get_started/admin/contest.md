@@ -19,3 +19,8 @@ To move pages around, use JSON tab under "Pages" section. Beware not to mess
 the contest up!
 
 ![](../../img/ui-contest-settings.png)
+
+> Learn more: 
+> 
+> - [Reference > Contest](../../reference/contests/structure.md)
+> - [Reference > Text page](../../reference/pages/text.md)

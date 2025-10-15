@@ -12,9 +12,9 @@
 
 4. Solution is compiled.
 
-    If it compiles for too long, it scores 0 points with <term:CE>.
+    If it compiles for too long, it scores 0 points with [CE](./verdicts.md).
 
-    If it fails to compile, it scores 0 points with <term:CE>.
+    If it fails to compile, it scores 0 points with [CE](./verdicts.md).
 
 5. For each test group, 
     1. If one of dependencies failed, do not run.
@@ -25,19 +25,19 @@
     
          2. Run solution
        
-            If a solution has been running for too long, test case ends with <term:TL>.
+            If a solution has been running for too long, test case ends with [TL](./verdicts.md).
 
-            If a solution has been taking too much RAM, test case ends with <term:ML>.   
+            If a solution has been taking too much RAM, test case ends with [ML](./verdicts.md).   
 
          3. Retrieve required output files
             
-            If a required file is not present, test case ends with <term:PE>.
+            If a required file is not present, test case ends with [PE](./verdicts.md).
          
          4. Run all validators.
        
-            If at least one fails, test case ends with <term:WA>.
+            If at least one fails, test case ends with [WA](./verdicts.md).
        
-            If all pass, test case ends with <term:OK>.
+            If all pass, test case ends with [OK](./verdicts.md).
          
          5. Cleanup files
     
