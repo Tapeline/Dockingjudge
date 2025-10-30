@@ -79,14 +79,14 @@ Dockingjudge consists of several services:
 - [ ] deploy from ghcr.io
 - [ ] Add tests
     - [x] judgelet
-    - [ ] judge svc
+    - [x] judge svc
     - [x] solution svc
     - [x] contest svc
     - [x] account svc
     - [ ] e2e
 - [ ] Lint and test in CI
     - [x] judgelet
-    - [ ] judge svc
+    - [x] judge svc
     - [x] solution svc
     - [x] contest svc
     - [x] account svc
@@ -117,6 +117,7 @@ Dockingjudge consists of several services:
 ### Third round
 
 - [ ] Migrate from RMQ to NATS
+- [ ] Consider using inbox pattern with judgeservice
 - [ ] Add tracing
     - [ ] judge svc
     - [ ] solution svc
