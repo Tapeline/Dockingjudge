@@ -15,6 +15,7 @@
     <orderEntry type="module" module-name="docs" />
     <orderEntry type="module" module-name="ContestService" />
     <orderEntry type="module" module-name="JudgeService" />
+    <orderEntry type="module" module-name="Tests" />
   </component>
   <component name="PackageRequirementsSettings">
     <option name="requirementsPath" value="" />

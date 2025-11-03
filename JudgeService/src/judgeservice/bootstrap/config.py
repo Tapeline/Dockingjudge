@@ -17,8 +17,8 @@ from judgeservice.domain.pool.strategies import (
 from judgeservice.infrastructure.judgelet import JudgeletImpl
 
 service_config_loader = config_loader(
-    EnvSource(prefix="JUDGE_SVC_"),
     YamlSource("config.yml"),
+    EnvSource(prefix="JUDGE_SVC_"),
     config=Config,
 )
 

@@ -1,4 +1,4 @@
-ARG build_variant
+ARG build_variant=full
 
 FROM python:3.13.2-alpine3.21 AS base
 

@@ -1,0 +1,16 @@
+pool:
+  groups:
+    - name: General
+      selector: .*
+      nodes:
+        - http://judgelet_0:8000
+        - http://judgelet_1:8000
+  load_balancing: round-robin
+
+s3:
+  base_url: http://minio:9000
+
+rabbitmq:
+  host: rabbitmq
+  username: rm_user
+  password: rm_password

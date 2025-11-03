@@ -78,6 +78,9 @@ services:
         condition: service_healthy
     links:
       - rabbitmq
+    configs:
+      - source: judge_service_prod_config
+        target: /app/config.yml
     networks:
       - main_network
       - judgelet_network
@@ -484,3 +487,5 @@ configs:
     file: ContestService/contest_service.yml
   solution_service_cfg:
     file: SolutionService/solution_service.yml
+  judge_service_prod_config:
+    file: JudgeService/config.prod.yml

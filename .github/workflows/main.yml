@@ -17,3 +17,24 @@ jobs:
     uses: ./.github/workflows/contest_svc.yml
   judge_svc_tests:
     uses: ./.github/workflows/judge_svc.yml
+  system_tests:
+    runs-on: ubuntu-latest
+    needs:
+      - judgelet_tests
+      - solution_svc_tests
+      - account_svc_tests
+      - contest_svc_tests
+      - judge_svc_tests
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: extractions/setup-just@v3
+      - name: Sync
+        working-directory: ./Tests
+        run: uv sync
+      - name: Start containers
+        working-directory: ./Tests
+        run: just dep-up
+      - name: Run tests
+        working-directory: ./Tests
+        run: just test
