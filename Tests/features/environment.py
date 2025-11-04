@@ -1,3 +1,4 @@
+import os
 from typing import Any, Protocol
 
 from tests.db import purge_everything
@@ -9,10 +10,6 @@ def before_scenario(context, scenario):
 
 
 def after_scenario(context, scenario):
-    purge_everything()
-
-
-def after_all(context):
     purge_everything()
 
 

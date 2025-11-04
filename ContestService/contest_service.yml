@@ -24,4 +24,4 @@ app:
     - id: cpp17
       syntax_highlighting: cpp
   allow_contest_creation_to:
-    - Tapeline
+    - "*"

@@ -77,20 +77,20 @@ Dockingjudge consists of several services:
     - [ ] (maybe) introduce bubblewrap
 - [x] Add more compilers (at least cpp)
 - [ ] deploy from ghcr.io
-- [ ] Add tests
+- [x] Add tests
     - [x] judgelet
     - [x] judge svc
     - [x] solution svc
     - [x] contest svc
     - [x] account svc
-    - [ ] e2e
-- [ ] Lint and test in CI
+    - [x] e2e
+- [x] Lint and test in CI
     - [x] judgelet
     - [x] judge svc
     - [x] solution svc
     - [x] contest svc
     - [x] account svc
-    - [ ] e2e
+    - [x] e2e
 - [x] Move config to config files
     - [x] judgelet
     - [x] solution svc
@@ -124,6 +124,7 @@ Dockingjudge consists of several services:
     - [ ] contest svc
     - [ ] account svc
 - [ ] Load testing
+- [ ] Refactor Gherkin tests
 
 ### Fourth round
 

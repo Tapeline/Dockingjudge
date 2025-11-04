@@ -35,9 +35,9 @@ Feature: page and task management
     Given registered user "Manager"
       And as user "Manager"
       And created contest "Test contest"
-      And created text page "Test text page"
+      And created quiz page "Test quiz page"
     When sets the page's points to 999
-    Then the page's text is now 999
+    Then the page's points is now 999
 
   Scenario: delete quiz task
     Given registered user "Manager"

@@ -25,6 +25,14 @@ def impl(context, contest_name):
     ).raise_for_status().json()["id"]
 
 
+@given('set contest {field} {value}')
+def impl(context, field, value):
+    get_client(context).patch(
+        f"v1/contests/{context.contest_id}/",
+        json={field: eval(value)}
+    )
+
+
 @when('sets contest {field} {value}')
 def impl(context, field, value):
     context.response = get_client(context).patch(
