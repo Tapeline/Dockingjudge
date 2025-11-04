@@ -32,6 +32,9 @@ jobs:
       - name: Sync
         working-directory: ./Tests
         run: uv sync
+      - name: Build Judgelet
+        working-directory: ./JudgeUnit
+        run: just build
       - name: Start containers
         working-directory: ./Tests
         run: just dep-up
