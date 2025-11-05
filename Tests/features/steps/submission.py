@@ -63,7 +63,7 @@ def _get_solution(context):
 @then("solution's verdict is {verdict}")
 def step_impl(context, verdict):
     solution = _get_solution(context)
-    assert solution["short_verdict"] == verdict
+    assert solution["short_verdict"] == verdict, solution["short_verdict"]
 
 
 @given('a contest with code task with test case (input "{inp}" output "{outp}")')
