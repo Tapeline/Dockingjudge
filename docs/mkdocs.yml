@@ -31,10 +31,8 @@ nav:
           - Text pages: reference/pages/text.md
           - Quiz tasks: reference/pages/quiz.md
           - Code tasks: reference/pages/code.md
-      - Solutions:
-          - Quiz solutions: reference/solutions/quiz.md
-          - Code solutions: reference/solutions/code.md
       - Checking:
+          - Solutions: reference/checking/solutions.md
           - Quiz validators declaration: reference/checking/quiz.md
           - Code test suites declaration: reference/checking/code.md
           - Running test suites: reference/checking/running_suites.md
@@ -116,6 +114,7 @@ plugins:
             signature_crossrefs: true
             show_symbol_type_heading: true
             show_symbol_type_toc: true
+            line_length: 79
 
 
 markdown_extensions:
