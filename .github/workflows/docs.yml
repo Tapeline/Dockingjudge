@@ -27,6 +27,7 @@ jobs:
           cd docs
           just gen-oas
           uv run mkdocs build
+          cp google6bb01b7bba8e712b.html site/google6bb01b7bba8e712b.html
       - name: Save artifact with build results
         id: deployment
         uses: actions/upload-pages-artifact@v3
