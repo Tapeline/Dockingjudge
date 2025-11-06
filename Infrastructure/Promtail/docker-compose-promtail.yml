@@ -1,0 +1,20 @@
+services:
+  promtail:
+    image: grafana/promtail:2.6.0
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/log:/var/log:ro
+    command: -config.file=/etc/promtail/promtail-config.yaml
+    restart: always
+    networks:
+      - monitoring_network
+      - main_network
+      - judgelet_network
+    configs:
+      - source: promtail_config
+        target: /etc/promtail/promtail-config.yaml
+
+
+configs:
+  promtail_config:
+    file: promtail-config.yml

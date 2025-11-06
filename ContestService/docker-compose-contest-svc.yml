@@ -1,0 +1,63 @@
+services:
+  contest_service:
+    build: .
+    hostname: contest.service
+    environment:
+      CONTEST_SVC_SECURITY__SECRET_KEY: ${SECRET_KEY}
+      CONTEST_SVC_POSTGRES__USERNAME: ${DB_USER}
+      CONTEST_SVC_POSTGRES__PASSWORD: ${DB_PASS}
+      CONTEST_SVC_POSTGRES__HOST: contest_db
+      CONTEST_SVC_POSTGRES__PORT: 5432
+      CONTEST_SVC_MODE: production
+      CONTEST_SVC_RABBIT__HOST: rabbitmq
+      CONTEST_SVC_RABBIT__USERNAME: ${RMQ_USER}
+      CONTEST_SVC_RABBIT__PASSWORD: ${RMQ_PASSWORD}
+      CONTEST_SVC_SERVICES__ACCOUNT_SERVICE: "http://account.service:8000/api/v1/accounts"
+    ports:
+      - "8002:8000"
+    expose:
+      - 8000
+    networks:
+      - main_network
+    configs:
+      - source: contest_service_cfg
+        target: /app/contest_service.yml
+    depends_on:
+      contest_db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      account_service:
+        condition: service_started
+
+  contest_db:
+    image: postgres:17.4
+    hostname: contest_db
+    environment:
+      POSTGRES_DB: contest_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    expose:
+      - "5432"
+    ports:
+      - "5501:5432"
+    networks:
+      - main_network
+    volumes:
+      - contest_pgdata:/var/lib/postgresql/
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d contest_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+
+volumes:
+  contest_pgdata:
+
+
+configs:
+  contest_service_cfg:
+    file: ./contest_service.yml

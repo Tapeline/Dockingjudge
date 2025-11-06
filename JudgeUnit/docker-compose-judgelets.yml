@@ -1,0 +1,30 @@
+#
+# Common judgelet configs
+#
+x-judgelet: &judgelet
+  image: dockingjudge-unit
+  expose: [ 8000 ]
+  environment:
+    IO_ENCODING: ${GLOBAL_ENCODING}
+  healthcheck:
+    test: curl --fail http://localhost:8000/ping || exit 1
+    interval: 10s
+    retries: 5
+    start_period: 10s
+    timeout: 10s
+  networks:
+    - judgelet_network
+
+
+#
+#  Services
+#
+services:
+  judgelet_0:
+    <<: *judgelet
+    ports:
+      - "9000:8000"
+  judgelet_1:
+    <<: *judgelet
+    ports:
+      - "9001:8000"

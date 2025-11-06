@@ -104,7 +104,7 @@ Dockingjudge consists of several services:
 - [x] Add metrics
     - [x] contest svc
     - [x] account svc
-- [ ] tidy up in docker-compose.yml
+- [x] tidy up in docker-compose.yml
 
 ### Second round
 

@@ -1,0 +1,60 @@
+services:
+  account_service:
+    build: .
+    hostname: account.service
+    environment:
+      ACCOUNT_SVC_SECURITY__SECRET_KEY: ${SECRET_KEY}
+      ACCOUNT_SVC_POSTGRES__USERNAME: ${DB_USER}
+      ACCOUNT_SVC_POSTGRES__PASSWORD: ${DB_PASS}
+      ACCOUNT_SVC_POSTGRES__HOST: account_db
+      ACCOUNT_SVC_POSTGRES__PORT: 5432
+      ACCOUNT_SVC_MODE: production
+      ACCOUNT_SVC_RABBIT__HOST: rabbitmq
+      ACCOUNT_SVC_RABBIT__USERNAME: ${RMQ_USER}
+      ACCOUNT_SVC_RABBIT__PASSWORD: ${RMQ_PASSWORD}
+    ports:
+      - "8001:8000"
+    expose:
+      - 8000
+    networks:
+      - main_network
+    configs:
+      - source: account_service_cfg
+        target: /app/account_service.yml
+    depends_on:
+      account_db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  account_db:
+    image: postgres:13.3
+    hostname: account_db
+    environment:
+      POSTGRES_DB: account_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - "5500:5432"
+    expose:
+      - "5432"
+    networks:
+      - main_network
+    volumes:
+      - account_pgdata:/var/lib/postgresql/
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d account_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+
+volumes:
+  account_pgdata:
+
+
+configs:
+  account_service_cfg:
+    file: ./account_service.yml

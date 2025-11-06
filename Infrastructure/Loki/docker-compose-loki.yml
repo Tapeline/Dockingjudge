@@ -1,0 +1,18 @@
+services:
+  loki:
+    image: grafana/loki
+    hostname: loki
+    command: -config.file=/etc/loki/loki-config.yaml
+    expose:
+      - 3100
+    restart: always
+    networks:
+      - monitoring_network
+    configs:
+      - source: loki_config
+        target: /etc/loki/loki-config.yaml
+
+
+configs:
+  loki_config:
+    file: config.yml

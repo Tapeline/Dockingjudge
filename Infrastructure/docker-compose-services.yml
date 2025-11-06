@@ -1,0 +1,66 @@
+include:
+  - ../AccountService/docker-compose-account-svc.yml
+  - ../ContestService/docker-compose-contest-svc.yml
+  - ../SolutionService/docker-compose-solution-svc.yml
+  - ../JudgeService/docker-compose-judge-svc.yml
+  - ../JudgeUnit/docker-compose-judgelets.yml
+
+
+services:
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    hostname: rabbitmq
+    restart: always
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RMQ_PASSWORD}
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: "-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    expose:
+      - "5672"
+      - "15672"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    networks:
+      - main_network
+
+  minio:
+    image: minio/minio:latest
+    command: server --console-address ":9001" /data/
+    hostname: minio
+    ports:
+      - "9900:9000"
+      - "9901:9001"
+    expose:
+      - 9000
+      - 9001
+    environment:
+      MINIO_ROOT_USER: ${MINIO_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_PASS}
+      MINIO_BROWSER_REFERRER_POLICY: "unsafe-url"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+    networks:
+      - main_network
+
+
+networks:
+  judgelet_network:
+    driver: bridge
+
+
+volumes:
+  rabbitmq_data:
+  minio_data:

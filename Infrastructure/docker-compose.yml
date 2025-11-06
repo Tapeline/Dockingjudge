@@ -1,0 +1,20 @@
+name: dockingjudge
+
+include:
+  - Nginx/docker-compose-nginx.yml
+  - docker-compose-services.yml
+  - docker-compose-monitoring.yml
+
+services:
+  frontend_service:
+    build: ../Frontend
+    hostname: frontend.service
+    expose:
+      - 3000
+    networks:
+      - main_network
+
+
+networks:
+  main_network:
+    driver: bridge

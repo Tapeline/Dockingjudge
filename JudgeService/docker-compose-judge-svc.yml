@@ -1,0 +1,34 @@
+services:
+  judge_service:
+    hostname: judge_service
+    build: .
+    environment:
+      JUDGE_SVC_RABBITMQ__HOST: rabbitmq
+      JUDGE_SVC_RABBITMQ__USERNAME: ${RMQ_USER}
+      JUDGE_SVC_RABBITMQ__PASSWORD: ${RMQ_PASSWORD}
+      JUDGE_SVC_S3__BASE_URL: http://minio:9000
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      judgelet_0:
+        condition: service_healthy
+      judgelet_1:
+        condition: service_healthy
+    links:
+      - rabbitmq
+    configs:
+      - source: judge_service_prod_config
+        target: /app/config.yml
+    networks:
+      - main_network
+      - judgelet_network
+
+
+networks:
+  judgelet_network:
+    driver: bridge
+
+
+configs:
+  judge_service_prod_config:
+    file: ./config.prod.yml

@@ -1,0 +1,74 @@
+services:
+  solution_service:
+    build: .
+    hostname: solution.service
+    environment:
+      SOLUTION_SVC_POSTGRES__USER: ${DB_USER}
+      SOLUTION_SVC_POSTGRES__PASS: ${DB_PASS}
+      SOLUTION_SVC_POSTGRES__HOST: solution_db
+      SOLUTION_SVC_POSTGRES__PORT: 5432
+      SOLUTION_SVC_POSTGRES__NAME: solution_db
+      SOLUTION_SVC_MODE: production
+      SOLUTION_SVC_DEBUG_MODE: True
+      SOLUTION_SVC_RABBITMQ__HOST: rabbitmq
+      SOLUTION_SVC_RABBITMQ__USER: ${RMQ_USER}
+      SOLUTION_SVC_RABBITMQ__PASS: ${RMQ_PASSWORD}
+      SOLUTION_SVC_ENCODING: ${GLOBAL_ENCODING}
+      SOLUTION_SVC_SERVICES__ACCOUNT_SERVICE: "http://account.service:8000/api/v1/accounts"
+      SOLUTION_SVC_SERVICES__CONTEST_SERVICE: "http://contest.service:8000/api/v1"
+      SOLUTION_SVC_SERVICES__CONTEST_SERVICE_INTERNAL: "http://contest.service:8000/internal"
+      SOLUTION_SVC_S3__HOST: "http://minio"
+      SOLUTION_SVC_S3__PORT: 9000
+      SOLUTION_SVC_S3__USER: ${MINIO_USER}
+      SOLUTION_SVC_S3__PASS: ${MINIO_PASS}
+      SOLUTION_SVC_ALLOWED_HOSTS: "*"
+    ports:
+      - "8003:8000"
+    expose:
+      - 8000
+    networks:
+      - main_network
+    configs:
+      - source: solution_service_cfg
+        target: /app/solution_service.yml
+    depends_on:
+      solution_db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      account_service:
+        condition: service_started
+      contest_service:
+        condition: service_started
+
+  solution_db:
+    image: postgres:13.3
+    hostname: solution_db
+    environment:
+      POSTGRES_DB: solution_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    expose:
+      - "5432"
+    ports:
+      - "5503:5432"
+    networks:
+      - main_network
+    volumes:
+      - solution_pgdata:/var/lib/postgresql/
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d solution_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
+
+volumes:
+  solution_pgdata:
+
+
+configs:
+  solution_service_cfg:
+    file: ./solution_service.yml

@@ -46,9 +46,8 @@ jobs:
         working-directory: ./JudgeUnit
         run: just build
       - name: Start containers
-        working-directory: ./Tests
         run: |
-          just dep-up
+          just up
           sleep 10
       - name: Check
         run: curl http://localhost:8888/api/v1/accounts/ping/

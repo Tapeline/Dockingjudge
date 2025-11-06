@@ -1,0 +1,40 @@
+services:
+  prometheus:
+    image: prom/prometheus:v2.38.0
+    hostname: prometheus
+    volumes:
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    restart: always
+    expose:
+      - 9090
+    ports:
+      - "9090:9090"
+    networks:
+      - monitoring_network
+      - main_network
+      - judgelet_network
+    labels:
+      org.label-schema.group: "monitoring"
+    configs:
+      - source: prometheus_config
+        target: /etc/prometheus/prometheus.yml
+      - source: prometheus_alert_rules_config
+        target: /etc/prometheus/alert.rules
+
+
+volumes:
+  prometheus_data:
+
+
+configs:
+  prometheus_config:
+    file: prometheus.yml
+  prometheus_alert_rules_config:
+    file: alert.rules

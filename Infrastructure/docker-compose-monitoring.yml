@@ -1,0 +1,67 @@
+include:
+  - Grafana/docker-compose-grafana.yml
+  - Loki/docker-compose-loki.yml
+  - Prometheus/docker-compose-prometheus.yml
+  - Promtail/docker-compose-promtail.yml
+
+services:
+  nodeexporter:
+    image: prom/node-exporter:v1.3.1
+    hostname: nodeexporter
+    container_name: nodeexporter
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    restart: always
+    expose:
+      - 9100
+    networks:
+      - monitoring_network
+    labels:
+      org.label-schema.group: "monitoring"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:v0.52.1
+    container_name: cadvisor
+    hostname: cadvisor
+    privileged: true
+    ports:
+      - "3200:8080"
+    devices:
+      - /dev/kmsg:/dev/kmsg
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /etc/machine-id:/etc/machine-id:ro
+    restart: always
+    expose:
+      - 8080
+    networks:
+      - monitoring_network
+    labels:
+      org.label-schema.group: "monitoring"
+
+  nginx-prometheus-exporter:
+    image: nginx/nginx-prometheus-exporter:1.0
+    container_name: prometheus-nginx-exporter
+    hostname: promexporter.service
+    restart: always
+    command:
+      - -nginx.scrape-uri=http://api.service:4000/nginx_status
+    expose:
+      - 9113
+    networks:
+      - main_network
+
+
+networks:
+  monitoring_network:
+    driver: bridge

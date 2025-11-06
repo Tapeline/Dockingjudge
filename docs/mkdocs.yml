@@ -68,8 +68,10 @@ nav:
           - Description: services/frontend/description.md
           - Configuration: services/frontend/config.md
   - Contributing:
-      - Guidelines: contributing/guidelines.md
-      - Working on the codebase: contributing/working.md
+      - How to contribute: contributing/howto.md
+      - Codebase structure: contributing/structure.md
+      - Contributing to documentation: contributing/documentation.md
+      - AI usage: contributing/ai.md
 theme:
   name: material2014
   primary_color: "#2F24C1"
