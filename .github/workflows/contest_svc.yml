@@ -70,7 +70,7 @@ jobs:
         run: uv sync --group test
 
       - name: Start dependencies
-        run: docker compose up -d account_service contest_db
+        run: just up account_service contest_db
 
       - id: integration_test
         working-directory: ./ContestService
