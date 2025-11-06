@@ -3,6 +3,16 @@ name: Run tests
 on:
   push:
     branches: ["develop", "master"]
+    paths:
+      - "AccountService/**"
+      - "ContestService/**"
+      - "SolutionService/**"
+      - "JudgeService/**"
+      - "JudgeUnit/**"
+      - "Frontend/**"
+      - "Tests/**"
+      - "docker-compose.yml"
+      - "api_gateway_nginx.conf"
   workflow_dispatch:
 
 
