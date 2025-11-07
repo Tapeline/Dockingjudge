@@ -8,6 +8,7 @@ RUN apk add curl
 RUN apk add uv
 RUN apk add g++ gcc python3-dev musl-dev linux-headers
 RUN apk add git
+RUN apk add bubblewrap
 
 RUN addgroup -S limgroup
 RUN adduser -S limited -G limgroup
@@ -15,6 +16,8 @@ RUN chown limited:limgroup /app
 
 COPY --chown=limited:limgroup . .
 RUN chmod +x ./start.sh
+
+RUN python3 -m pip install psutil
 
 USER limited
 

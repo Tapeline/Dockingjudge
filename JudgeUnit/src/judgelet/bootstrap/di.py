@@ -11,7 +11,7 @@ from judgelet.infrastructure.filesystem import RealFileSystem
 from judgelet.infrastructure.languages.factory import (
     DefaultLanguageBackendFactory,
 )
-from judgelet.infrastructure.sandboxes.simple import SimpleSandboxFactory
+from judgelet.infrastructure.sandboxes.types import get_sandbox_factory
 
 
 class AppProvider(Provider):
@@ -23,11 +23,9 @@ class AppProvider(Provider):
         scope=Scope.APP,
     )
 
-    sandbox_factory = provide(
-        SimpleSandboxFactory,
-        provides=SandboxFactory,
-        scope=Scope.APP,
-    )
+    @provide(scope=Scope.APP)
+    def provide_sandbox_factory(self, config: Config) -> SandboxFactory:
+        return get_sandbox_factory(config.sandbox)
 
     @provide(scope=Scope.APP)
     def provide_fs(self) -> FileSystem:

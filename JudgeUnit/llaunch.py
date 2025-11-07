@@ -35,6 +35,7 @@ def _will_terminate_by_memory_limit(mem_limit_bytes: int) -> bool:
     mem_bytes = proc.memory_info().rss
     return mem_bytes > mem_limit_bytes
 
+
 def _kill_process() -> None:
     process.kill()
 

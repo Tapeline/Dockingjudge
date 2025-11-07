@@ -1,2 +1,3 @@
 debug_mode: true
 enable_lock: true
+sandbox: bubblewrap

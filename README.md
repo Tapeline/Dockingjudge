@@ -70,13 +70,10 @@ Dockingjudge consists of several services:
 
 ### First round
 
-- [ ] More security on judgelet
+- [x] More security on judgelet
     - [x] run judgelet as non-root
-    - [ ] run solutions as different users
-    - [ ] utilize chown and chmod to protect non-solution files
-    - [ ] (maybe) introduce bubblewrap
+    - [x] (maybe) introduce bubblewrap
 - [x] Add more compilers (at least cpp)
-- [ ] deploy from ghcr.io
 - [x] Add tests
     - [x] judgelet
     - [x] judge svc
@@ -96,15 +93,16 @@ Dockingjudge consists of several services:
     - [x] solution svc
     - [x] contest svc
     - [x] account svc
+- [x] Add metrics
+    - [x] contest svc
+    - [x] account svc
+- [x] tidy up in docker-compose.yml
+- [ ] deploy from ghcr.io
 - [ ] Add struct logging
     - [x] solution svc
     - [ ] contest svc
     - [ ] account svc
     - [ ] judge svc
-- [x] Add metrics
-    - [x] contest svc
-    - [x] account svc
-- [x] tidy up in docker-compose.yml
 
 ### Second round
 
