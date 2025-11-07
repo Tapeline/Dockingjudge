@@ -12,7 +12,13 @@ postgres:
   password: pgpass
 
 security:
-  allowed_hosts: ["*"]
+  allowed_hosts:
+    - "*"
+    - "contest.service:8000"
+    - "contest.service"
+    - "dockingjudge.tapeline.dev"
+    - "localhost"
+    - "127.0.0.1"
 
 services:
   account_service: "http://localhost:8001/api/v1/accounts"
