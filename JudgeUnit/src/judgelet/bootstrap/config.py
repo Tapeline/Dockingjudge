@@ -6,6 +6,6 @@ from judgelet.config import Config
 
 judgelet_config_loader = config_loader(
     YamlSource("judgelet.yml"),
-    EnvSource(prefix="JUDGELET_"),
+    EnvSource(prefix="JUDGELET_", sep="__"),
     config=Config,
 )
