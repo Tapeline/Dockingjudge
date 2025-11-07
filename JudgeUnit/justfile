@@ -24,7 +24,7 @@ __test_integration:
   docker rm -f judgelet-integration-testing
 
 __test_container:
-  docker run -d --name judgelet-container-testing -p 9090:8000 dockingjudge-unit
+  docker run -d --cap-add=SYS_ADMIN --name judgelet-container-testing -p 9090:8000 dockingjudge-unit
   sleep 8
   uv run pytest tests/container -vvv
   docker rm -f judgelet-container-testing

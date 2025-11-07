@@ -8,6 +8,9 @@ set shell := ["sh", "-c"]
 up *PARAMS:
     docker compose -f Infrastructure/docker-compose.yml up -d {{PARAMS}}
 
+up-ci *PARAMS:
+    docker compose -f Infrastructure/docker-compose.yml -f Infrastructure/docker-compose-ci.yml up -d {{PARAMS}}
+
 down *PARAMS:
     docker compose -f Infrastructure/docker-compose.yml down {{PARAMS}}
 
