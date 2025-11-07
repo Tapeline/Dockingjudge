@@ -1,9 +1,0 @@
-# shall only be used for testing purposes
-
-services:
-  judgelet_0:
-    cap_add:
-      - SYS_ADMIN
-  judgelet_1:
-    cap_add:
-      - SYS_ADMIN
