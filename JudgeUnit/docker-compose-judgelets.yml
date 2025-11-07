@@ -5,7 +5,8 @@ x-judgelet: &judgelet
   image: dockingjudge-unit
   expose: [ 8000 ]
   environment:
-    IO_ENCODING: ${GLOBAL_ENCODING}
+    JUDGELET_SANDBOX: ${JUDGELET_SANDBOX}
+
   healthcheck:
     test: curl --fail http://localhost:8000/ping || exit 1
     interval: 10s

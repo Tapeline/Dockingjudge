@@ -53,4 +53,6 @@ jobs:
         run: curl http://localhost:8888/api/v1/accounts/ping/
       - name: Run tests
         working-directory: ./Tests
-        run: just test
+        run: |
+          export JUDGELET_SANDBOX=simple 
+          just test

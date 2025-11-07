@@ -8,11 +8,7 @@ from fuente.sources.yaml import YamlSource
 from judgelet.config import Config
 
 judgelet_config_loader = config_loader(
-    EnvSource(prefix="JUDGELET_"),
     YamlSource("judgelet.yml"),
-    recipe=[
-        merge(P[Config].debug_mode, UseFirst()),
-        merge(P[Config].enable_lock, UseFirst()),
-    ],
+    EnvSource(prefix="JUDGELET_"),
     config=Config,
 )

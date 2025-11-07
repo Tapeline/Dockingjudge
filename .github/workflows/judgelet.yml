@@ -94,7 +94,9 @@ jobs:
       - id: container_test
         working-directory: ./JudgeUnit
         continue-on-error: true
-        run: just test container
+        run: |
+          export JUDGELET_SANDBOX=simple
+          just test container
 
       - name: Check test status
         if: always()
