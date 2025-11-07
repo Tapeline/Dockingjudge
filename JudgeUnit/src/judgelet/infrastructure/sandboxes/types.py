@@ -1,15 +1,12 @@
 from types import MappingProxyType
-
 from typing import Final
 
 from judgelet.application.interfaces import SandboxFactory
 from judgelet.config import SandboxType
-from judgelet.infrastructure.sandboxes.simple import (
-    SimpleSandboxFactory
-)
 from judgelet.infrastructure.sandboxes.bubblewrap import (
-    BubblewrapSandboxFactory
+    BubblewrapSandboxFactory,
 )
+from judgelet.infrastructure.sandboxes.simple import SimpleSandboxFactory
 
 _SANDBOXES: Final = MappingProxyType({
     SandboxType.SIMPLE: SimpleSandboxFactory,

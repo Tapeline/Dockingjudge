@@ -1,9 +1,10 @@
-from enum import StrEnum
-
 from dataclasses import dataclass
+from enum import StrEnum
 
 
 class SandboxType(StrEnum):
+    """Sandbox types."""
+
     SIMPLE = "simple"
     BUBBLEWRAP = "bubblewrap"
 
@@ -18,6 +19,7 @@ class Config:
         enable_lock: if set to True, then only one solution at a time
             could be executed on this judgelet.
         sandbox: what sandbox type to use.
+
     """
 
     debug_mode: bool = True

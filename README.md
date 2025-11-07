@@ -98,11 +98,6 @@ Dockingjudge consists of several services:
     - [x] account svc
 - [x] tidy up in docker-compose.yml
 - [ ] deploy from ghcr.io
-- [ ] Add struct logging
-    - [x] solution svc
-    - [ ] contest svc
-    - [ ] account svc
-    - [ ] judge svc
 
 ### Second round
 

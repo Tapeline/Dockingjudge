@@ -1,5 +1,4 @@
-import os.path
-
+import os
 import shutil
 import sys
 import time
@@ -45,7 +44,7 @@ class BubblewrapSandbox(Sandbox):
         )
         final_cmd = _get_command(
             sys.platform, timeout_s, memory_limit_mb, clean_command,
-            self.sandbox_dir
+            self.sandbox_dir,
         )
         self.log.info("Final cmd: %s", final_cmd)
         start = time.time()
@@ -98,7 +97,7 @@ def _get_command(
     mem_limit: float,
     target: str,
     sandbox_dir: str,
-):
+) -> str:
     py_cmd = _get_py_command(platform, time_limit, mem_limit, target)
     if platform == "win32":
         return py_cmd
